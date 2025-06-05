@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory - HMS Pharmacy</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #fd7e14 0%, #e83e8c 100%);
+        }
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 0.75rem 1rem;
+            margin: 0.25rem 0;
+            border-radius: 0.5rem;
+        }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            color: white;
+            background-color: rgba(255,255,255,0.1);
+        }
+        .main-content {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+        .feature-card {
+            transition: transform 0.2s;
+        }
+        .feature-card:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar p-3">
+                <div class="d-flex align-items-center mb-4">
+                    <i class="fas fa-boxes text-white me-2"></i>
+                    <h5 class="text-white mb-0">HMS Pharmacy</h5>
+                </div>
+
+                <nav class="nav flex-column">
+                    <a class="nav-link" href="/dashboard.html">
+                        <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                    </a>
+                    <!-- Role-specific navigation will be added here -->
+                    <hr class="text-white-50">
+                    <a class="nav-link" href="#" onclick="logout()">
+                        <i class="fas fa-sign-out-alt me-2"></i> Logout
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 main-content p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2><i class="fas fa-boxes me-2"></i>Medication Inventory</h2>
+                    <button class="btn btn-outline-primary" onclick="refreshPage()">
+                        <i class="fas fa-sync-alt me-2"></i>Refresh
+                    </button>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card bg-primary text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h6 class="card-title">Total Medications</h6>
+                                        <h3 id="totalMedications">0</h3>
+                                    </div>
+                                    <div class="align-self-center">
+                                        <i class="fas fa-pills fa-2x"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-warning text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h6 class="card-title">Low Stock</h6>
+                                        <h3 id="lowStockCount">0</h3>
+                                    </div>
+                                    <div class="align-self-center">
+                                        <i class="fas fa-exclamation-triangle fa-2x"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-danger text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h6 class="card-title">Out of Stock</h6>
+                                        <h3 id="outOfStockCount">0</h3>
+                                    </div>
+                                    <div class="align-self-center">
+                                        <i class="fas fa-times-circle fa-2x"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-info text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h6 class="card-title">Expiring Soon</h6>
+                                        <h3 id="expiringSoonCount">0</h3>
+                                    </div>
+                                    <div class="align-self-center">
+                                        <i class="fas fa-calendar-times fa-2x"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Inventory Management -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-boxes me-2"></i>Medication Inventory
+                                </h5>
+                                <div>
+                                    <button class="btn btn-success btn-sm me-2" onclick="showAddMedicationModal()">
+                                        <i class="fas fa-plus me-1"></i>Add Medication
+                                    </button>
+                                    <button class="btn btn-outline-info btn-sm me-2" onclick="exportInventory()">
+                                        <i class="fas fa-download me-1"></i>Export
+                                    </button>
+                                    <button class="btn btn-outline-primary btn-sm" onclick="refreshInventory()">
+                                        <i class="fas fa-sync-alt me-1"></i>Refresh
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <!-- Filters -->
+                                <div class="row mb-3">
+                                    <div class="col-md-3">
+                                        <select class="form-select" id="stockStatusFilter">
+                                            <option value="">All Stock Levels</option>
+                                            <option value="in_stock">In Stock</option>
+                                            <option value="low_stock">Low Stock</option>
+                                            <option value="out_of_stock">Out of Stock</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <select class="form-select" id="categoryFilter">
+                                            <option value="">All Categories</option>
+                                            <option value="antibiotics">Antibiotics</option>
+                                            <option value="pain_relief">Pain Relief</option>
+                                            <option value="cardiovascular">Cardiovascular</option>
+                                            <option value="diabetes">Diabetes</option>
+                                            <option value="other">Other</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="text" class="form-control" id="medicationSearch" placeholder="Search medications...">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-check mt-2">
+                                            <input class="form-check-input" type="checkbox" id="expiringSoonFilter">
+                                            <label class="form-check-label" for="expiringSoonFilter">
+                                                Expiring within 30 days
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Inventory Table -->
+                                <div class="table-responsive">
+                                    <table class="table table-striped" id="inventoryTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Medication</th>
+                                                <th>Brand</th>
+                                                <th>Category</th>
+                                                <th>Current Stock</th>
+                                                <th>Min Level</th>
+                                                <th>Unit Price</th>
+                                                <th>Expiry Date</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="inventoryTableBody">
+                                            <tr>
+                                                <td colspan="9" class="text-center">
+                                                    <div class="spinner-border text-primary" role="status">
+                                                        <span class="visually-hidden">Loading...</span>
+                                                    </div>
+                                                    <p class="mt-2">Loading inventory...</p>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Authentication check
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+        if (!token || user.role !== 'pharmacist') {
+            window.location.href = '/login.html';
+        }
+
+        let allInventory = [];
+
+        // Load inventory on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadInventory();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            // Filter event listeners
+            document.getElementById('stockStatusFilter').addEventListener('change', filterInventory);
+            document.getElementById('categoryFilter').addEventListener('change', filterInventory);
+            document.getElementById('medicationSearch').addEventListener('input', filterInventory);
+            document.getElementById('expiringSoonFilter').addEventListener('change', filterInventory);
+        }
+
+        async function loadInventory() {
+            try {
+                // Since we don't have a dedicated inventory endpoint, we'll use medications
+                const response = await fetch('/medication', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const medications = await response.json();
+                    // Add mock inventory data to medications
+                    allInventory = medications.map(med => ({
+                        ...med,
+                        current_stock: Math.floor(Math.random() * 200) + 10,
+                        min_level: Math.floor(Math.random() * 20) + 5,
+                        unit_price: (Math.random() * 50 + 5).toFixed(2),
+                        expiry_date: new Date(Date.now() + Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                        category: getRandomCategory()
+                    }));
+
+                    displayInventory(allInventory);
+                    updateQuickStats(allInventory);
+                } else {
+                    throw new Error('Failed to load inventory');
+                }
+            } catch (error) {
+                console.error('Error loading inventory:', error);
+                showError('Failed to load inventory');
+            }
+        }
+
+        function getRandomCategory() {
+            const categories = ['antibiotics', 'pain_relief', 'cardiovascular', 'diabetes', 'other'];
+            return categories[Math.floor(Math.random() * categories.length)];
+        }
+
+        function displayInventory(inventory) {
+            const tbody = document.getElementById('inventoryTableBody');
+
+            if (inventory.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="9" class="text-center py-4">
+                            <i class="fas fa-info-circle text-muted fa-2x mb-2"></i>
+                            <p class="text-muted">No medications found in inventory</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = inventory.map(item => `
+                <tr class="${getRowClass(item)}">
+                    <td>
+                        <strong>${item.name}</strong>
+                        <br><small class="text-muted">${item.description || 'No description'}</small>
+                    </td>
+                    <td>${item.brand || 'Generic'}</td>
+                    <td>
+                        <span class="badge bg-light text-dark">${formatCategory(item.category)}</span>
+                    </td>
+                    <td>
+                        <span class="fw-bold ${getStockClass(item.current_stock, item.min_level)}">
+                            ${item.current_stock}
+                        </span>
+                    </td>
+                    <td>${item.min_level}</td>
+                    <td>$${item.unit_price}</td>
+                    <td>
+                        <span class="${getExpiryClass(item.expiry_date)}">
+                            ${formatDate(item.expiry_date)}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge ${getStatusBadgeClass(item.current_stock, item.min_level, item.expiry_date)}">
+                            ${getStatusText(item.current_stock, item.min_level, item.expiry_date)}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-primary" onclick="editMedication(${item.code})" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-outline-success" onclick="addStock(${item.code})" title="Add Stock">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                            <button class="btn btn-outline-warning" onclick="adjustStock(${item.code})" title="Adjust Stock">
+                                <i class="fas fa-adjust"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateQuickStats(inventory) {
+            const total = inventory.length;
+            const lowStock = inventory.filter(item => item.current_stock <= item.min_level && item.current_stock > 0).length;
+            const outOfStock = inventory.filter(item => item.current_stock === 0).length;
+            const expiringSoon = inventory.filter(item => isExpiringSoon(item.expiry_date)).length;
+
+            document.getElementById('totalMedications').textContent = total;
+            document.getElementById('lowStockCount').textContent = lowStock;
+            document.getElementById('outOfStockCount').textContent = outOfStock;
+            document.getElementById('expiringSoonCount').textContent = expiringSoon;
+        }
+
+        function filterInventory() {
+            const stockStatusFilter = document.getElementById('stockStatusFilter').value;
+            const categoryFilter = document.getElementById('categoryFilter').value;
+            const medicationSearch = document.getElementById('medicationSearch').value.toLowerCase();
+            const expiringSoonFilter = document.getElementById('expiringSoonFilter').checked;
+
+            let filteredInventory = allInventory.filter(item => {
+                const matchesStockStatus = !stockStatusFilter || getStockStatus(item.current_stock, item.min_level) === stockStatusFilter;
+                const matchesCategory = !categoryFilter || item.category === categoryFilter;
+                const matchesSearch = !medicationSearch ||
+                    item.name.toLowerCase().includes(medicationSearch) ||
+                    (item.brand && item.brand.toLowerCase().includes(medicationSearch));
+                const matchesExpiring = !expiringSoonFilter || isExpiringSoon(item.expiry_date);
+
+                return matchesStockStatus && matchesCategory && matchesSearch && matchesExpiring;
+            });
+
+            displayInventory(filteredInventory);
+        }
+
+        function getStockStatus(currentStock, minLevel) {
+            if (currentStock === 0) return 'out_of_stock';
+            if (currentStock <= minLevel) return 'low_stock';
+            return 'in_stock';
+        }
+
+        function getRowClass(item) {
+            if (item.current_stock === 0) return 'table-danger';
+            if (item.current_stock <= item.min_level) return 'table-warning';
+            if (isExpiringSoon(item.expiry_date)) return 'table-info';
+            return '';
+        }
+
+        function getStockClass(currentStock, minLevel) {
+            if (currentStock === 0) return 'text-danger';
+            if (currentStock <= minLevel) return 'text-warning';
+            return 'text-success';
+        }
+
+        function getExpiryClass(expiryDate) {
+            if (isExpiringSoon(expiryDate)) return 'text-warning fw-bold';
+            return '';
+        }
+
+        function getStatusBadgeClass(currentStock, minLevel, expiryDate) {
+            if (currentStock === 0) return 'bg-danger';
+            if (currentStock <= minLevel) return 'bg-warning';
+            if (isExpiringSoon(expiryDate)) return 'bg-info';
+            return 'bg-success';
+        }
+
+        function getStatusText(currentStock, minLevel, expiryDate) {
+            if (currentStock === 0) return 'Out of Stock';
+            if (currentStock <= minLevel) return 'Low Stock';
+            if (isExpiringSoon(expiryDate)) return 'Expiring Soon';
+            return 'In Stock';
+        }
+
+        function isExpiringSoon(expiryDate) {
+            if (!expiryDate) return false;
+            const expiry = new Date(expiryDate);
+            const thirtyDaysFromNow = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+            return expiry <= thirtyDaysFromNow;
+        }
+
+        function formatCategory(category) {
+            return category.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            return new Date(dateString).toLocaleDateString();
+        }
+
+        function showAddMedicationModal() {
+            // Create and show modal for adding new medication
+            const modalHtml = `
+                <div class="modal fade" id="addMedicationModal" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Add New Medication</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="addMedicationForm">
+                                    <div class="mb-3">
+                                        <label class="form-label">Medication Name *</label>
+                                        <input type="text" class="form-control" id="newMedName" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Brand</label>
+                                        <input type="text" class="form-control" id="newMedBrand">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Category *</label>
+                                        <select class="form-select" id="newMedCategory" required>
+                                            <option value="">Select Category</option>
+                                            <option value="antibiotics">Antibiotics</option>
+                                            <option value="pain_relief">Pain Relief</option>
+                                            <option value="cardiovascular">Cardiovascular</option>
+                                            <option value="diabetes">Diabetes</option>
+                                            <option value="other">Other</option>
+                                        </select>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Initial Stock *</label>
+                                                <input type="number" class="form-control" id="newMedStock" required min="0">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Minimum Level *</label>
+                                                <input type="number" class="form-control" id="newMedMinLevel" required min="1">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Unit Price *</label>
+                                                <input type="number" class="form-control" id="newMedPrice" required min="0" step="0.01">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Expiry Date *</label>
+                                                <input type="date" class="form-control" id="newMedExpiry" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Description</label>
+                                        <textarea class="form-control" id="newMedDescription" rows="2"></textarea>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-success" onclick="addNewMedication()">Add Medication</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Remove existing modal if any
+            const existingModal = document.getElementById('addMedicationModal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+
+            // Add modal to body and show
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            const modal = new bootstrap.Modal(document.getElementById('addMedicationModal'));
+            modal.show();
+        }
+
+        function addNewMedication() {
+            const form = document.getElementById('addMedicationForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const medicationData = {
+                name: document.getElementById('newMedName').value,
+                brand: document.getElementById('newMedBrand').value,
+                category: document.getElementById('newMedCategory').value,
+                current_stock: parseInt(document.getElementById('newMedStock').value),
+                min_level: parseInt(document.getElementById('newMedMinLevel').value),
+                unit_price: parseFloat(document.getElementById('newMedPrice').value),
+                expiry_date: document.getElementById('newMedExpiry').value,
+                description: document.getElementById('newMedDescription').value
+            };
+
+            // Mock adding medication (in real app, this would be an API call)
+            const newMedication = {
+                ...medicationData,
+                code: Date.now(), // Mock ID
+            };
+
+            allInventory.push(newMedication);
+            displayInventory(allInventory);
+            updateQuickStats(allInventory);
+
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('addMedicationModal'));
+            modal.hide();
+
+            showSuccess('Medication added successfully');
+        }
+
+        function editMedication(medicationCode) {
+            const medication = allInventory.find(med => med.code === medicationCode);
+            if (medication) {
+                showInfo(`Edit functionality for ${medication.name} would be implemented here`);
+            }
+        }
+
+        function addStock(medicationCode) {
+            const quantity = prompt('Enter quantity to add:');
+            if (quantity && !isNaN(quantity) && parseInt(quantity) > 0) {
+                const medication = allInventory.find(med => med.code === medicationCode);
+                if (medication) {
+                    medication.current_stock += parseInt(quantity);
+                    displayInventory(allInventory);
+                    updateQuickStats(allInventory);
+                    showSuccess(`Added ${quantity} units to ${medication.name}`);
+                }
+            }
+        }
+
+        function adjustStock(medicationCode) {
+            const newQuantity = prompt('Enter new stock quantity:');
+            if (newQuantity && !isNaN(newQuantity) && parseInt(newQuantity) >= 0) {
+                const medication = allInventory.find(med => med.code === medicationCode);
+                if (medication) {
+                    medication.current_stock = parseInt(newQuantity);
+                    displayInventory(allInventory);
+                    updateQuickStats(allInventory);
+                    showSuccess(`Stock adjusted for ${medication.name}`);
+                }
+            }
+        }
+
+        function exportInventory() {
+            const csvContent = generateInventoryCSV(allInventory);
+            downloadCSV(csvContent, 'inventory.csv');
+        }
+
+        function generateInventoryCSV(inventory) {
+            const headers = ['Medication', 'Brand', 'Category', 'Current Stock', 'Min Level', 'Unit Price', 'Expiry Date', 'Status'];
+            const csvRows = [headers.join(',')];
+
+            inventory.forEach(item => {
+                const row = [
+                    `"${item.name}"`,
+                    `"${item.brand || 'Generic'}"`,
+                    item.category,
+                    item.current_stock,
+                    item.min_level,
+                    item.unit_price,
+                    item.expiry_date,
+                    getStatusText(item.current_stock, item.min_level, item.expiry_date)
+                ];
+                csvRows.push(row.join(','));
+            });
+
+            return csvRows.join('\n');
+        }
+
+        function downloadCSV(csvContent, filename) {
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            if (link.download !== undefined) {
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', filename);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        }
+
+        function refreshInventory() {
+            loadInventory();
+        }
+
+        function refreshPage() {
+            location.reload();
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/login.html';
+        }
+
+        // Notification functions
+        function showSuccess(message) {
+            showNotification(message, 'success');
+        }
+
+        function showError(message) {
+            showNotification(message, 'danger');
+        }
+
+        function showInfo(message) {
+            showNotification(message, 'info');
+        }
+
+        function showNotification(message, type) {
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            alert.style.top = '20px';
+            alert.style.right = '20px';
+            alert.style.zIndex = '9999';
+            alert.style.minWidth = '300px';
+            alert.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'danger' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alert);
+
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (alert.parentNode) {
+                    alert.remove();
+                }
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

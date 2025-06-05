@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Care - Nurse Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #198754 0%, #146c43 100%);
+            color: white;
+            padding: 1rem 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .nav-breadcrumb {
+            background: white;
+            padding: 1rem 2rem;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .main-content {
+            padding: 0 2rem;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, #198754 0%, #146c43 100%);
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
+            padding: 1rem 1.5rem;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #198754 0%, #146c43 100%);
+            border: none;
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+            transition: transform 0.2s;
+        }
+        
+        .btn-success:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg, #157347 0%, #0f5132 100%);
+        }
+        
+        .patient-status {
+            font-weight: 500;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+        }
+        
+        .status-stable { background-color: #d1e7dd; color: #0f5132; }
+        .status-critical { background-color: #f8d7da; color: #721c24; }
+        .status-monitoring { background-color: #fff3cd; color: #664d03; }
+        .status-recovering { background-color: #cff4fc; color: #055160; }
+        
+        .priority-high { color: #dc3545; font-weight: bold; }
+        .priority-medium { color: #fd7e14; font-weight: bold; }
+        .priority-low { color: #198754; font-weight: bold; }
+        
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #198754;
+        }
+        
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+        
+        .vital-signs {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 0.5rem;
+        }
+        
+        .vital-item {
+            background: #f8f9fa;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+        }
+        
+        .room-badge {
+            background: #e9ecef;
+            color: #495057;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body class="protected-page">
+    <!-- Header -->
+    <div class="header">
+        <h1>
+            <i class="fas fa-user-nurse"></i>
+            Patient Care Management
+        </h1>
+    </div>
+
+    <!-- Breadcrumb -->
+    <div class="nav-breadcrumb">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="/dashboard.html">Dashboard</a></li>
+                <li class="breadcrumb-item active">Patient Care</li>
+            </ol>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Alert Messages -->
+        <div id="alertContainer"></div>
+
+        <!-- Quick Stats -->
+        <div class="quick-stats">
+            <div class="stat-card">
+                <div class="stat-number" id="assignedPatients">0</div>
+                <div class="stat-label">Assigned Patients</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="criticalPatients">0</div>
+                <div class="stat-label">Critical Patients</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="vitalsToday">0</div>
+                <div class="stat-label">Vitals Recorded Today</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="medicationsDue">0</div>
+                <div class="stat-label">Medications Due</div>
+            </div>
+        </div>
+
+        <!-- Patients Table -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-users me-2"></i>
+                    My Assigned Patients
+                </h5>
+                <div class="d-flex gap-2">
+                    <select class="form-select form-select-sm" id="statusFilter" style="width: auto;">
+                        <option value="">All Status</option>
+                        <option value="stable">Stable</option>
+                        <option value="critical">Critical</option>
+                        <option value="monitoring">Monitoring</option>
+                        <option value="recovering">Recovering</option>
+                    </select>
+                    <button class="btn btn-light btn-sm" onclick="showVitalSignsModal()">
+                        <i class="fas fa-heartbeat me-1"></i>
+                        Record Vitals
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="loadingIndicator" class="text-center py-4">
+                    <i class="fas fa-spinner fa-spin fa-2x text-success"></i>
+                    <p class="mt-3">Loading patients...</p>
+                </div>
+                
+                <div id="patientsTableContainer" style="display: none;">
+                    <table id="patientsTable" class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Patient</th>
+                                <th>Room</th>
+                                <th>Status</th>
+                                <th>Last Vitals</th>
+                                <th>Medications</th>
+                                <th>Assigned Doctor</th>
+                                <th>Priority</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="patientsTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vital Signs Modal -->
+    <div class="modal fade" id="vitalSignsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-heartbeat me-2"></i>
+                        Record Vital Signs
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="vitalSignsForm">
+                        <div class="mb-3">
+                            <label for="vitalPatientSelect" class="form-label">Patient *</label>
+                            <select class="form-select" id="vitalPatientSelect" name="patient_id" required>
+                                <option value="">Select Patient</option>
+                            </select>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="bloodPressureSystolic" class="form-label">Blood Pressure (Systolic)</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="bloodPressureSystolic" name="bp_systolic" min="60" max="250">
+                                        <span class="input-group-text">mmHg</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="bloodPressureDiastolic" class="form-label">Blood Pressure (Diastolic)</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="bloodPressureDiastolic" name="bp_diastolic" min="40" max="150">
+                                        <span class="input-group-text">mmHg</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="heartRate" class="form-label">Heart Rate</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="heartRate" name="heart_rate" min="30" max="200">
+                                        <span class="input-group-text">bpm</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="temperature" class="form-label">Temperature</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="temperature" name="temperature" step="0.1" min="95" max="110">
+                                        <span class="input-group-text">°F</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="respiratoryRate" class="form-label">Respiratory Rate</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="respiratoryRate" name="respiratory_rate" min="8" max="40">
+                                        <span class="input-group-text">breaths/min</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="oxygenSaturation" class="form-label">Oxygen Saturation</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="oxygenSaturation" name="oxygen_saturation" min="70" max="100">
+                                        <span class="input-group-text">%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="vitalNotes" class="form-label">Notes</label>
+                            <textarea class="form-control" id="vitalNotes" name="notes" rows="3" 
+                                      placeholder="Additional observations or notes..."></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-success" onclick="saveVitalSigns()">
+                        <i class="fas fa-save me-1"></i>
+                        Save Vital Signs
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nursing Notes Modal -->
+    <div class="modal fade" id="nursingNotesModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-notes-medical me-2"></i>
+                        Nursing Notes
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="nursingNotesForm">
+                        <input type="hidden" id="notesPatientId" name="patient_id">
+                        
+                        <div class="mb-3">
+                            <label for="noteType" class="form-label">Note Type *</label>
+                            <select class="form-select" id="noteType" name="note_type" required>
+                                <option value="">Select Type</option>
+                                <option value="assessment">Assessment</option>
+                                <option value="intervention">Intervention</option>
+                                <option value="medication">Medication Administration</option>
+                                <option value="observation">Observation</option>
+                                <option value="discharge">Discharge Planning</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="noteContent" class="form-label">Note Content *</label>
+                            <textarea class="form-control" id="noteContent" name="content" rows="6" required
+                                      placeholder="Enter detailed nursing notes..."></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="flagForDoctor" name="flag_for_doctor">
+                                <label class="form-check-label" for="flagForDoctor">
+                                    Flag for doctor's attention
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-success" onclick="saveNursingNote()">
+                        <i class="fas fa-save me-1"></i>
+                        Save Note
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    <script src="../js/common.js"></script>
+    <script src="patients.js"></script>
+</body>
+</html>

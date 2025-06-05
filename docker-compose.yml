@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  pulsecare:
+    build: .
+    container_name: pulsecare-app
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./database:/app/database
+      - ./logs:/app/logs
+    environment:
+      - FLASK_ENV=production
+      - FLASK_APP=app.py
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001/login.html"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Optional: Add nginx reverse proxy for production
+  # nginx:
+  #   image: nginx:alpine
+  #   container_name: pulsecare-nginx
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - ./nginx.conf:/etc/nginx/nginx.conf
+  #   depends_on:
+  #     - pulsecare
+  #   restart: unless-stopped
+
+volumes:
+  database_data:
+  logs_data:

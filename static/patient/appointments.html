@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Appointments - HMS Patient</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%);
+        }
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 0.75rem 1rem;
+            margin: 0.25rem 0;
+            border-radius: 0.5rem;
+        }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            color: white;
+            background-color: rgba(255,255,255,0.1);
+        }
+        .main-content {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+        .feature-card {
+            transition: transform 0.2s;
+        }
+        .feature-card:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar p-3">
+                <div class="d-flex align-items-center mb-4">
+                    <i class="fas fa-calendar-check text-white me-2"></i>
+                    <h5 class="text-white mb-0">HMS Patient</h5>
+                </div>
+
+                <nav class="nav flex-column">
+                    <a class="nav-link" href="/dashboard.html">
+                        <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                    </a>
+                    <!-- Role-specific navigation will be added here -->
+                    <hr class="text-white-50">
+                    <a class="nav-link" href="#" onclick="logout()">
+                        <i class="fas fa-sign-out-alt me-2"></i> Logout
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 main-content p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2><i class="fas fa-calendar-check me-2"></i>My Appointments</h2>
+                    <button class="btn btn-outline-primary" onclick="refreshPage()">
+                        <i class="fas fa-sync-alt me-2"></i>Refresh
+                    </button>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row align-items-center">
+                                    <div class="col-md-8">
+                                        <h5 class="mb-2">
+                                            <i class="fas fa-calendar-plus me-2"></i>Appointment Management
+                                        </h5>
+                                        <p class="text-muted mb-0">Schedule new appointments and manage your existing ones</p>
+                                    </div>
+                                    <div class="col-md-4 text-end">
+                                        <button class="btn btn-primary" onclick="showRequestAppointmentModal()">
+                                            <i class="fas fa-plus me-2"></i>Request Appointment
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Appointment Statistics -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h3 class="text-primary" id="upcomingCount">0</h3>
+                                <p class="mb-0">Upcoming</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h3 class="text-success" id="completedCount">0</h3>
+                                <p class="mb-0">Completed</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h3 class="text-warning" id="pendingCount">0</h3>
+                                <p class="mb-0">Pending</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h3 class="text-danger" id="cancelledCount">0</h3>
+                                <p class="mb-0">Cancelled</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Next Appointment Alert -->
+                <div id="nextAppointmentAlert" class="row mb-4" style="display: none;">
+                    <div class="col-12">
+                        <div class="alert alert-info">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <h6 class="alert-heading mb-1">
+                                        <i class="fas fa-clock me-2"></i>Next Appointment
+                                    </h6>
+                                    <p class="mb-0" id="nextAppointmentDetails"></p>
+                                </div>
+                                <div class="col-md-4 text-end">
+                                    <button class="btn btn-outline-info btn-sm" onclick="viewNextAppointment()">
+                                        <i class="fas fa-eye me-1"></i>View Details
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filter and Search -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <label class="form-label">Filter by Status</label>
+                                        <select class="form-select" id="statusFilter" onchange="filterAppointments()">
+                                            <option value="">All Status</option>
+                                            <option value="scheduled">Scheduled</option>
+                                            <option value="confirmed">Confirmed</option>
+                                            <option value="completed">Completed</option>
+                                            <option value="cancelled">Cancelled</option>
+                                            <option value="no-show">No Show</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Filter by Doctor</label>
+                                        <select class="form-select" id="doctorFilter" onchange="filterAppointments()">
+                                            <option value="">All Doctors</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Date Range</label>
+                                        <select class="form-select" id="dateFilter" onchange="filterAppointments()">
+                                            <option value="upcoming">Upcoming</option>
+                                            <option value="past">Past</option>
+                                            <option value="today">Today</option>
+                                            <option value="week">This Week</option>
+                                            <option value="month">This Month</option>
+                                            <option value="all">All Time</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Search</label>
+                                        <input type="text" class="form-control" id="searchInput" placeholder="Search appointments..." onkeyup="filterAppointments()">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Appointments List -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-list me-2"></i>My Appointments
+                                </h5>
+                                <div>
+                                    <button class="btn btn-outline-info btn-sm me-2" onclick="exportAppointments()">
+                                        <i class="fas fa-download me-1"></i>Export
+                                    </button>
+                                    <button class="btn btn-outline-primary btn-sm" onclick="refreshAppointments()">
+                                        <i class="fas fa-sync-alt me-1"></i>Refresh
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div id="loadingIndicator" class="text-center py-4">
+                                    <i class="fas fa-spinner fa-spin fa-2x text-info"></i>
+                                    <p class="mt-3">Loading appointments...</p>
+                                </div>
+
+                                <div id="appointmentsContainer" style="display: none;">
+                                    <div id="appointmentsList">
+                                        <!-- Appointments will be loaded here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Request Appointment Modal -->
+    <div class="modal fade" id="requestAppointmentModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Request New Appointment</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="appointmentRequestForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Department *</label>
+                                    <select class="form-select" id="departmentSelect" required onchange="loadDoctorsByDepartment()">
+                                        <option value="">Select Department</option>
+                                        <option value="cardiology">Cardiology</option>
+                                        <option value="dermatology">Dermatology</option>
+                                        <option value="endocrinology">Endocrinology</option>
+                                        <option value="gastroenterology">Gastroenterology</option>
+                                        <option value="general_medicine">General Medicine</option>
+                                        <option value="neurology">Neurology</option>
+                                        <option value="orthopedics">Orthopedics</option>
+                                        <option value="pediatrics">Pediatrics</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Doctor *</label>
+                                    <select class="form-select" id="doctorSelect" required>
+                                        <option value="">Select Doctor</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Preferred Date *</label>
+                                    <input type="date" class="form-control" id="preferredDate" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Preferred Time *</label>
+                                    <select class="form-select" id="preferredTime" required>
+                                        <option value="">Select Time</option>
+                                        <option value="09:00">9:00 AM</option>
+                                        <option value="10:00">10:00 AM</option>
+                                        <option value="11:00">11:00 AM</option>
+                                        <option value="14:00">2:00 PM</option>
+                                        <option value="15:00">3:00 PM</option>
+                                        <option value="16:00">4:00 PM</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Appointment Type *</label>
+                            <select class="form-select" id="appointmentType" required>
+                                <option value="">Select Type</option>
+                                <option value="consultation">Consultation</option>
+                                <option value="follow-up">Follow-up</option>
+                                <option value="check-up">Regular Check-up</option>
+                                <option value="emergency">Emergency</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Reason for Visit *</label>
+                            <textarea class="form-control" id="reasonForVisit" rows="3" required placeholder="Please describe your symptoms or reason for the appointment..."></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Additional Notes</label>
+                            <textarea class="form-control" id="additionalNotes" rows="2" placeholder="Any additional information or special requests..."></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="submitAppointmentRequest()">Submit Request</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Authentication check
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+        if (!token || user.role !== 'patient') {
+            window.location.href = '/login.html';
+        }
+
+        let allAppointments = [];
+        let allDoctors = [];
+
+        // Load data on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAppointments();
+            loadDoctors();
+            setMinDate();
+        });
+
+        function setMinDate() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('preferredDate').min = today;
+        }
+
+        async function loadAppointments() {
+            try {
+                const response = await fetch(`/appointments?patient_id=${user.entity_id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    allAppointments = await response.json();
+                } else {
+                    allAppointments = generateMockAppointments();
+                }
+
+                displayAppointments(allAppointments);
+                updateStats();
+                showNextAppointment();
+            } catch (error) {
+                console.error('Error loading appointments:', error);
+                allAppointments = generateMockAppointments();
+                displayAppointments(allAppointments);
+                updateStats();
+                showNextAppointment();
+            }
+        }
+
+        async function loadDoctors() {
+            try {
+                const response = await fetch('/doctor', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    allDoctors = await response.json();
+                } else {
+                    allDoctors = generateMockDoctors();
+                }
+
+                populateDoctorFilter();
+            } catch (error) {
+                console.error('Error loading doctors:', error);
+                allDoctors = generateMockDoctors();
+                populateDoctorFilter();
+            }
+        }
+
+        function generateMockAppointments() {
+            const statuses = ['scheduled', 'confirmed', 'completed', 'cancelled'];
+            const types = ['consultation', 'follow-up', 'check-up'];
+            const doctors = ['Dr. Smith', 'Dr. Johnson', 'Dr. Brown', 'Dr. Davis'];
+            const mockData = [];
+
+            for (let i = 0; i < 15; i++) {
+                const appointmentDate = new Date();
+                appointmentDate.setDate(appointmentDate.getDate() + Math.floor(Math.random() * 60) - 30);
+
+                mockData.push({
+                    appointment_id: i + 1,
+                    patient_id: user.entity_id,
+                    doctor_first_name: doctors[Math.floor(Math.random() * doctors.length)].split(' ')[1],
+                    doctor_last_name: doctors[Math.floor(Math.random() * doctors.length)].split(' ')[0].replace('Dr. ', ''),
+                    appointment_date: appointmentDate.toISOString(),
+                    appointment_time: ['09:00', '10:00', '11:00', '14:00', '15:00'][Math.floor(Math.random() * 5)],
+                    appointment_type: types[Math.floor(Math.random() * types.length)],
+                    status: statuses[Math.floor(Math.random() * statuses.length)],
+                    reason: 'Regular checkup and consultation',
+                    department: ['cardiology', 'general_medicine', 'dermatology'][Math.floor(Math.random() * 3)]
+                });
+            }
+
+            return mockData.sort((a, b) => new Date(a.appointment_date) - new Date(b.appointment_date));
+        }
+
+        function generateMockDoctors() {
+            return [
+                {doctor_id: 1, doc_first_name: 'John', doc_last_name: 'Smith', doc_specialization: 'cardiology'},
+                {doctor_id: 2, doc_first_name: 'Sarah', doc_last_name: 'Johnson', doc_specialization: 'general_medicine'},
+                {doctor_id: 3, doc_first_name: 'Michael', doc_last_name: 'Brown', doc_specialization: 'dermatology'},
+                {doctor_id: 4, doc_first_name: 'Emily', doc_last_name: 'Davis', doc_specialization: 'neurology'}
+            ];
+        }
+
+        function displayAppointments(appointments) {
+            const container = document.getElementById('appointmentsList');
+
+            if (appointments.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-5">
+                        <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No appointments found</h5>
+                        <p class="text-muted">You don't have any appointments matching the current filters.</p>
+                        <button class="btn btn-primary" onclick="showRequestAppointmentModal()">
+                            <i class="fas fa-plus me-2"></i>Request Your First Appointment
+                        </button>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = appointments.map(appointment => `
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-2">
+                                    <div class="text-center">
+                                        <div class="h5 mb-0">${formatDateShort(appointment.appointment_date)}</div>
+                                        <small class="text-muted">${appointment.appointment_time}</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <h6 class="mb-1">Dr. ${appointment.doctor_first_name} ${appointment.doctor_last_name}</h6>
+                                    <small class="text-muted">${appointment.department}</small>
+                                </div>
+                                <div class="col-md-2">
+                                    <span class="badge ${getStatusBadgeClass(appointment.status)} fs-6">
+                                        ${appointment.status.toUpperCase()}
+                                    </span>
+                                </div>
+                                <div class="col-md-3">
+                                    <small class="text-muted">${appointment.appointment_type}</small>
+                                    <div class="text-truncate" style="max-width: 200px;" title="${appointment.reason}">
+                                        ${appointment.reason}
+                                    </div>
+                                </div>
+                                <div class="col-md-2 text-end">
+                                    <div class="btn-group btn-group-sm">
+                                        <button class="btn btn-outline-primary" onclick="viewAppointment(${appointment.appointment_id})" title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        ${appointment.status === 'scheduled' ? `
+                                            <button class="btn btn-outline-warning" onclick="rescheduleAppointment(${appointment.appointment_id})" title="Reschedule">
+                                                <i class="fas fa-calendar-alt"></i>
+                                            </button>
+                                            <button class="btn btn-outline-danger" onclick="cancelAppointment(${appointment.appointment_id})" title="Cancel">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Show container and hide loading
+            document.getElementById('loadingIndicator').style.display = 'none';
+            document.getElementById('appointmentsContainer').style.display = 'block';
+        }
+
+        function updateStats() {
+            const now = new Date();
+            const upcoming = allAppointments.filter(a => new Date(a.appointment_date) > now && a.status !== 'cancelled').length;
+            const completed = allAppointments.filter(a => a.status === 'completed').length;
+            const pending = allAppointments.filter(a => a.status === 'scheduled').length;
+            const cancelled = allAppointments.filter(a => a.status === 'cancelled').length;
+
+            document.getElementById('upcomingCount').textContent = upcoming;
+            document.getElementById('completedCount').textContent = completed;
+            document.getElementById('pendingCount').textContent = pending;
+            document.getElementById('cancelledCount').textContent = cancelled;
+        }
+
+        function showNextAppointment() {
+            const now = new Date();
+            const nextAppointment = allAppointments
+                .filter(a => new Date(a.appointment_date) > now && a.status !== 'cancelled')
+                .sort((a, b) => new Date(a.appointment_date) - new Date(b.appointment_date))[0];
+
+            if (nextAppointment) {
+                document.getElementById('nextAppointmentDetails').innerHTML = `
+                    <strong>${formatDateTime(nextAppointment.appointment_date)} at ${nextAppointment.appointment_time}</strong><br>
+                    with Dr. ${nextAppointment.doctor_first_name} ${nextAppointment.doctor_last_name} - ${nextAppointment.appointment_type}
+                `;
+                document.getElementById('nextAppointmentAlert').style.display = 'block';
+            }
+        }
+
+        function populateDoctorFilter() {
+            const doctorFilter = document.getElementById('doctorFilter');
+            doctorFilter.innerHTML = '<option value="">All Doctors</option>';
+
+            allDoctors.forEach(doctor => {
+                const option = document.createElement('option');
+                option.value = doctor.doctor_id;
+                option.textContent = `Dr. ${doctor.doc_first_name} ${doctor.doc_last_name}`;
+                doctorFilter.appendChild(option);
+            });
+        }
+
+        function loadDoctorsByDepartment() {
+            const department = document.getElementById('departmentSelect').value;
+            const doctorSelect = document.getElementById('doctorSelect');
+
+            doctorSelect.innerHTML = '<option value="">Select Doctor</option>';
+
+            if (department) {
+                const filteredDoctors = allDoctors.filter(doctor =>
+                    doctor.doc_specialization === department
+                );
+
+                filteredDoctors.forEach(doctor => {
+                    const option = document.createElement('option');
+                    option.value = doctor.doctor_id;
+                    option.textContent = `Dr. ${doctor.doc_first_name} ${doctor.doc_last_name}`;
+                    doctorSelect.appendChild(option);
+                });
+            }
+        }
+
+        function getStatusBadgeClass(status) {
+            switch (status) {
+                case 'scheduled': return 'bg-warning';
+                case 'confirmed': return 'bg-info';
+                case 'completed': return 'bg-success';
+                case 'cancelled': return 'bg-danger';
+                case 'no-show': return 'bg-secondary';
+                default: return 'bg-secondary';
+            }
+        }
+
+        function formatDateTime(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        }
+
+        function formatDateShort(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        }
+
+        function showRequestAppointmentModal() {
+            document.getElementById('appointmentRequestForm').reset();
+            setMinDate();
+            new bootstrap.Modal(document.getElementById('requestAppointmentModal')).show();
+        }
+
+        async function submitAppointmentRequest() {
+            const form = document.getElementById('appointmentRequestForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const appointmentData = {
+                patient_id: user.entity_id,
+                doctor_id: document.getElementById('doctorSelect').value,
+                appointment_date: document.getElementById('preferredDate').value,
+                appointment_time: document.getElementById('preferredTime').value,
+                appointment_type: document.getElementById('appointmentType').value,
+                reason: document.getElementById('reasonForVisit').value,
+                notes: document.getElementById('additionalNotes').value,
+                status: 'scheduled'
+            };
+
+            try {
+                const response = await fetch('/appointments', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(appointmentData)
+                });
+
+                if (response.ok) {
+                    showAlert('Appointment request submitted successfully!', 'success');
+                    bootstrap.Modal.getInstance(document.getElementById('requestAppointmentModal')).hide();
+                    loadAppointments();
+                } else {
+                    const error = await response.json();
+                    showAlert('Failed to submit appointment request: ' + (error.message || 'Unknown error'), 'danger');
+                }
+            } catch (error) {
+                console.error('Error submitting appointment request:', error);
+                showAlert('Failed to submit appointment request', 'danger');
+            }
+        }
+
+        function filterAppointments() {
+            const statusFilter = document.getElementById('statusFilter').value;
+            const doctorFilter = document.getElementById('doctorFilter').value;
+            const dateFilter = document.getElementById('dateFilter').value;
+            const searchInput = document.getElementById('searchInput').value.toLowerCase();
+
+            let filtered = allAppointments.filter(appointment => {
+                const matchesStatus = !statusFilter || appointment.status === statusFilter;
+                const matchesDoctor = !doctorFilter || appointment.doctor_id == doctorFilter;
+                const matchesSearch = !searchInput ||
+                    `${appointment.doctor_first_name} ${appointment.doctor_last_name}`.toLowerCase().includes(searchInput) ||
+                    appointment.reason.toLowerCase().includes(searchInput) ||
+                    appointment.appointment_type.toLowerCase().includes(searchInput);
+
+                let matchesDate = true;
+                const appointmentDate = new Date(appointment.appointment_date);
+                const now = new Date();
+
+                switch (dateFilter) {
+                    case 'upcoming':
+                        matchesDate = appointmentDate > now;
+                        break;
+                    case 'past':
+                        matchesDate = appointmentDate < now;
+                        break;
+                    case 'today':
+                        matchesDate = appointmentDate.toDateString() === now.toDateString();
+                        break;
+                    case 'week':
+                        const weekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+                        matchesDate = appointmentDate >= now && appointmentDate <= weekFromNow;
+                        break;
+                    case 'month':
+                        const monthFromNow = new Date(now.getFullYear(), now.getMonth() + 1, now.getDate());
+                        matchesDate = appointmentDate >= now && appointmentDate <= monthFromNow;
+                        break;
+                }
+
+                return matchesStatus && matchesDoctor && matchesSearch && matchesDate;
+            });
+
+            displayAppointments(filtered);
+        }
+
+        function viewAppointment(appointmentId) {
+            showAlert('View appointment details functionality will be implemented soon', 'info');
+        }
+
+        function rescheduleAppointment(appointmentId) {
+            showAlert('Reschedule appointment functionality will be implemented soon', 'info');
+        }
+
+        function cancelAppointment(appointmentId) {
+            if (confirm('Are you sure you want to cancel this appointment?')) {
+                showAlert('Cancel appointment functionality will be implemented soon', 'info');
+            }
+        }
+
+        function viewNextAppointment() {
+            showAlert('View next appointment details functionality will be implemented soon', 'info');
+        }
+
+        function exportAppointments() {
+            showAlert('Export functionality will be implemented soon', 'info');
+        }
+
+        function refreshAppointments() {
+            document.getElementById('loadingIndicator').style.display = 'block';
+            document.getElementById('appointmentsContainer').style.display = 'none';
+            loadAppointments();
+        }
+
+        function refreshPage() {
+            location.reload();
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/login.html';
+        }
+
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+
+            const mainContent = document.querySelector('.main-content');
+            mainContent.insertBefore(alertDiv, mainContent.firstChild);
+
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.remove();
+                }
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

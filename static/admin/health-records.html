@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Records - HMS Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 0.75rem 1rem;
+            margin: 0.25rem 0;
+            border-radius: 0.5rem;
+        }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            color: white;
+            background-color: rgba(255,255,255,0.1);
+        }
+        .main-content {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+        .card {
+            border: none;
+            box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+        }
+        .record-type-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+        }
+        .confidential-badge {
+            background-color: #dc3545;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar p-3">
+                <div class="d-flex align-items-center mb-4">
+                    <i class="fas fa-hospital text-white me-2"></i>
+                    <h5 class="text-white mb-0">HMS Admin</h5>
+                </div>
+                
+                <nav class="nav flex-column">
+                    <a class="nav-link" href="/dashboard.html">
+                        <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                    </a>
+                    <a class="nav-link" href="/admin/users.html">
+                        <i class="fas fa-users me-2"></i> User Management
+                    </a>
+                    <a class="nav-link" href="/admin/patients.html">
+                        <i class="fas fa-user-injured me-2"></i> Patients
+                    </a>
+                    <a class="nav-link active" href="/admin/health-records.html">
+                        <i class="fas fa-file-medical me-2"></i> Health Records
+                    </a>
+                    <a class="nav-link" href="/admin/doctors.html">
+                        <i class="fas fa-user-md me-2"></i> Doctors
+                    </a>
+                    <a class="nav-link" href="/admin/nurses.html">
+                        <i class="fas fa-user-nurse me-2"></i> Nurses
+                    </a>
+                    <a class="nav-link" href="/admin/audit-logs.html">
+                        <i class="fas fa-clipboard-list me-2"></i> Audit Logs
+                    </a>
+                    <hr class="text-white-50">
+                    <a class="nav-link" href="#" onclick="logout()">
+                        <i class="fas fa-sign-out-alt me-2"></i> Logout
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 main-content p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2><i class="fas fa-file-medical me-2"></i>Health Records Management</h2>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#healthRecordModal" onclick="openCreateRecordModal()">
+                        <i class="fas fa-plus me-2"></i>Add Health Record
+                    </button>
+                </div>
+
+                <!-- Filters -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <select class="form-select" id="patientFilter">
+                                    <option value="">All Patients</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select" id="recordTypeFilter">
+                                    <option value="">All Record Types</option>
+                                    <option value="medical_history">Medical History</option>
+                                    <option value="diagnosis">Diagnosis</option>
+                                    <option value="treatment_plan">Treatment Plan</option>
+                                    <option value="discharge_summary">Discharge Summary</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <input type="date" class="form-control" id="dateFilter">
+                            </div>
+                            <div class="col-md-3">
+                                <button class="btn btn-outline-primary" onclick="applyFilters()">
+                                    <i class="fas fa-filter me-2"></i>Filter
+                                </button>
+                                <button class="btn btn-outline-secondary" onclick="clearFilters()">
+                                    <i class="fas fa-times me-2"></i>Clear
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Health Records Table -->
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table id="healthRecordsTable" class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Patient</th>
+                                        <th>Type</th>
+                                        <th>Title</th>
+                                        <th>Created By</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Data will be loaded via JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Health Record Modal -->
+    <div class="modal fade" id="healthRecordModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="recordModalTitle">Add Health Record</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="healthRecordForm">
+                        <input type="hidden" id="recordId" name="recordId">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="patientSelect" class="form-label">Patient *</label>
+                                    <select class="form-select" id="patientSelect" name="pat_id" required>
+                                        <option value="">Select Patient</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="recordType" class="form-label">Record Type *</label>
+                                    <select class="form-select" id="recordType" name="record_type" required>
+                                        <option value="">Select Type</option>
+                                        <option value="medical_history">Medical History</option>
+                                        <option value="diagnosis">Diagnosis</option>
+                                        <option value="treatment_plan">Treatment Plan</option>
+                                        <option value="discharge_summary">Discharge Summary</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="recordTitle" class="form-label">Title *</label>
+                            <input type="text" class="form-control" id="recordTitle" name="title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="recordContent" class="form-label">Content *</label>
+                            <textarea class="form-control" id="recordContent" name="content" rows="8" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="isConfidential" name="is_confidential">
+                                <label class="form-check-label" for="isConfidential">
+                                    Confidential Record (Restricted Access)
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="saveHealthRecord()">Save Record</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Record Modal -->
+    <div class="modal fade" id="viewRecordModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Health Record Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="recordDetailsContent">
+                        <!-- Content will be loaded dynamically -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    
+    <script>
+        // Authentication check
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+        if (!token || user.role !== 'admin') {
+            window.location.href = '/login.html';
+        }
+
+        let healthRecordsTable;
+        let editingRecordId = null;
+        let patients = [];
+
+        // Initialize page
+        $(document).ready(function() {
+            initializeTable();
+            loadPatients();
+            loadHealthRecords();
+            
+            // Check for patient_id in URL params
+            const urlParams = new URLSearchParams(window.location.search);
+            const patientId = urlParams.get('patient_id');
+            if (patientId) {
+                document.getElementById('patientFilter').value = patientId;
+            }
+        });
+
+        function initializeTable() {
+            healthRecordsTable = $('#healthRecordsTable').DataTable({
+                responsive: true,
+                pageLength: 25,
+                order: [[5, 'desc']],
+                columnDefs: [
+                    { targets: [7], orderable: false }
+                ]
+            });
+        }
+
+        async function loadPatients() {
+            try {
+                const response = await apiCall('/patient');
+                if (response) {
+                    patients = response;
+                    populatePatientSelects();
+                }
+            } catch (error) {
+                showAlert('Error loading patients: ' + error.message, 'danger');
+            }
+        }
+
+        function populatePatientSelects() {
+            const patientFilter = document.getElementById('patientFilter');
+            const patientSelect = document.getElementById('patientSelect');
+            
+            // Clear existing options
+            patientFilter.innerHTML = '<option value="">All Patients</option>';
+            patientSelect.innerHTML = '<option value="">Select Patient</option>';
+            
+            patients.forEach(patient => {
+                const option = `<option value="${patient.pat_id}">${patient.pat_first_name} ${patient.pat_last_name} (${patient.pat_insurance_no})</option>`;
+                patientFilter.innerHTML += option;
+                patientSelect.innerHTML += option;
+            });
+        }
+
+        async function loadHealthRecords() {
+            try {
+                const patientId = document.getElementById('patientFilter').value;
+                const recordType = document.getElementById('recordTypeFilter').value;
+                
+                let url = '/health-records?';
+                if (patientId) url += `patient_id=${patientId}&`;
+                if (recordType) url += `record_type=${recordType}&`;
+                
+                const response = await apiCall(url);
+                if (response) {
+                    displayHealthRecords(response);
+                }
+            } catch (error) {
+                showAlert('Error loading health records: ' + error.message, 'danger');
+            }
+        }
+
+        function displayHealthRecords(records) {
+            healthRecordsTable.clear();
+            
+            records.forEach(record => {
+                const typeColors = {
+                    'medical_history': 'primary',
+                    'diagnosis': 'danger',
+                    'treatment_plan': 'success',
+                    'discharge_summary': 'info'
+                };
+
+                const typeBadge = `<span class="badge bg-${typeColors[record.record_type] || 'secondary'} record-type-badge">${record.record_type.replace('_', ' ').toUpperCase()}</span>`;
+                const confidentialBadge = record.is_confidential ? '<span class="badge confidential-badge ms-1">CONFIDENTIAL</span>' : '';
+                
+                const actions = `
+                    <button class="btn btn-sm btn-outline-info me-1" onclick="viewRecord(${record.record_id})" title="View">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-primary me-1" onclick="editRecord(${record.record_id})" title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="deleteRecord(${record.record_id})" title="Delete">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                `;
+
+                healthRecordsTable.row.add([
+                    record.record_id,
+                    `${record.pat_first_name} ${record.pat_last_name}`,
+                    typeBadge,
+                    record.title,
+                    `${record.created_by_first_name} ${record.created_by_last_name}`,
+                    new Date(record.created_date).toLocaleDateString(),
+                    confidentialBadge,
+                    actions
+                ]);
+            });
+            
+            healthRecordsTable.draw();
+        }
+
+        function openCreateRecordModal() {
+            editingRecordId = null;
+            document.getElementById('recordModalTitle').textContent = 'Add Health Record';
+            document.getElementById('healthRecordForm').reset();
+            document.getElementById('recordId').value = '';
+        }
+
+        async function editRecord(recordId) {
+            try {
+                const response = await apiCall(`/health-records/${recordId}`);
+                if (response) {
+                    editingRecordId = recordId;
+                    document.getElementById('recordModalTitle').textContent = 'Edit Health Record';
+                    
+                    // Populate form
+                    document.getElementById('recordId').value = response.record_id;
+                    document.getElementById('patientSelect').value = response.pat_id;
+                    document.getElementById('recordType').value = response.record_type;
+                    document.getElementById('recordTitle').value = response.title;
+                    document.getElementById('recordContent').value = response.content;
+                    document.getElementById('isConfidential').checked = response.is_confidential;
+                    
+                    // Show modal
+                    new bootstrap.Modal(document.getElementById('healthRecordModal')).show();
+                }
+            } catch (error) {
+                showAlert('Error loading record details: ' + error.message, 'danger');
+            }
+        }
+
+        async function saveHealthRecord() {
+            const form = document.getElementById('healthRecordForm');
+            const formData = new FormData(form);
+            const recordData = {};
+            
+            for (let [key, value] of formData.entries()) {
+                if (value.trim() !== '') {
+                    recordData[key] = value;
+                }
+            }
+            
+            // Convert checkbox value
+            recordData.is_confidential = document.getElementById('isConfidential').checked ? 1 : 0;
+
+            try {
+                let response;
+                if (editingRecordId) {
+                    // Update existing record
+                    response = await apiCall(`/health-records/${editingRecordId}`, 'PUT', recordData);
+                } else {
+                    // Create new record
+                    response = await apiCall('/health-records', 'POST', recordData);
+                }
+
+                if (response) {
+                    showAlert(editingRecordId ? 'Health record updated successfully!' : 'Health record created successfully!', 'success');
+                    bootstrap.Modal.getInstance(document.getElementById('healthRecordModal')).hide();
+                    loadHealthRecords();
+                }
+            } catch (error) {
+                showAlert('Error saving health record: ' + error.message, 'danger');
+            }
+        }
+
+        async function viewRecord(recordId) {
+            try {
+                const response = await apiCall(`/health-records/${recordId}`);
+                if (response) {
+                    const content = `
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6><i class="fas fa-user me-2"></i>Patient Information</h6>
+                                <p><strong>Name:</strong> ${response.pat_first_name} ${response.pat_last_name}</p>
+                                <p><strong>Record Type:</strong> ${response.record_type.replace('_', ' ').toUpperCase()}</p>
+                                <p><strong>Confidential:</strong> ${response.is_confidential ? 'Yes' : 'No'}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6><i class="fas fa-info-circle me-2"></i>Record Details</h6>
+                                <p><strong>Created By:</strong> ${response.created_by_first_name} ${response.created_by_last_name}</p>
+                                <p><strong>Created Date:</strong> ${new Date(response.created_date).toLocaleString()}</p>
+                                <p><strong>Updated Date:</strong> ${new Date(response.updated_date).toLocaleString()}</p>
+                            </div>
+                        </div>
+                        <hr>
+                        <h6><i class="fas fa-file-alt me-2"></i>${response.title}</h6>
+                        <div class="border p-3 bg-light">
+                            ${response.content.replace(/\n/g, '<br>')}
+                        </div>
+                    `;
+
+                    document.getElementById('recordDetailsContent').innerHTML = content;
+                    new bootstrap.Modal(document.getElementById('viewRecordModal')).show();
+                }
+            } catch (error) {
+                showAlert('Error loading record details: ' + error.message, 'danger');
+            }
+        }
+
+        async function deleteRecord(recordId) {
+            if (!confirm('Are you sure you want to delete this health record? This action cannot be undone.')) {
+                return;
+            }
+
+            try {
+                const response = await apiCall(`/health-records/${recordId}`, 'DELETE');
+                if (response) {
+                    showAlert('Health record deleted successfully!', 'success');
+                    loadHealthRecords();
+                }
+            } catch (error) {
+                showAlert('Error deleting health record: ' + error.message, 'danger');
+            }
+        }
+
+        function applyFilters() {
+            loadHealthRecords();
+        }
+
+        function clearFilters() {
+            document.getElementById('patientFilter').value = '';
+            document.getElementById('recordTypeFilter').value = '';
+            document.getElementById('dateFilter').value = '';
+            loadHealthRecords();
+        }
+
+        // API helper function
+        async function apiCall(endpoint, method = 'GET', data = null) {
+            const options = {
+                method,
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            };
+
+            if (data) {
+                options.body = JSON.stringify(data);
+            }
+
+            const response = await fetch(endpoint, options);
+            
+            if (response.status === 401) {
+                logout();
+                return;
+            }
+
+            const result = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(result.error || 'Request failed');
+            }
+
+            return result;
+        }
+
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.parentNode.removeChild(alertDiv);
+                }
+            }, 5000);
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/login.html';
+        }
+    </script>
+</body>
+</html>

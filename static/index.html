@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Management System - Welcome</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .hero-section {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 100px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="rgba(255,255,255,0.1)"><polygon points="1000,100 1000,0 0,100"/></svg>');
+            background-size: cover;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .hero-subtitle {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .btn-hero {
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            border: none;
+            margin: 0 10px;
+        }
+
+        .btn-primary-hero {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .btn-primary-hero:hover {
+            background: white;
+            color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .btn-outline-hero {
+            background: transparent;
+            color: white;
+            border: 2px solid rgba(255,255,255,0.5);
+        }
+
+        .btn-outline-hero:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: white;
+            transform: translateY(-2px);
+        }
+
+        .features-section {
+            padding: 80px 0;
+            background: #f8f9fa;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 15px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border: none;
+            height: 100%;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 2rem;
+            color: white;
+        }
+
+        .feature-icon.admin { background: var(--primary-gradient); }
+        .feature-icon.doctor { background: var(--success-gradient); }
+        .feature-icon.nurse { background: var(--secondary-gradient); }
+
+        .roles-section {
+            padding: 80px 0;
+            background: white;
+        }
+
+        .role-card {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .role-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .role-card.admin { border-left-color: #667eea; }
+        .role-card.doctor { border-left-color: #28a745; }
+        .role-card.nurse { border-left-color: #17a2b8; }
+        .role-card.lab { border-left-color: #ffc107; }
+        .role-card.pharmacist { border-left-color: #fd7e14; }
+        .role-card.patient { border-left-color: #6f42c1; }
+
+        .stats-section {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 60px 0;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .cta-section {
+            background: #f8f9fa;
+            padding: 80px 0;
+            text-align: center;
+        }
+
+        .footer {
+            background: #343a40;
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .btn-hero {
+                padding: 12px 30px;
+                font-size: 1rem;
+                margin: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background: rgba(102, 126, 234, 0.95); backdrop-filter: blur(10px);">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#home">
+                <i class="fas fa-hospital me-2"></i>HMS
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#home">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features">Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#roles">User Roles</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#about">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-outline-light rounded-pill px-3 ms-2" href="/login.html">
+                            <i class="fas fa-sign-in-alt me-1"></i>Login
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 hero-content">
+                    <h1 class="hero-title">Hospital Management System</h1>
+                    <p class="hero-subtitle">
+                        Comprehensive digital health record management with role-based access control. 
+                        Streamline your healthcare operations with our advanced HMS platform.
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="/login.html" class="btn btn-primary-hero btn-hero">
+                            <i class="fas fa-sign-in-alt me-2"></i>Get Started
+                        </a>
+                        <a href="#features" class="btn btn-outline-hero btn-hero">
+                            <i class="fas fa-info-circle me-2"></i>Learn More
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-6 text-center">
+                    <div class="hero-image">
+                        <i class="fas fa-hospital" style="font-size: 15rem; opacity: 0.3;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features-section">
+        <div class="container">
+            <div class="row text-center mb-5">
+                <div class="col-12">
+                    <h2 class="display-4 fw-bold mb-3">Powerful Features</h2>
+                    <p class="lead text-muted">Everything you need to manage your healthcare facility efficiently</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="feature-card">
+                        <div class="feature-icon admin">
+                            <i class="fas fa-users-cog"></i>
+                        </div>
+                        <h4>User Management</h4>
+                        <p>Complete role-based access control with six distinct user roles. Manage permissions and access rights efficiently.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="feature-card">
+                        <div class="feature-icon doctor">
+                            <i class="fas fa-file-medical"></i>
+                        </div>
+                        <h4>Digital Health Records</h4>
+                        <p>Comprehensive patient health records with secure storage, easy retrieval, and detailed medical history tracking.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="feature-card">
+                        <div class="feature-icon nurse">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h4>Security & Compliance</h4>
+                        <p>Advanced security features with audit trails, data encryption, and healthcare compliance standards.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- User Roles Section -->
+    <section id="roles" class="roles-section">
+        <div class="container">
+            <div class="row text-center mb-5">
+                <div class="col-12">
+                    <h2 class="display-4 fw-bold mb-3">User Roles & Access</h2>
+                    <p class="lead text-muted">Six specialized roles designed for comprehensive healthcare management</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6 mb-4">
+                    <div class="role-card admin">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="me-3">
+                                <i class="fas fa-user-shield fa-2x text-primary"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-1">Administrator</h5>
+                                <small class="text-muted">Full System Access</small>
+                            </div>
+                        </div>
+                        <p>Complete system control including user management, system monitoring, data management, and audit logs access.</p>
+                    </div>
+                </div>
+                <div class="col-lg-6 mb-4">
+                    <div class="role-card doctor">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="me-3">
+                                <i class="fas fa-user-md fa-2x text-success"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-1">Doctor</h5>
+                                <small class="text-muted">Medical Care Provider</small>
+                            </div>
+                        </div>
+                        <p>Patient records access, prescription management, medical notes, lab test requests, and appointment scheduling.</p>
+                    </div>
+                </div>
+                <div class="col-lg-6 mb-4">
+                    <div class="role-card nurse">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="me-3">
+                                <i class="fas fa-user-nurse fa-2x text-info"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-1">Nurse</h5>
+                                <small class="text-muted">Patient Care Coordinator</small>
+                            </div>
+                        </div>
+                        <p>Assigned patient management, vital signs recording, nursing notes, and patient care coordination.</p>
+                    </div>
+                </div>
+                <div class="col-lg-6 mb-4">
+                    <div class="role-card lab">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="me-3">
+                                <i class="fas fa-flask fa-2x text-warning"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-1">Lab Technician</h5>
+                                <small class="text-muted">Laboratory Services</small>
+                            </div>
+                        </div>
+                        <p>Lab test management, sample processing, result entry, and quality control for laboratory operations.</p>
+                    </div>
+                </div>
+                <div class="col-lg-6 mb-4">
+                    <div class="role-card pharmacist">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="me-3">
+                                <i class="fas fa-pills fa-2x" style="color: #fd7e14;"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-1">Pharmacist</h5>
+                                <small class="text-muted">Medication Management</small>
+                            </div>
+                        </div>
+                        <p>Prescription dispensing, medication inventory management, drug interaction checks, and pharmacy operations.</p>
+                    </div>
+                </div>
+                <div class="col-lg-6 mb-4">
+                    <div class="role-card patient">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="me-3">
+                                <i class="fas fa-user fa-2x" style="color: #6f42c1;"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-1">Patient</h5>
+                                <small class="text-muted">Healthcare Consumer</small>
+                            </div>
+                        </div>
+                        <p>Personal health records access, appointment viewing, prescription history, and lab results review.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3 col-6">
+                    <div class="stat-item">
+                        <span class="stat-number">6</span>
+                        <span class="stat-label">User Roles</span>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stat-item">
+                        <span class="stat-number">100%</span>
+                        <span class="stat-label">Secure</span>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stat-item">
+                        <span class="stat-number">24/7</span>
+                        <span class="stat-label">Available</span>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stat-item">
+                        <span class="stat-number">∞</span>
+                        <span class="stat-label">Scalable</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="cta-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto text-center">
+                    <h2 class="display-4 fw-bold mb-4">About Our System</h2>
+                    <p class="lead mb-4">
+                        Our Hospital Management System is designed with modern healthcare needs in mind.
+                        Built using cutting-edge technology and following best practices in healthcare IT,
+                        we provide a comprehensive solution for managing all aspects of hospital operations.
+                    </p>
+                    <div class="row text-center">
+                        <div class="col-md-4 mb-3">
+                            <i class="fas fa-code fa-3x text-primary mb-3"></i>
+                            <h5>Modern Technology</h5>
+                            <p>Built with Flask, SQLite, and modern web technologies for reliability and performance.</p>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <i class="fas fa-lock fa-3x text-primary mb-3"></i>
+                            <h5>Security First</h5>
+                            <p>Advanced authentication, role-based access control, and comprehensive audit trails.</p>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <i class="fas fa-mobile-alt fa-3x text-primary mb-3"></i>
+                            <h5>Responsive Design</h5>
+                            <p>Works seamlessly across all devices - desktop, tablet, and mobile platforms.</p>
+                        </div>
+                    </div>
+                    <div class="mt-5">
+                        <a href="/login.html" class="btn btn-primary btn-lg rounded-pill px-5">
+                            <i class="fas fa-rocket me-2"></i>Start Using HMS Today
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><i class="fas fa-hospital me-2"></i>Hospital Management System</h5>
+                    <p class="mb-0">Comprehensive healthcare management solution with role-based access control.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0">&copy; 2024 HMS. All rights reserved.</p>
+                    <p class="mb-0">
+                        <small>Built with <i class="fas fa-heart text-danger"></i> for better healthcare</small>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Navbar background on scroll
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.style.background = 'rgba(102, 126, 234, 0.95)';
+            } else {
+                navbar.style.background = 'rgba(102, 126, 234, 0.95)';
+            }
+        });
+
+        // Check if user is already logged in
+        if (localStorage.getItem('token')) {
+            // Add a "Go to Dashboard" button if user is logged in
+            const loginBtn = document.querySelector('a[href="/login.html"]');
+            if (loginBtn) {
+                loginBtn.href = '/dashboard.html';
+                loginBtn.innerHTML = '<i class="fas fa-tachometer-alt me-1"></i>Dashboard';
+            }
+        }
+    </script>
+</body>
+</html>

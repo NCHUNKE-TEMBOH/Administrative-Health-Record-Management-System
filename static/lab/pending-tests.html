@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pending Tests - HMS Lab</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+        }
+        .sidebar .nav-link {
+            color: rgba(0,0,0,0.7);
+            padding: 0.75rem 1rem;
+            margin: 0.25rem 0;
+            border-radius: 0.5rem;
+        }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            color: black;
+            background-color: rgba(0,0,0,0.1);
+        }
+        .main-content {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar p-3">
+                <div class="d-flex align-items-center mb-4">
+                    <i class="fas fa-flask text-dark me-2"></i>
+                    <h5 class="text-dark mb-0">HMS Lab</h5>
+                </div>
+
+                <nav class="nav flex-column">
+                    <a class="nav-link" href="/dashboard.html">
+                        <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                    </a>
+                    <a class="nav-link" href="/lab/tests.html">
+                        <i class="fas fa-flask me-2"></i> Lab Tests
+                    </a>
+                    <a class="nav-link active" href="/lab/pending-tests.html">
+                        <i class="fas fa-clock me-2"></i> Pending Tests
+                    </a>
+                    <a class="nav-link" href="/lab/in-progress-tests.html">
+                        <i class="fas fa-spinner me-2"></i> In Progress
+                    </a>
+                    <a class="nav-link" href="/lab/test-results.html">
+                        <i class="fas fa-check-circle me-2"></i> Results
+                    </a>
+                    <a class="nav-link" href="/lab/enter-results.html">
+                        <i class="fas fa-edit me-2"></i> Enter Results
+                    </a>
+                    <hr class="text-dark">
+                    <a class="nav-link" href="#" onclick="logout()">
+                        <i class="fas fa-sign-out-alt me-2"></i> Logout
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 main-content p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2><i class="fas fa-clock me-2"></i>Pending Lab Tests</h2>
+                    <button class="btn btn-outline-primary" onclick="refreshPage()">
+                        <i class="fas fa-sync-alt me-2"></i>Refresh
+                    </button>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card bg-warning text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h6 class="card-title">Pending Tests</h6>
+                                        <h3 id="pendingCount">0</h3>
+                                    </div>
+                                    <div class="align-self-center">
+                                        <i class="fas fa-clock fa-2x"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-danger text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h6 class="card-title">STAT Priority</h6>
+                                        <h3 id="statCount">0</h3>
+                                    </div>
+                                    <div class="align-self-center">
+                                        <i class="fas fa-exclamation-triangle fa-2x"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-info text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h6 class="card-title">Urgent</h6>
+                                        <h3 id="urgentCount">0</h3>
+                                    </div>
+                                    <div class="align-self-center">
+                                        <i class="fas fa-clock fa-2x"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-secondary text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h6 class="card-title">Normal</h6>
+                                        <h3 id="normalCount">0</h3>
+                                    </div>
+                                    <div class="align-self-center">
+                                        <i class="fas fa-flask fa-2x"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pending Tests Table -->
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-clock me-2"></i>Pending Lab Tests
+                        </h5>
+                        <div>
+                            <button class="btn btn-outline-primary btn-sm" onclick="refreshPendingTests()">
+                                <i class="fas fa-sync-alt me-1"></i>Refresh
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <!-- Filters -->
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <select class="form-select" id="priorityFilter">
+                                    <option value="">All Priorities</option>
+                                    <option value="stat">STAT</option>
+                                    <option value="urgent">Urgent</option>
+                                    <option value="normal">Normal</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <select class="form-select" id="testTypeFilter">
+                                    <option value="">All Test Types</option>
+                                    <option value="blood">Blood Test</option>
+                                    <option value="urine">Urine Test</option>
+                                    <option value="imaging">Imaging</option>
+                                    <option value="culture">Culture</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <input type="text" class="form-control" id="patientSearch" placeholder="Search by patient name...">
+                            </div>
+                        </div>
+
+                        <!-- Tests Table -->
+                        <div class="table-responsive">
+                            <table class="table table-striped" id="pendingTestsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Test ID</th>
+                                        <th>Patient</th>
+                                        <th>Test Type</th>
+                                        <th>Priority</th>
+                                        <th>Requested</th>
+                                        <th>Requested By</th>
+                                        <th>Wait Time</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="pendingTestsTableBody">
+                                    <tr>
+                                        <td colspan="8" class="text-center">
+                                            <div class="spinner-border text-primary" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </div>
+                                            <p class="mt-2">Loading pending tests...</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Authentication check
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+        if (!token || user.role !== 'lab_technician') {
+            window.location.href = '/login.html';
+        }
+
+        let allPendingTests = [];
+
+        // Load pending tests on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadPendingTests();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            // Filter event listeners
+            document.getElementById('priorityFilter').addEventListener('change', filterTests);
+            document.getElementById('testTypeFilter').addEventListener('change', filterTests);
+            document.getElementById('patientSearch').addEventListener('input', filterTests);
+        }
+
+        async function loadPendingTests() {
+            try {
+                const response = await fetch('/lab-tests/pending', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    allPendingTests = await response.json();
+                    displayPendingTests(allPendingTests);
+                    updateQuickStats(allPendingTests);
+                } else {
+                    throw new Error('Failed to load pending tests');
+                }
+            } catch (error) {
+                console.error('Error loading pending tests:', error);
+                showError('Failed to load pending tests');
+            }
+        }
+
+        function displayPendingTests(tests) {
+            const tbody = document.getElementById('pendingTestsTableBody');
+
+            if (tests.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center py-4">
+                            <i class="fas fa-info-circle text-muted fa-2x mb-2"></i>
+                            <p class="text-muted">No pending tests found</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = tests.map(test => `
+                <tr class="${getPriorityRowClass(test.priority)}">
+                    <td><strong>#${test.test_id}</strong></td>
+                    <td>${test.pat_first_name} ${test.pat_last_name}</td>
+                    <td>
+                        <span class="badge bg-light text-dark">${test.test_type}</span>
+                    </td>
+                    <td>
+                        <span class="badge ${getPriorityBadgeClass(test.priority)}">
+                            ${test.priority.toUpperCase()}
+                        </span>
+                    </td>
+                    <td>${formatDateTime(test.requested_date)}</td>
+                    <td>Dr. ${test.requested_by_first_name} ${test.requested_by_last_name}</td>
+                    <td>
+                        <span class="badge ${getWaitTimeBadgeClass(test.requested_date)}">
+                            ${getWaitTime(test.requested_date)}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-primary" onclick="viewTestDetails(${test.test_id})" title="View Details">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-outline-success" onclick="startTest(${test.test_id})" title="Start Test">
+                                <i class="fas fa-play"></i>
+                            </button>
+                            <button class="btn btn-outline-info" onclick="addNote(${test.test_id})" title="Add Note">
+                                <i class="fas fa-sticky-note"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateQuickStats(tests) {
+            const pending = tests.filter(t => t.status === 'pending').length;
+            const stat = tests.filter(t => t.priority === 'stat').length;
+            const urgent = tests.filter(t => t.priority === 'urgent').length;
+            const normal = tests.filter(t => t.priority === 'normal').length;
+
+            document.getElementById('pendingCount').textContent = pending;
+            document.getElementById('statCount').textContent = stat;
+            document.getElementById('urgentCount').textContent = urgent;
+            document.getElementById('normalCount').textContent = normal;
+        }
+
+        function filterTests() {
+            const priorityFilter = document.getElementById('priorityFilter').value;
+            const testTypeFilter = document.getElementById('testTypeFilter').value;
+            const patientSearch = document.getElementById('patientSearch').value.toLowerCase();
+
+            let filteredTests = allPendingTests.filter(test => {
+                const matchesPriority = !priorityFilter || test.priority === priorityFilter;
+                const matchesTestType = !testTypeFilter || test.test_type === testTypeFilter;
+                const matchesPatient = !patientSearch ||
+                    `${test.pat_first_name} ${test.pat_last_name}`.toLowerCase().includes(patientSearch);
+
+                return matchesPriority && matchesTestType && matchesPatient;
+            });
+
+            displayPendingTests(filteredTests);
+        }
+
+        function getPriorityBadgeClass(priority) {
+            switch (priority) {
+                case 'stat': return 'bg-danger';
+                case 'urgent': return 'bg-warning';
+                case 'normal': return 'bg-secondary';
+                default: return 'bg-secondary';
+            }
+        }
+
+        function getPriorityRowClass(priority) {
+            switch (priority) {
+                case 'stat': return 'table-danger';
+                case 'urgent': return 'table-warning';
+                default: return '';
+            }
+        }
+
+        function getWaitTime(requestedDate) {
+            if (!requestedDate) return 'N/A';
+
+            const requested = new Date(requestedDate);
+            const now = new Date();
+            const diffMs = now - requested;
+            const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+            const diffDays = Math.floor(diffHours / 24);
+
+            if (diffDays > 0) {
+                return `${diffDays}d ${diffHours % 24}h`;
+            } else {
+                return `${diffHours}h`;
+            }
+        }
+
+        function getWaitTimeBadgeClass(requestedDate) {
+            if (!requestedDate) return 'bg-secondary';
+
+            const requested = new Date(requestedDate);
+            const now = new Date();
+            const diffHours = (now - requested) / (1000 * 60 * 60);
+
+            if (diffHours > 24) return 'bg-danger';
+            if (diffHours > 8) return 'bg-warning';
+            return 'bg-success';
+        }
+
+        function formatDateTime(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        }
+
+        async function startTest(testId) {
+            if (!confirm('Start processing this test? This will move it to the in-progress section.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/lab-tests/${testId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        status: 'in_progress',
+                        started_date: new Date().toISOString(),
+                        processed_by: user.user_id
+                    })
+                });
+
+                if (response.ok) {
+                    showSuccess('Test started successfully');
+                    loadPendingTests(); // Refresh the list
+                } else {
+                    throw new Error('Failed to start test');
+                }
+            } catch (error) {
+                console.error('Error starting test:', error);
+                showError('Failed to start test');
+            }
+        }
+
+        function viewTestDetails(testId) {
+            // Redirect to test details page
+            window.location.href = `/lab/test-details.html?id=${testId}`;
+        }
+
+        function addNote(testId) {
+            const note = prompt('Add a note for this test:');
+            if (note && note.trim()) {
+                // Add note functionality - could be implemented with a proper modal
+                console.log(`Adding note for test ${testId}: ${note}`);
+                showSuccess('Note added successfully');
+            }
+        }
+
+        function refreshPendingTests() {
+            loadPendingTests();
+        }
+
+        function refreshPage() {
+            location.reload();
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/login.html';
+        }
+
+        function showSuccess(message) {
+            const alert = document.createElement('div');
+            alert.className = 'alert alert-success alert-dismissible fade show position-fixed';
+            alert.style.top = '20px';
+            alert.style.right = '20px';
+            alert.style.zIndex = '9999';
+            alert.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alert);
+            setTimeout(() => alert.remove(), 5000);
+        }
+
+        function showError(message) {
+            const alert = document.createElement('div');
+            alert.className = 'alert alert-danger alert-dismissible fade show position-fixed';
+            alert.style.top = '20px';
+            alert.style.right = '20px';
+            alert.style.zIndex = '9999';
+            alert.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alert);
+            setTimeout(() => alert.remove(), 5000);
+        }
+    </script>
+</body>
+</html>

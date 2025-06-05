@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Patients - HMS Doctor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 0.75rem 1rem;
+            margin: 0.25rem 0;
+            border-radius: 0.5rem;
+        }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            color: white;
+            background-color: rgba(255,255,255,0.1);
+        }
+        .main-content {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+        .card {
+            border: none;
+            box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            border: none;
+        }
+        .patient-card {
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+        .patient-card:hover {
+            transform: translateY(-2px);
+        }
+        .vital-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+        .vital-normal { background-color: #28a745; }
+        .vital-warning { background-color: #ffc107; }
+        .vital-critical { background-color: #dc3545; }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar p-3">
+                <div class="d-flex align-items-center mb-4">
+                    <i class="fas fa-user-md text-white me-2"></i>
+                    <h5 class="text-white mb-0">HMS Doctor</h5>
+                </div>
+
+                <nav class="nav flex-column">
+                    <a class="nav-link" href="/dashboard.html">
+                        <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                    </a>
+                    <a class="nav-link active" href="/doctor/patients.html">
+                        <i class="fas fa-user-injured me-2"></i> My Patients
+                    </a>
+                    <a class="nav-link" href="/doctor/appointments.html">
+                        <i class="fas fa-calendar-check me-2"></i> Appointments
+                    </a>
+                    <a class="nav-link" href="/doctor/prescriptions.html">
+                        <i class="fas fa-prescription-bottle-alt me-2"></i> Prescriptions
+                    </a>
+                    <a class="nav-link" href="/doctor/lab-tests.html">
+                        <i class="fas fa-flask me-2"></i> Lab Tests
+                    </a>
+                    <a class="nav-link" href="/doctor/medical-notes.html">
+                        <i class="fas fa-notes-medical me-2"></i> Medical Notes
+                    </a>
+                    <hr class="text-white-50">
+                    <a class="nav-link" href="#" onclick="logout()">
+                        <i class="fas fa-sign-out-alt me-2"></i> Logout
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 main-content p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2><i class="fas fa-user-injured me-2"></i>My Patients</h2>
+                    <div>
+                        <button class="btn btn-outline-primary me-2" onclick="refreshPatients()">
+                            <i class="fas fa-sync-alt me-2"></i>Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h3 class="text-primary" id="totalPatients">0</h3>
+                                <p class="mb-0">Total Patients</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h3 class="text-warning" id="todayAppointments">0</h3>
+                                <p class="mb-0">Today's Appointments</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h3 class="text-info" id="pendingLabTests">0</h3>
+                                <p class="mb-0">Pending Lab Tests</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h3 class="text-success" id="activePrescriptions">0</h3>
+                                <p class="mb-0">Active Prescriptions</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search and Filter -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <input type="text" class="form-control" id="searchPatient" placeholder="Search patients...">
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select" id="filterStatus">
+                                    <option value="">All Patients</option>
+                                    <option value="recent">Recent Visits</option>
+                                    <option value="critical">Critical Cases</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <button class="btn btn-outline-primary" onclick="applyFilters()">
+                                    <i class="fas fa-search me-2"></i>Search
+                                </button>
+                                <button class="btn btn-outline-secondary" onclick="clearFilters()">
+                                    <i class="fas fa-times me-2"></i>Clear
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Patients Grid -->
+                <div id="patientsGrid" class="row">
+                    <!-- Patient cards will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Patient Details Modal -->
+    <div class="modal fade" id="patientModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="patientModalTitle">Patient Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="patientDetailsContent">
+                        <!-- Content will be loaded dynamically -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="addHealthRecordBtn" onclick="addHealthRecord()">
+                        <i class="fas fa-plus me-2"></i>Add Health Record
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Health Record Modal -->
+    <div class="modal fade" id="healthRecordModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Health Record</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="healthRecordForm">
+                        <input type="hidden" id="selectedPatientId" name="pat_id">
+                        <div class="mb-3">
+                            <label for="recordType" class="form-label">Record Type *</label>
+                            <select class="form-select" id="recordType" name="record_type" required>
+                                <option value="">Select Type</option>
+                                <option value="medical_history">Medical History</option>
+                                <option value="diagnosis">Diagnosis</option>
+                                <option value="treatment_plan">Treatment Plan</option>
+                                <option value="discharge_summary">Discharge Summary</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="recordTitle" class="form-label">Title *</label>
+                            <input type="text" class="form-control" id="recordTitle" name="title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="recordContent" class="form-label">Content *</label>
+                            <textarea class="form-control" id="recordContent" name="content" rows="6" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="isConfidential" name="is_confidential">
+                                <label class="form-check-label" for="isConfidential">
+                                    Confidential Record
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="saveHealthRecord()">Save Record</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        // Authentication check
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+        if (!token || user.role !== 'doctor') {
+            window.location.href = '/login.html';
+        }
+
+        let patients = [];
+        let currentPatientId = null;
+
+        // Initialize page
+        $(document).ready(function() {
+            loadPatients();
+            loadStats();
+            setupSearch();
+        });
+
+        function setupSearch() {
+            $('#searchPatient').on('keyup', function() {
+                const searchTerm = this.value.toLowerCase();
+                filterPatients(searchTerm);
+            });
+        }
+
+        async function loadPatients() {
+            try {
+                // For now, load all patients (in real implementation, filter by doctor's patients)
+                const response = await apiCall('/patient');
+                patients = response || [];
+
+                displayPatients(patients);
+                updateStats();
+            } catch (error) {
+                showAlert('Error loading patients: ' + error.message, 'danger');
+                console.error('Error details:', error);
+            }
+        }
+
+        function displayPatients(patientsToShow) {
+            const grid = document.getElementById('patientsGrid');
+            grid.innerHTML = '';
+
+            if (patientsToShow.length === 0) {
+                grid.innerHTML = '<div class="col-12"><div class="alert alert-info">No patients found.</div></div>';
+                return;
+            }
+
+            patientsToShow.forEach(patient => {
+                const patientCard = `
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card patient-card h-100" onclick="viewPatientDetails(${patient.pat_id})">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <h6 class="card-title mb-0">${patient.pat_first_name} ${patient.pat_last_name}</h6>
+                                    <span class="vital-indicator vital-normal" title="Stable"></span>
+                                </div>
+                                <p class="card-text">
+                                    <small class="text-muted">
+                                        <i class="fas fa-id-card me-1"></i>${patient.pat_insurance_no}<br>
+                                        <i class="fas fa-phone me-1"></i>${patient.pat_ph_no}
+                                    </small>
+                                </p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">
+                                        <i class="fas fa-map-marker-alt me-1"></i>
+                                        ${patient.pat_address.substring(0, 30)}...
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="card-footer bg-transparent">
+                                <div class="btn-group w-100" role="group">
+                                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="event.stopPropagation(); viewHealthRecords(${patient.pat_id})">
+                                        <i class="fas fa-file-medical"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-success" onclick="event.stopPropagation(); viewVitalSigns(${patient.pat_id})">
+                                        <i class="fas fa-heartbeat"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-info" onclick="event.stopPropagation(); viewLabTests(${patient.pat_id})">
+                                        <i class="fas fa-flask"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-warning" onclick="event.stopPropagation(); viewPrescriptions(${patient.pat_id})">
+                                        <i class="fas fa-pills"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                grid.innerHTML += patientCard;
+            });
+        }
+
+        function filterPatients(searchTerm) {
+            const filtered = patients.filter(patient =>
+                patient.pat_first_name.toLowerCase().includes(searchTerm) ||
+                patient.pat_last_name.toLowerCase().includes(searchTerm) ||
+                patient.pat_insurance_no.toLowerCase().includes(searchTerm)
+            );
+            displayPatients(filtered);
+        }
+
+        async function loadStats() {
+            try {
+                // Load basic stats - for now just show patient count
+                // Other stats will be implemented as modules are added
+                updateStats(0, 0, 0);
+            } catch (error) {
+                console.error('Error loading stats:', error);
+                updateStats(0, 0, 0);
+            }
+        }
+
+        function updateStats(todayApts = 0, pendingTests = 0, activePrescriptions = 0) {
+            document.getElementById('totalPatients').textContent = patients.length;
+            document.getElementById('todayAppointments').textContent = todayApts;
+            document.getElementById('pendingLabTests').textContent = pendingTests;
+            document.getElementById('activePrescriptions').textContent = activePrescriptions;
+        }
+
+        async function viewPatientDetails(patientId) {
+            try {
+                currentPatientId = patientId;
+                const patient = await apiCall(`/patient/${patientId}`);
+
+                // For now, show basic patient info. Other data will be loaded as modules are implemented
+                const healthRecords = [];
+                const vitals = [];
+                const labTests = [];
+                const prescriptions = [];
+
+                const content = `
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6><i class="fas fa-user me-2"></i>Patient Information</h6>
+                                </div>
+                                <div class="card-body">
+                                    <p><strong>Name:</strong> ${patient.pat_first_name} ${patient.pat_last_name}</p>
+                                    <p><strong>Insurance:</strong> ${patient.pat_insurance_no}</p>
+                                    <p><strong>Phone:</strong> ${patient.pat_ph_no}</p>
+                                    <p><strong>Address:</strong> ${patient.pat_address}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h6><i class="fas fa-chart-line me-2"></i>Medical Summary</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <p><strong>Health Records:</strong> ${healthRecords.length}</p>
+                                            <p><strong>Vital Signs:</strong> ${vitals.length}</p>
+                                            <p><strong>Lab Tests:</strong> ${labTests.length}</p>
+                                            <p><strong>Prescriptions:</strong> ${prescriptions.length}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h6><i class="fas fa-heartbeat me-2"></i>Latest Vitals</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            ${vitals.length > 0 ? `
+                                                <p><strong>Temperature:</strong> ${vitals[0].temperature || 'N/A'}°F</p>
+                                                <p><strong>BP:</strong> ${vitals[0].blood_pressure_systolic || 'N/A'}/${vitals[0].blood_pressure_diastolic || 'N/A'}</p>
+                                                <p><strong>Heart Rate:</strong> ${vitals[0].heart_rate || 'N/A'} bpm</p>
+                                                <small class="text-muted">Recorded: ${new Date(vitals[0].recorded_date).toLocaleDateString()}</small>
+                                            ` : '<p class="text-muted">No vital signs recorded</p>'}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <ul class="nav nav-tabs" id="patientTabs" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="records-tab" data-bs-toggle="tab" data-bs-target="#records" type="button" role="tab">
+                                        Health Records (${healthRecords.length})
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="lab-tab" data-bs-toggle="tab" data-bs-target="#lab" type="button" role="tab">
+                                        Lab Tests (${labTests.length})
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="prescriptions-tab" data-bs-toggle="tab" data-bs-target="#prescriptions" type="button" role="tab">
+                                        Prescriptions (${prescriptions.length})
+                                    </button>
+                                </li>
+                            </ul>
+                            <div class="tab-content" id="patientTabsContent">
+                                <div class="tab-pane fade show active" id="records" role="tabpanel">
+                                    <div class="p-3">
+                                        ${healthRecords.length > 0 ?
+                                            healthRecords.slice(0, 5).map(record => `
+                                                <div class="border-bottom pb-2 mb-2">
+                                                    <div class="d-flex justify-content-between">
+                                                        <strong>${record.title}</strong>
+                                                        <span class="badge bg-primary">${record.record_type.replace('_', ' ')}</span>
+                                                    </div>
+                                                    <p class="mb-1">${record.content.substring(0, 100)}...</p>
+                                                    <small class="text-muted">${new Date(record.created_date).toLocaleDateString()}</small>
+                                                </div>
+                                            `).join('') :
+                                            '<p class="text-muted">No health records found.</p>'
+                                        }
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="lab" role="tabpanel">
+                                    <div class="p-3">
+                                        ${labTests.length > 0 ?
+                                            labTests.slice(0, 5).map(test => `
+                                                <div class="border-bottom pb-2 mb-2">
+                                                    <div class="d-flex justify-content-between">
+                                                        <strong>${test.test_name}</strong>
+                                                        <span class="badge bg-${test.status === 'completed' ? 'success' : 'warning'}">${test.status}</span>
+                                                    </div>
+                                                    <p class="mb-1">${test.test_type}</p>
+                                                    <small class="text-muted">${new Date(test.requested_date).toLocaleDateString()}</small>
+                                                </div>
+                                            `).join('') :
+                                            '<p class="text-muted">No lab tests found.</p>'
+                                        }
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="prescriptions" role="tabpanel">
+                                    <div class="p-3">
+                                        ${prescriptions.length > 0 ?
+                                            prescriptions.slice(0, 5).map(prescription => `
+                                                <div class="border-bottom pb-2 mb-2">
+                                                    <div class="d-flex justify-content-between">
+                                                        <strong>${prescription.medication_name || 'Medication'}</strong>
+                                                        <span class="badge bg-${prescription.status === 'active' ? 'success' : 'secondary'}">${prescription.status}</span>
+                                                    </div>
+                                                    <p class="mb-1">${prescription.dosage} - ${prescription.frequency}</p>
+                                                    <small class="text-muted">${new Date(prescription.prescribed_date).toLocaleDateString()}</small>
+                                                </div>
+                                            `).join('') :
+                                            '<p class="text-muted">No prescriptions found.</p>'
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                document.getElementById('patientDetailsContent').innerHTML = content;
+                document.getElementById('patientModalTitle').textContent = `${patient.pat_first_name} ${patient.pat_last_name} - Patient Details`;
+                new bootstrap.Modal(document.getElementById('patientModal')).show();
+            } catch (error) {
+                showAlert('Error loading patient details: ' + error.message, 'danger');
+            }
+        }
+
+        function addHealthRecord() {
+            if (currentPatientId) {
+                document.getElementById('selectedPatientId').value = currentPatientId;
+                bootstrap.Modal.getInstance(document.getElementById('patientModal')).hide();
+                new bootstrap.Modal(document.getElementById('healthRecordModal')).show();
+            }
+        }
+
+        async function saveHealthRecord() {
+            const form = document.getElementById('healthRecordForm');
+            const formData = new FormData(form);
+            const recordData = {};
+
+            for (let [key, value] of formData.entries()) {
+                if (value.trim() !== '') {
+                    recordData[key] = value;
+                }
+            }
+
+            recordData.is_confidential = document.getElementById('isConfidential').checked ? 1 : 0;
+
+            try {
+                const response = await apiCall('/health-records', 'POST', recordData);
+                if (response) {
+                    showAlert('Health record created successfully!', 'success');
+                    bootstrap.Modal.getInstance(document.getElementById('healthRecordModal')).hide();
+                    form.reset();
+                }
+            } catch (error) {
+                showAlert('Error saving health record: ' + error.message, 'danger');
+            }
+        }
+
+        function viewHealthRecords(patientId) {
+            showAlert('Health Records module coming soon!', 'info');
+        }
+
+        function viewVitalSigns(patientId) {
+            showAlert('Vital Signs module coming soon!', 'info');
+        }
+
+        function viewLabTests(patientId) {
+            showAlert('Lab Tests module coming soon!', 'info');
+        }
+
+        function viewPrescriptions(patientId) {
+            showAlert('Prescriptions module coming soon!', 'info');
+        }
+
+        function refreshPatients() {
+            loadPatients();
+            loadStats();
+        }
+
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchPatient').value.toLowerCase();
+            filterPatients(searchTerm);
+        }
+
+        function clearFilters() {
+            document.getElementById('searchPatient').value = '';
+            document.getElementById('filterStatus').value = '';
+            displayPatients(patients);
+        }
+
+        // API helper function
+        async function apiCall(endpoint, method = 'GET', data = null) {
+            const options = {
+                method,
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            };
+
+            if (data) {
+                options.body = JSON.stringify(data);
+            }
+
+            const response = await fetch(endpoint, options);
+
+            if (response.status === 401) {
+                logout();
+                return;
+            }
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.error || 'Request failed');
+            }
+
+            return result;
+        }
+
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alertDiv);
+
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.parentNode.removeChild(alertDiv);
+                }
+            }, 5000);
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/login.html';
+        }
+    </script>
+</body>
+</html>

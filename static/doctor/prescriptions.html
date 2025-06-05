@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prescriptions - HMS Doctor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 0.75rem 1rem;
+            margin: 0.25rem 0;
+            border-radius: 0.5rem;
+        }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            color: white;
+            background-color: rgba(255,255,255,0.1);
+        }
+        .main-content {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+        .feature-card {
+            transition: transform 0.2s;
+        }
+        .feature-card:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar p-3">
+                <div class="d-flex align-items-center mb-4">
+                    <i class="fas fa-prescription-bottle-alt text-white me-2"></i>
+                    <h5 class="text-white mb-0">HMS Doctor</h5>
+                </div>
+
+                <nav class="nav flex-column">
+                    <a class="nav-link" href="/dashboard.html">
+                        <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                    </a>
+                    <!-- Role-specific navigation will be added here -->
+                    <hr class="text-white-50">
+                    <a class="nav-link" href="#" onclick="logout()">
+                        <i class="fas fa-sign-out-alt me-2"></i> Logout
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 main-content p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2><i class="fas fa-prescription-bottle-alt me-2"></i>Prescription Management</h2>
+                    <button class="btn btn-outline-primary" onclick="refreshPage()">
+                        <i class="fas fa-sync-alt me-2"></i>Refresh
+                    </button>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <h5 class="mb-3">
+                                            <i class="fas fa-prescription-bottle-alt me-2"></i>Prescription Management
+                                        </h5>
+                                        <p class="text-muted">Create, manage, and track patient prescriptions with comprehensive medication management.</p>
+                                    </div>
+                                    <div class="col-md-4 text-end">
+                                        <button class="btn btn-primary" onclick="showCreatePrescriptionModal()">
+                                            <i class="fas fa-plus me-2"></i>New Prescription
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Statistics Cards -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h3 class="text-primary" id="totalPrescriptions">0</h3>
+                                <p class="mb-0">Total Prescriptions</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h3 class="text-warning" id="activePrescriptions">0</h3>
+                                <p class="mb-0">Active Prescriptions</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h3 class="text-info" id="todayPrescriptions">0</h3>
+                                <p class="mb-0">Today's Prescriptions</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h3 class="text-success" id="dispensedPrescriptions">0</h3>
+                                <p class="mb-0">Dispensed</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Patient Search -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="mb-0">
+                                    <i class="fas fa-search me-2"></i>Find Patient
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="patientSearch" placeholder="Search by patient name or ID...">
+                                            <button class="btn btn-outline-primary" onclick="searchPatients()">
+                                                <i class="fas fa-search"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <select class="form-select" id="statusFilter" onchange="filterPrescriptions()">
+                                            <option value="">All Status</option>
+                                            <option value="active">Active</option>
+                                            <option value="completed">Completed</option>
+                                            <option value="cancelled">Cancelled</option>
+                                            <option value="dispensed">Dispensed</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="date" class="form-control" id="dateFilter" onchange="filterPrescriptions()">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Prescriptions List -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-list me-2"></i>Recent Prescriptions
+                                </h5>
+                                <div>
+                                    <button class="btn btn-outline-info btn-sm me-2" onclick="exportPrescriptions()">
+                                        <i class="fas fa-download me-1"></i>Export
+                                    </button>
+                                    <button class="btn btn-outline-primary btn-sm" onclick="refreshPrescriptions()">
+                                        <i class="fas fa-sync-alt me-1"></i>Refresh
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover" id="prescriptionsTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Date</th>
+                                                <th>Patient</th>
+                                                <th>Medication</th>
+                                                <th>Dosage</th>
+                                                <th>Duration</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="prescriptionsTableBody">
+                                            <tr>
+                                                <td colspan="7" class="text-center">
+                                                    <div class="spinner-border text-primary" role="status">
+                                                        <span class="visually-hidden">Loading...</span>
+                                                    </div>
+                                                    <p class="mt-2">Loading prescriptions...</p>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Prescription Modal -->
+    <div class="modal fade" id="prescriptionModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create New Prescription</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="prescriptionForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Patient *</label>
+                                    <select class="form-select" id="prescriptionPatientId" required>
+                                        <option value="">Select Patient</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Medication *</label>
+                                    <select class="form-select" id="medicationId" required>
+                                        <option value="">Select Medication</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Dosage *</label>
+                                    <input type="text" class="form-control" id="dosage" required placeholder="e.g., 500mg">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Frequency *</label>
+                                    <select class="form-select" id="frequency" required>
+                                        <option value="">Select Frequency</option>
+                                        <option value="once_daily">Once Daily</option>
+                                        <option value="twice_daily">Twice Daily</option>
+                                        <option value="three_times_daily">Three Times Daily</option>
+                                        <option value="four_times_daily">Four Times Daily</option>
+                                        <option value="as_needed">As Needed</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Duration (days) *</label>
+                                    <input type="number" class="form-control" id="duration" required min="1" placeholder="7">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Quantity *</label>
+                                    <input type="number" class="form-control" id="quantity" required min="1" placeholder="30">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Refills</label>
+                                    <input type="number" class="form-control" id="refills" min="0" max="5" value="0">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Instructions</label>
+                            <textarea class="form-control" id="instructions" rows="3" placeholder="Take with food, avoid alcohol, etc."></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Notes</label>
+                            <textarea class="form-control" id="notes" rows="2" placeholder="Additional notes for pharmacist or patient"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="savePrescription()">Create Prescription</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Authentication check
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+        if (!token || user.role !== 'doctor') {
+            window.location.href = '/login.html';
+        }
+
+        let allPrescriptions = [];
+        let allPatients = [];
+        let allMedications = [];
+
+        // Load data on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadPrescriptions();
+            loadPatients();
+            loadMedications();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            document.getElementById('patientSearch').addEventListener('input', filterPrescriptions);
+        }
+
+        async function loadPrescriptions() {
+            try {
+                const response = await fetch('/prescriptions', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    allPrescriptions = await response.json();
+                } else {
+                    allPrescriptions = generateMockPrescriptions();
+                }
+
+                displayPrescriptions(allPrescriptions);
+                updateStats();
+            } catch (error) {
+                console.error('Error loading prescriptions:', error);
+                allPrescriptions = generateMockPrescriptions();
+                displayPrescriptions(allPrescriptions);
+                updateStats();
+            }
+        }
+
+        async function loadPatients() {
+            try {
+                const response = await fetch('/patient', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    allPatients = await response.json();
+                } else {
+                    allPatients = generateMockPatients();
+                }
+
+                populatePatientSelect();
+            } catch (error) {
+                console.error('Error loading patients:', error);
+                allPatients = generateMockPatients();
+                populatePatientSelect();
+            }
+        }
+
+        async function loadMedications() {
+            try {
+                const response = await fetch('/medication', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    allMedications = await response.json();
+                } else {
+                    allMedications = generateMockMedications();
+                }
+
+                populateMedicationSelect();
+            } catch (error) {
+                console.error('Error loading medications:', error);
+                allMedications = generateMockMedications();
+                populateMedicationSelect();
+            }
+        }
+
+        function generateMockPrescriptions() {
+            const medications = ['Amoxicillin', 'Ibuprofen', 'Metformin', 'Lisinopril', 'Atorvastatin'];
+            const statuses = ['active', 'completed', 'dispensed', 'cancelled'];
+            const mockData = [];
+
+            for (let i = 0; i < 15; i++) {
+                const prescriptionDate = new Date();
+                prescriptionDate.setDate(prescriptionDate.getDate() - Math.floor(Math.random() * 30));
+
+                mockData.push({
+                    prescription_id: i + 1,
+                    patient_id: Math.floor(Math.random() * 5) + 1,
+                    pat_first_name: ['John', 'Jane', 'Bob', 'Alice', 'Charlie'][Math.floor(Math.random() * 5)],
+                    pat_last_name: ['Doe', 'Smith', 'Johnson', 'Brown', 'Wilson'][Math.floor(Math.random() * 5)],
+                    medication_name: medications[Math.floor(Math.random() * medications.length)],
+                    dosage: ['250mg', '500mg', '10mg', '20mg', '5mg'][Math.floor(Math.random() * 5)],
+                    frequency: ['once_daily', 'twice_daily', 'three_times_daily'][Math.floor(Math.random() * 3)],
+                    duration: Math.floor(Math.random() * 30) + 7,
+                    quantity: Math.floor(Math.random() * 60) + 30,
+                    status: statuses[Math.floor(Math.random() * statuses.length)],
+                    prescribed_date: prescriptionDate.toISOString(),
+                    instructions: 'Take with food',
+                    doctor_first_name: user.first_name || 'Current',
+                    doctor_last_name: user.last_name || 'Doctor'
+                });
+            }
+
+            return mockData.sort((a, b) => new Date(b.prescribed_date) - new Date(a.prescribed_date));
+        }
+
+        function generateMockPatients() {
+            return [
+                {patient_id: 1, pat_first_name: 'John', pat_last_name: 'Doe', pat_insurance_no: 'INS001'},
+                {patient_id: 2, pat_first_name: 'Jane', pat_last_name: 'Smith', pat_insurance_no: 'INS002'},
+                {patient_id: 3, pat_first_name: 'Bob', pat_last_name: 'Johnson', pat_insurance_no: 'INS003'},
+                {patient_id: 4, pat_first_name: 'Alice', pat_last_name: 'Brown', pat_insurance_no: 'INS004'},
+                {patient_id: 5, pat_first_name: 'Charlie', pat_last_name: 'Wilson', pat_insurance_no: 'INS005'}
+            ];
+        }
+
+        function generateMockMedications() {
+            return [
+                {med_code: 1, med_name: 'Amoxicillin', med_type: 'Antibiotic'},
+                {med_code: 2, med_name: 'Ibuprofen', med_type: 'Pain Reliever'},
+                {med_code: 3, med_name: 'Metformin', med_type: 'Diabetes'},
+                {med_code: 4, med_name: 'Lisinopril', med_type: 'Blood Pressure'},
+                {med_code: 5, med_name: 'Atorvastatin', med_type: 'Cholesterol'}
+            ];
+        }
+
+        function populatePatientSelect() {
+            const select = document.getElementById('prescriptionPatientId');
+            select.innerHTML = '<option value="">Select Patient</option>';
+
+            allPatients.forEach(patient => {
+                const option = document.createElement('option');
+                option.value = patient.patient_id;
+                option.textContent = `${patient.pat_first_name} ${patient.pat_last_name} (${patient.pat_insurance_no})`;
+                select.appendChild(option);
+            });
+        }
+
+        function populateMedicationSelect() {
+            const select = document.getElementById('medicationId');
+            select.innerHTML = '<option value="">Select Medication</option>';
+
+            allMedications.forEach(medication => {
+                const option = document.createElement('option');
+                option.value = medication.med_code;
+                option.textContent = `${medication.med_name} (${medication.med_type})`;
+                select.appendChild(option);
+            });
+        }
+
+        function displayPrescriptions(prescriptions) {
+            const tbody = document.getElementById('prescriptionsTableBody');
+
+            if (prescriptions.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-center py-4">
+                            <i class="fas fa-info-circle text-muted fa-2x mb-2"></i>
+                            <p class="text-muted">No prescriptions found</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = prescriptions.map(prescription => `
+                <tr>
+                    <td>${formatDate(prescription.prescribed_date)}</td>
+                    <td>
+                        <strong>${prescription.pat_first_name} ${prescription.pat_last_name}</strong>
+                        <br><small class="text-muted">ID: ${prescription.patient_id}</small>
+                    </td>
+                    <td>${prescription.medication_name}</td>
+                    <td>${prescription.dosage}</td>
+                    <td>${prescription.duration} days</td>
+                    <td>
+                        <span class="badge ${getStatusBadgeClass(prescription.status)}">
+                            ${prescription.status.toUpperCase()}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-primary" onclick="viewPrescription(${prescription.prescription_id})" title="View">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-outline-success" onclick="editPrescription(${prescription.prescription_id})" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-outline-info" onclick="printPrescription(${prescription.prescription_id})" title="Print">
+                                <i class="fas fa-print"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateStats() {
+            const today = new Date().toISOString().split('T')[0];
+            const total = allPrescriptions.length;
+            const active = allPrescriptions.filter(p => p.status === 'active').length;
+            const todayCount = allPrescriptions.filter(p => p.prescribed_date.startsWith(today)).length;
+            const dispensed = allPrescriptions.filter(p => p.status === 'dispensed').length;
+
+            document.getElementById('totalPrescriptions').textContent = total;
+            document.getElementById('activePrescriptions').textContent = active;
+            document.getElementById('todayPrescriptions').textContent = todayCount;
+            document.getElementById('dispensedPrescriptions').textContent = dispensed;
+        }
+
+        function getStatusBadgeClass(status) {
+            switch (status) {
+                case 'active': return 'bg-success';
+                case 'completed': return 'bg-primary';
+                case 'dispensed': return 'bg-info';
+                case 'cancelled': return 'bg-danger';
+                default: return 'bg-secondary';
+            }
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            return date.toLocaleDateString();
+        }
+
+        function showCreatePrescriptionModal() {
+            document.getElementById('prescriptionForm').reset();
+            new bootstrap.Modal(document.getElementById('prescriptionModal')).show();
+        }
+
+        async function savePrescription() {
+            const form = document.getElementById('prescriptionForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const prescriptionData = {
+                patient_id: document.getElementById('prescriptionPatientId').value,
+                medication_id: document.getElementById('medicationId').value,
+                dosage: document.getElementById('dosage').value,
+                frequency: document.getElementById('frequency').value,
+                duration: document.getElementById('duration').value,
+                quantity: document.getElementById('quantity').value,
+                refills: document.getElementById('refills').value,
+                instructions: document.getElementById('instructions').value,
+                notes: document.getElementById('notes').value,
+                doctor_id: user.user_id,
+                status: 'active'
+            };
+
+            try {
+                const response = await fetch('/prescriptions', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(prescriptionData)
+                });
+
+                if (response.ok) {
+                    showSuccess('Prescription created successfully');
+                    bootstrap.Modal.getInstance(document.getElementById('prescriptionModal')).hide();
+                    loadPrescriptions();
+                } else {
+                    const error = await response.json();
+                    showError('Failed to create prescription: ' + (error.message || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error creating prescription:', error);
+                showError('Failed to create prescription');
+            }
+        }
+
+        function filterPrescriptions() {
+            const patientSearch = document.getElementById('patientSearch').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const dateFilter = document.getElementById('dateFilter').value;
+
+            let filtered = allPrescriptions.filter(prescription => {
+                const matchesPatient = !patientSearch ||
+                    `${prescription.pat_first_name} ${prescription.pat_last_name}`.toLowerCase().includes(patientSearch) ||
+                    prescription.patient_id.toString().includes(patientSearch);
+                const matchesStatus = !statusFilter || prescription.status === statusFilter;
+                const matchesDate = !dateFilter || prescription.prescribed_date.startsWith(dateFilter);
+
+                return matchesPatient && matchesStatus && matchesDate;
+            });
+
+            displayPrescriptions(filtered);
+        }
+
+        function searchPatients() {
+            filterPrescriptions();
+        }
+
+        function refreshPrescriptions() {
+            loadPrescriptions();
+        }
+
+        function exportPrescriptions() {
+            showInfo('Export functionality will be implemented soon');
+        }
+
+        function viewPrescription(prescriptionId) {
+            showInfo('View prescription functionality will be implemented soon');
+        }
+
+        function editPrescription(prescriptionId) {
+            showInfo('Edit prescription functionality will be implemented soon');
+        }
+
+        function printPrescription(prescriptionId) {
+            showInfo('Print prescription functionality will be implemented soon');
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/login.html';
+        }
+
+        function showSuccess(message) {
+            showAlert(message, 'success');
+        }
+
+        function showError(message) {
+            showAlert(message, 'danger');
+        }
+
+        function showInfo(message) {
+            showAlert(message, 'info');
+        }
+
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+
+            const mainContent = document.querySelector('.main-content');
+            mainContent.insertBefore(alertDiv, mainContent.firstChild);
+
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.remove();
+                }
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

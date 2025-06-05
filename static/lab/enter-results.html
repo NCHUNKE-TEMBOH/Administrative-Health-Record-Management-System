@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enter Results - HMS Lab</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+        }
+        .sidebar .nav-link {
+            color: rgba(0,0,0,0.7);
+            padding: 0.75rem 1rem;
+            margin: 0.25rem 0;
+            border-radius: 0.5rem;
+        }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            color: black;
+            background-color: rgba(0,0,0,0.1);
+        }
+        .main-content {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+        .feature-card {
+            transition: transform 0.2s;
+        }
+        .feature-card:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar p-3">
+                <div class="d-flex align-items-center mb-4">
+                    <i class="fas fa-edit text-dark me-2"></i>
+                    <h5 class="text-dark mb-0">HMS Lab</h5>
+                </div>
+
+                <nav class="nav flex-column">
+                    <a class="nav-link" href="/dashboard.html">
+                        <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                    </a>
+                    <!-- Role-specific navigation will be added here -->
+                    <hr class="text-dark">
+                    <a class="nav-link" href="#" onclick="logout()">
+                        <i class="fas fa-sign-out-alt me-2"></i> Logout
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 main-content p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2><i class="fas fa-edit me-2"></i>Enter Results</h2>
+                    <button class="btn btn-outline-primary" onclick="refreshPage()">
+                        <i class="fas fa-sync-alt me-2"></i>Refresh
+                    </button>
+                </div>
+
+                <!-- Test Selection -->
+                <div class="row mb-4" id="testSelectionSection">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-search me-2"></i>Select Lab Test
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label for="testSelect" class="form-label">Select Test to Enter Results</label>
+                                        <select class="form-select" id="testSelect" onchange="loadTestDetails()">
+                                            <option value="">Choose a test...</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="patientSearch" class="form-label">Search by Patient</label>
+                                        <input type="text" class="form-control" id="patientSearch" placeholder="Search patient name or ID..." onkeyup="filterTests()">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Test Details and Results Entry -->
+                <div class="row" id="resultsEntrySection" style="display: none;">
+                    <div class="col-md-4">
+                        <!-- Test Information -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-info-circle me-2"></i>Test Information
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="testInfo">
+                                    <!-- Test details will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Patient Information -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-user me-2"></i>Patient Information
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="patientInfo">
+                                    <!-- Patient details will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-8">
+                        <!-- Results Entry Form -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-edit me-2"></i>Enter Test Results
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="resultsForm">
+                                    <input type="hidden" id="selectedTestId" name="test_id">
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="testStatus" class="form-label">Test Status *</label>
+                                            <select class="form-select" id="testStatus" name="status" required>
+                                                <option value="completed">Completed</option>
+                                                <option value="cancelled">Cancelled</option>
+                                                <option value="inconclusive">Inconclusive</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="completedDate" class="form-label">Completion Date *</label>
+                                            <input type="datetime-local" class="form-control" id="completedDate" name="completed_date" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="testResults" class="form-label">Test Results *</label>
+                                        <textarea class="form-control" id="testResults" name="results" rows="8" required placeholder="Enter detailed test results..."></textarea>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="normalValues" class="form-label">Normal Values/Reference Range</label>
+                                        <textarea class="form-control" id="normalValues" name="normal_values" rows="3" placeholder="Enter normal values or reference ranges..."></textarea>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="interpretation" class="form-label">Interpretation</label>
+                                        <textarea class="form-control" id="interpretation" name="interpretation" rows="4" placeholder="Clinical interpretation of results..."></textarea>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="criticalFlag" class="form-label">Critical Flag</label>
+                                            <select class="form-select" id="criticalFlag" name="critical_flag">
+                                                <option value="normal">Normal</option>
+                                                <option value="abnormal">Abnormal</option>
+                                                <option value="critical">Critical</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="verifiedBy" class="form-label">Verified By</label>
+                                            <input type="text" class="form-control" id="verifiedBy" name="verified_by" readonly>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="technicalNotes" class="form-label">Technical Notes</label>
+                                        <textarea class="form-control" id="technicalNotes" name="technical_notes" rows="3" placeholder="Any technical notes or observations..."></textarea>
+                                    </div>
+
+                                    <div class="d-flex justify-content-between">
+                                        <button type="button" class="btn btn-secondary" onclick="clearForm()">
+                                            <i class="fas fa-times me-2"></i>Clear Form
+                                        </button>
+                                        <div>
+                                            <button type="button" class="btn btn-outline-primary me-2" onclick="saveAsDraft()">
+                                                <i class="fas fa-save me-2"></i>Save as Draft
+                                            </button>
+                                            <button type="button" class="btn btn-primary" onclick="submitResults()">
+                                                <i class="fas fa-check me-2"></i>Submit Results
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Authentication check
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+        if (!token || user.role !== 'lab_technician') {
+            window.location.href = '/login.html';
+        }
+
+        let labTests = [];
+        let patients = [];
+        let selectedTest = null;
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadInProgressTests();
+            loadPatients();
+            setCurrentDateTime();
+            setVerifiedBy();
+
+            // Check if testId is provided in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const testId = urlParams.get('testId');
+            if (testId) {
+                setTimeout(() => {
+                    document.getElementById('testSelect').value = testId;
+                    loadTestDetails();
+                }, 1000);
+            }
+        });
+
+        async function loadInProgressTests() {
+            try {
+                const response = await fetch('/lab-tests?status=in-progress', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    labTests = await response.json();
+                } else {
+                    // Use mock data as fallback
+                    labTests = generateMockInProgressTests();
+                }
+
+                populateTestSelect();
+            } catch (error) {
+                console.error('Error loading tests:', error);
+                labTests = generateMockInProgressTests();
+                populateTestSelect();
+            }
+        }
+
+        async function loadPatients() {
+            try {
+                const response = await fetch('/patient', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    patients = await response.json();
+                } else {
+                    patients = generateMockPatients();
+                }
+            } catch (error) {
+                console.error('Error loading patients:', error);
+                patients = generateMockPatients();
+            }
+        }
+
+        function generateMockInProgressTests() {
+            return [
+                {
+                    test_id: 1,
+                    pat_id: 1,
+                    test_name: 'Complete Blood Count',
+                    test_type: 'blood',
+                    priority: 'normal',
+                    status: 'in-progress',
+                    requested_date: '2024-01-15T09:00:00',
+                    started_date: '2024-01-15T10:30:00',
+                    instructions: 'Fasting required'
+                },
+                {
+                    test_id: 2,
+                    pat_id: 2,
+                    test_name: 'Urinalysis',
+                    test_type: 'urine',
+                    priority: 'urgent',
+                    status: 'in-progress',
+                    requested_date: '2024-01-15T08:00:00',
+                    started_date: '2024-01-15T09:15:00',
+                    instructions: 'Clean catch specimen'
+                }
+            ];
+        }
+
+        function generateMockPatients() {
+            return [
+                {pat_id: 1, pat_first_name: 'John', pat_last_name: 'Doe', pat_insurance_no: 'INS001', pat_phone: '555-0101'},
+                {pat_id: 2, pat_first_name: 'Jane', pat_last_name: 'Smith', pat_insurance_no: 'INS002', pat_phone: '555-0102'}
+            ];
+        }
+
+        function populateTestSelect() {
+            const testSelect = document.getElementById('testSelect');
+            testSelect.innerHTML = '<option value="">Choose a test...</option>';
+
+            labTests.forEach(test => {
+                const patient = patients.find(p => p.pat_id === test.pat_id);
+                const patientName = patient ? `${patient.pat_first_name} ${patient.pat_last_name}` : 'Unknown';
+
+                const option = document.createElement('option');
+                option.value = test.test_id;
+                option.textContent = `${test.test_name} - ${patientName} (ID: ${test.test_id})`;
+                option.dataset.patientId = test.pat_id;
+                testSelect.appendChild(option);
+            });
+        }
+
+        function filterTests() {
+            const searchTerm = document.getElementById('patientSearch').value.toLowerCase();
+            const testSelect = document.getElementById('testSelect');
+            const options = testSelect.querySelectorAll('option');
+
+            options.forEach(option => {
+                if (option.value === '') return; // Skip the default option
+
+                const patient = patients.find(p => p.pat_id == option.dataset.patientId);
+                if (patient) {
+                    const patientText = `${patient.pat_first_name} ${patient.pat_last_name} ${patient.pat_insurance_no}`.toLowerCase();
+                    option.style.display = patientText.includes(searchTerm) ? 'block' : 'none';
+                }
+            });
+        }
+
+        function loadTestDetails() {
+            const testId = document.getElementById('testSelect').value;
+            if (!testId) {
+                document.getElementById('resultsEntrySection').style.display = 'none';
+                return;
+            }
+
+            selectedTest = labTests.find(test => test.test_id == testId);
+            if (!selectedTest) return;
+
+            const patient = patients.find(p => p.pat_id === selectedTest.pat_id);
+
+            // Populate test information
+            document.getElementById('testInfo').innerHTML = `
+                <table class="table table-borderless">
+                    <tr><td><strong>Test ID:</strong></td><td>${selectedTest.test_id}</td></tr>
+                    <tr><td><strong>Test Name:</strong></td><td>${selectedTest.test_name}</td></tr>
+                    <tr><td><strong>Test Type:</strong></td><td>${selectedTest.test_type}</td></tr>
+                    <tr><td><strong>Priority:</strong></td><td><span class="badge bg-${selectedTest.priority === 'stat' ? 'danger' : selectedTest.priority === 'urgent' ? 'warning' : 'secondary'}">${selectedTest.priority}</span></td></tr>
+                    <tr><td><strong>Requested:</strong></td><td>${formatDateTime(selectedTest.requested_date)}</td></tr>
+                    <tr><td><strong>Started:</strong></td><td>${formatDateTime(selectedTest.started_date)}</td></tr>
+                    ${selectedTest.instructions ? `<tr><td><strong>Instructions:</strong></td><td>${selectedTest.instructions}</td></tr>` : ''}
+                </table>
+            `;
+
+            // Populate patient information
+            if (patient) {
+                document.getElementById('patientInfo').innerHTML = `
+                    <table class="table table-borderless">
+                        <tr><td><strong>Name:</strong></td><td>${patient.pat_first_name} ${patient.pat_last_name}</td></tr>
+                        <tr><td><strong>Patient ID:</strong></td><td>${patient.pat_id}</td></tr>
+                        <tr><td><strong>Insurance No:</strong></td><td>${patient.pat_insurance_no}</td></tr>
+                        ${patient.pat_phone ? `<tr><td><strong>Phone:</strong></td><td>${patient.pat_phone}</td></tr>` : ''}
+                    </table>
+                `;
+            }
+
+            // Set form values
+            document.getElementById('selectedTestId').value = selectedTest.test_id;
+
+            document.getElementById('resultsEntrySection').style.display = 'block';
+        }
+
+        function setCurrentDateTime() {
+            const now = new Date();
+            const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+            document.getElementById('completedDate').value = localDateTime;
+        }
+
+        function setVerifiedBy() {
+            document.getElementById('verifiedBy').value = `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'Lab Technician';
+        }
+
+        function formatDateTime(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        }
+
+        async function submitResults() {
+            const form = document.getElementById('resultsForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const formData = new FormData(form);
+            const resultsData = {};
+
+            for (let [key, value] of formData.entries()) {
+                if (value.trim() !== '') {
+                    resultsData[key] = value;
+                }
+            }
+
+            // Add technician info
+            resultsData.processed_by = user.user_id;
+            resultsData.verified_by = document.getElementById('verifiedBy').value;
+
+            try {
+                const response = await fetch(`/lab-tests/${resultsData.test_id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(resultsData)
+                });
+
+                if (response.ok) {
+                    showAlert('Test results submitted successfully!', 'success');
+
+                    // Redirect to tests page after a delay
+                    setTimeout(() => {
+                        window.location.href = '/lab/tests.html';
+                    }, 2000);
+                } else {
+                    const error = await response.json();
+                    showAlert('Error submitting results: ' + (error.message || 'Unknown error'), 'danger');
+                }
+            } catch (error) {
+                console.error('Error submitting results:', error);
+                showAlert('Error submitting results: ' + error.message, 'danger');
+            }
+        }
+
+        async function saveAsDraft() {
+            const formData = new FormData(document.getElementById('resultsForm'));
+            const resultsData = {};
+
+            for (let [key, value] of formData.entries()) {
+                if (value.trim() !== '') {
+                    resultsData[key] = value;
+                }
+            }
+
+            // Set status as draft
+            resultsData.status = 'draft';
+            resultsData.processed_by = user.user_id;
+
+            try {
+                const response = await fetch(`/lab-tests/${resultsData.test_id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(resultsData)
+                });
+
+                if (response.ok) {
+                    showAlert('Results saved as draft!', 'info');
+                } else {
+                    const error = await response.json();
+                    showAlert('Error saving draft: ' + (error.message || 'Unknown error'), 'danger');
+                }
+            } catch (error) {
+                console.error('Error saving draft:', error);
+                showAlert('Error saving draft: ' + error.message, 'danger');
+            }
+        }
+
+        function clearForm() {
+            if (confirm('Are you sure you want to clear all entered data?')) {
+                document.getElementById('resultsForm').reset();
+                setCurrentDateTime();
+                setVerifiedBy();
+            }
+        }
+
+        function refreshPage() {
+            location.reload();
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/login.html';
+        }
+
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+
+            // Insert at the top of main content
+            const mainContent = document.querySelector('.main-content');
+            mainContent.insertBefore(alertDiv, mainContent.firstChild);
+
+            // Auto-dismiss after 5 seconds
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.remove();
+                }
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

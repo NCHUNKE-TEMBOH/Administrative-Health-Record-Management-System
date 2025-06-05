@@ -1,0 +1,1583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HMS Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --admin-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --doctor-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            --nurse-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --lab-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --pharmacist-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --patient-gradient: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+
+            --shadow-light: 0 4px 6px rgba(0, 0, 0, 0.07);
+            --shadow-medium: 0 10px 25px rgba(0, 0, 0, 0.1);
+            --shadow-heavy: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: var(--admin-gradient);
+            color: white;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-medium);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .header h1 {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 700;
+            font-size: 1.5rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .header h1 i {
+            font-size: 1.8rem;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .user-details {
+            text-align: right;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .role-badge {
+            padding: 0.4rem 1rem;
+            border-radius: 25px;
+            background: rgba(255,255,255,0.25);
+            backdrop-filter: blur(10px);
+            font-size: 0.85rem;
+            font-weight: 500;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+        }
+
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
+            border-color: rgba(255,255,255,0.5);
+            transform: translateY(-2px);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .welcome-section {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-light);
+            border: 1px solid rgba(255,255,255,0.8);
+        }
+
+        .welcome-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .welcome-subtitle {
+            color: #718096;
+            font-size: 1.1rem;
+            font-weight: 400;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: var(--shadow-light);
+            border: 1px solid rgba(255,255,255,0.8);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--admin-gradient);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-heavy);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--admin-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: var(--admin-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #718096;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--shadow-light);
+            border: 1px solid rgba(255,255,255,0.8);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--admin-gradient);
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-heavy);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: var(--admin-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.3rem;
+            margin-right: 1rem;
+        }
+
+        .card h3 {
+            color: #2d3748;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .card-content {
+            color: #718096;
+            margin-bottom: 1.5rem;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .quick-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .action-btn {
+            padding: 0.75rem 1.5rem;
+            background: var(--admin-gradient);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            text-decoration: none;
+            color: white;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .action-btn.secondary {
+            background: #f7fafc;
+            color: #4a5568;
+            border: 2px solid #e2e8f0;
+        }
+
+        .action-btn.secondary:hover {
+            background: #edf2f7;
+            color: #2d3748;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .alert {
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            font-weight: 500;
+        }
+
+        /* Role-specific color schemes */
+        .admin-theme {
+            --primary-gradient: var(--admin-gradient);
+        }
+
+        .doctor-theme {
+            --primary-gradient: var(--doctor-gradient);
+        }
+
+        .nurse-theme {
+            --primary-gradient: var(--nurse-gradient);
+        }
+
+        .lab-theme {
+            --primary-gradient: var(--lab-gradient);
+        }
+
+        .pharmacist-theme {
+            --primary-gradient: var(--pharmacist-gradient);
+        }
+
+        .patient-theme {
+            --primary-gradient: var(--patient-gradient);
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .header {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .user-info {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header" id="headerSection">
+        <h1>
+            <i class="fas fa-hospital"></i>
+            Hospital Management System
+        </h1>
+        <div class="user-info">
+            <div class="user-details">
+                <div class="user-name" id="userName">Loading...</div>
+                <div class="role-badge" id="userRole">Loading...</div>
+            </div>
+            <button class="logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="welcome-section">
+            <div class="welcome-title" id="welcomeTitle">Welcome to HMS</div>
+            <div class="welcome-subtitle" id="welcomeSubtitle">Your personalized dashboard is loading...</div>
+        </div>
+
+        <!-- Admin Dashboard -->
+        <div id="adminDashboard" class="hidden admin-theme">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-number" id="totalUsers">0</div>
+                    <div class="stat-label">Total Users</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-user-injured"></i>
+                    </div>
+                    <div class="stat-number" id="totalPatients">0</div>
+                    <div class="stat-label">Total Patients</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-user-md"></i>
+                    </div>
+                    <div class="stat-number" id="totalDoctors">0</div>
+                    <div class="stat-label">Total Doctors</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-user-nurse"></i>
+                    </div>
+                    <div class="stat-number" id="totalNurses">0</div>
+                    <div class="stat-label">Total Nurses</div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h3>User Management</h3>
+                    </div>
+                    <div class="card-content">
+                        <p>Manage system users, roles, and permissions. Create new accounts, update user information, and control access levels across the hospital management system.</p>
+                    </div>
+                    <div class="quick-actions">
+                        <a href="#" class="action-btn" onclick="loadUsers()">
+                            <i class="fas fa-eye"></i> View Users
+                        </a>
+                        <a href="#" class="action-btn secondary" onclick="showCreateUser()">
+                            <i class="fas fa-plus"></i> Add User
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <h3>System Analytics</h3>
+                    </div>
+                    <div class="card-content">
+                        <p>View comprehensive system usage statistics, performance reports, and operational insights to optimize hospital management efficiency.</p>
+                    </div>
+                    <div class="quick-actions">
+                        <a href="#" class="action-btn" onclick="loadAnalytics()">
+                            <i class="fas fa-chart-line"></i> View Reports
+                        </a>
+                        <a href="#" class="action-btn secondary" onclick="loadAuditLogs()">
+                            <i class="fas fa-history"></i> Audit Logs
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <h3>Data Management</h3>
+                    </div>
+                    <div class="card-content">
+                        <p>Centralized management of all hospital data including patients, medical staff, and health records with comprehensive oversight capabilities.</p>
+                    </div>
+                    <div class="quick-actions">
+                        <a href="/patient.html" class="action-btn">
+                            <i class="fas fa-user-injured"></i> Patients
+                        </a>
+                        <a href="/doctor.html" class="action-btn secondary">
+                            <i class="fas fa-user-md"></i> Doctors
+                        </a>
+                        <a href="/nurse.html" class="action-btn secondary">
+                            <i class="fas fa-user-nurse"></i> Nurses
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-cogs"></i>
+                        </div>
+                        <h3>System Settings</h3>
+                    </div>
+                    <div class="card-content">
+                        <p>Configure system-wide settings, manage security policies, and customize the hospital management system to meet your organization's needs.</p>
+                    </div>
+                    <div class="quick-actions">
+                        <a href="#" class="action-btn" onclick="loadSystemSettings()">
+                            <i class="fas fa-cog"></i> Settings
+                        </a>
+                        <a href="#" class="action-btn secondary" onclick="loadBackupRestore()">
+                            <i class="fas fa-download"></i> Backup
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Doctor Dashboard -->
+        <div id="doctorDashboard" class="hidden doctor-theme">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-user-injured"></i>
+                    </div>
+                    <div class="stat-number" id="myPatients">0</div>
+                    <div class="stat-label">My Patients</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="stat-number" id="todayAppointments">0</div>
+                    <div class="stat-label">Today's Appointments</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-prescription-bottle-alt"></i>
+                    </div>
+                    <div class="stat-number" id="activePrescriptions">0</div>
+                    <div class="stat-label">Active Prescriptions</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-flask"></i>
+                    </div>
+                    <div class="stat-number" id="pendingLabTests">0</div>
+                    <div class="stat-label">Pending Lab Tests</div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-user-injured"></i>
+                        </div>
+                        <h3>My Patients</h3>
+                    </div>
+                    <div class="card-content">
+                        <p>View and manage your assigned patients. Access comprehensive patient records, medical history, and treatment plans for optimal care delivery.</p>
+                    </div>
+                    <div class="quick-actions">
+                        <a href="#" class="action-btn" onclick="loadMyPatients()">
+                            <i class="fas fa-users"></i> View Patients
+                        </a>
+                        <a href="#" class="action-btn secondary" onclick="loadAppointments()">
+                            <i class="fas fa-calendar-check"></i> Appointments
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-prescription-bottle-alt"></i>
+                        </div>
+                        <h3>Prescriptions</h3>
+                    </div>
+                    <div class="card-content">
+                        <p>Manage patient prescriptions and medications. Create new prescriptions, review medication history, and ensure safe drug interactions.</p>
+                    </div>
+                    <div class="quick-actions">
+                        <a href="#" class="action-btn" onclick="loadPrescriptions()">
+                            <i class="fas fa-list"></i> View Prescriptions
+                        </a>
+                        <a href="#" class="action-btn secondary" onclick="createPrescription()">
+                            <i class="fas fa-plus"></i> New Prescription
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-flask"></i>
+                        </div>
+                        <h3>Laboratory Tests</h3>
+                    </div>
+                    <div class="card-content">
+                        <p>Request and review laboratory test results. Order diagnostic tests, track test progress, and analyze results for informed medical decisions.</p>
+                    </div>
+                    <div class="quick-actions">
+                        <a href="#" class="action-btn" onclick="loadLabTests()">
+                            <i class="fas fa-vial"></i> View Tests
+                        </a>
+                        <a href="#" class="action-btn secondary" onclick="requestLabTest()">
+                            <i class="fas fa-plus"></i> Request Test
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-notes-medical"></i>
+                        </div>
+                        <h3>Medical Notes</h3>
+                    </div>
+                    <div class="card-content">
+                        <p>Create and manage patient medical notes. Document consultations, treatment plans, and patient progress for comprehensive care records.</p>
+                    </div>
+                    <div class="quick-actions">
+                        <a href="#" class="action-btn" onclick="loadMedicalNotes()">
+                            <i class="fas fa-file-medical"></i> View Notes
+                        </a>
+                        <a href="#" class="action-btn secondary" onclick="createMedicalNote()">
+                            <i class="fas fa-edit"></i> New Note
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nurse Dashboard -->
+        <div id="nurseDashboard" class="hidden nurse-theme">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-user-injured"></i>
+                    </div>
+                    <div class="stat-number" id="assignedPatients">0</div>
+                    <div class="stat-label">Assigned Patients</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-heartbeat"></i>
+                    </div>
+                    <div class="stat-number" id="vitalsRecorded">0</div>
+                    <div class="stat-label">Vitals Recorded Today</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                    <div class="stat-number" id="nursingNotes">0</div>
+                    <div class="stat-label">Nursing Notes</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <div class="stat-number" id="pendingTasks">0</div>
+                    <div class="stat-label">Pending Tasks</div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-user-injured"></i>
+                        </div>
+                        <h3>Assigned Patients</h3>
+                    </div>
+                    <div class="card-content">
+                        <p>View and manage patients assigned to your care. Monitor patient status, coordinate care plans, and ensure quality nursing care delivery.</p>
+                    </div>
+                    <div class="quick-actions">
+                        <a href="#" class="action-btn" onclick="loadAssignedPatients()">
+                            <i class="fas fa-users"></i> View Patients
+                        </a>
+                        <a href="#" class="action-btn secondary" onclick="loadPatientAssignments()">
+                            <i class="fas fa-clipboard-list"></i> My Assignments
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-heartbeat"></i>
+                        </div>
+                        <h3>Vital Signs</h3>
+                    </div>
+                    <div class="card-content">
+                        <p>Record and monitor patient vital signs. Track temperature, blood pressure, heart rate, and other critical health indicators for patient care.</p>
+                    </div>
+                    <div class="quick-actions">
+                        <a href="#" class="action-btn" onclick="loadVitalSigns()">
+                            <i class="fas fa-chart-line"></i> View Vitals
+                        </a>
+                        <a href="#" class="action-btn secondary" onclick="recordVitalSigns()">
+                            <i class="fas fa-plus"></i> Record Vitals
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-clipboard-list"></i>
+                        </div>
+                        <h3>Nursing Notes</h3>
+                    </div>
+                    <div class="card-content">
+                        <p>Document patient care and observations. Create detailed nursing notes, track patient progress, and maintain comprehensive care records.</p>
+                    </div>
+                    <div class="quick-actions">
+                        <a href="#" class="action-btn" onclick="loadNursingNotes()">
+                            <i class="fas fa-file-medical"></i> View Notes
+                        </a>
+                        <a href="#" class="action-btn secondary" onclick="createNursingNote()">
+                            <i class="fas fa-edit"></i> New Note
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                        <h3>Care Tasks</h3>
+                    </div>
+                    <div class="card-content">
+                        <p>Manage daily care tasks and patient care schedules. Track medication administration, treatments, and care plan execution.</p>
+                    </div>
+                    <div class="quick-actions">
+                        <a href="#" class="action-btn" onclick="loadCareTasks()">
+                            <i class="fas fa-list-check"></i> View Tasks
+                        </a>
+                        <a href="#" class="action-btn secondary" onclick="createCareTask()">
+                            <i class="fas fa-plus"></i> New Task
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lab Technician Dashboard -->
+        <div id="labTechDashboard" class="hidden lab-theme">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-flask"></i>
+                    </div>
+                    <div class="stat-number" id="pendingTests">0</div>
+                    <div class="stat-label">Pending Tests</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-spinner"></i>
+                    </div>
+                    <div class="stat-number" id="inProgressTests">0</div>
+                    <div class="stat-label">In Progress</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-number" id="completedTests">0</div>
+                    <div class="stat-label">Completed Today</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-vial"></i>
+                    </div>
+                    <div class="stat-number" id="totalTests">0</div>
+                    <div class="stat-label">Total Tests</div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-flask"></i>
+                        </div>
+                        <h3>Laboratory Tests</h3>
+                    </div>
+                    <div class="card-content">
+                        <p>Process and manage laboratory tests. Handle sample collection, test execution, and quality control for accurate diagnostic results.</p>
+                    </div>
+                    <div class="quick-actions">
+                        <a href="#" class="action-btn" onclick="loadPendingTests()">
+                            <i class="fas fa-clock"></i> View Pending
+                        </a>
+                        <a href="#" class="action-btn secondary" onclick="loadInProgressTests()">
+                            <i class="fas fa-spinner"></i> In Progress
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-vial"></i>
+                        </div>
+                        <h3>Test Results</h3>
+                    </div>
+                    <div class="card-content">
+                        <p>Enter and manage test results. Record findings, validate results, and ensure accurate reporting for medical decision-making.</p>
+                    </div>
+                    <div class="quick-actions">
+                        <a href="#" class="action-btn" onclick="loadTestResults()">
+                            <i class="fas fa-chart-bar"></i> View Results
+                        </a>
+                        <a href="#" class="action-btn secondary" onclick="enterTestResult()">
+                            <i class="fas fa-edit"></i> Enter Result
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-microscope"></i>
+                        </div>
+                        <h3>Quality Control</h3>
+                    </div>
+                    <div class="card-content">
+                        <p>Maintain laboratory quality standards. Monitor equipment calibration, validate procedures, and ensure compliance with safety protocols.</p>
+                    </div>
+                    <div class="quick-actions">
+                        <a href="#" class="action-btn" onclick="loadQualityControl()">
+                            <i class="fas fa-shield-alt"></i> QC Dashboard
+                        </a>
+                        <a href="#" class="action-btn secondary" onclick="loadEquipmentStatus()">
+                            <i class="fas fa-cogs"></i> Equipment
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pharmacist Dashboard -->
+        <div id="pharmacistDashboard" class="hidden pharmacist-theme">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-prescription"></i>
+                    </div>
+                    <div class="stat-number" id="activePrescriptions">0</div>
+                    <div class="stat-label">Active Prescriptions</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-pills"></i>
+                    </div>
+                    <div class="stat-number" id="medicationsDispensed">0</div>
+                    <div class="stat-label">Dispensed Today</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-boxes"></i>
+                    </div>
+                    <div class="stat-number" id="inventoryItems">0</div>
+                    <div class="stat-label">Inventory Items</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="stat-number" id="lowStockItems">0</div>
+                    <div class="stat-label">Low Stock Alerts</div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-prescription"></i>
+                        </div>
+                        <h3>Prescription Management</h3>
+                    </div>
+                    <div class="card-content">
+                        <p>Process and manage patient prescriptions. Review medication orders, check for interactions, and ensure safe dispensing practices.</p>
+                    </div>
+                    <div class="quick-actions">
+                        <a href="#" class="action-btn" onclick="loadActivePrescriptions()">
+                            <i class="fas fa-list"></i> View Prescriptions
+                        </a>
+                        <a href="#" class="action-btn secondary" onclick="dispenseMedication()">
+                            <i class="fas fa-hand-holding-medical"></i> Dispense
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-pills"></i>
+                        </div>
+                        <h3>Medication Inventory</h3>
+                    </div>
+                    <div class="card-content">
+                        <p>Manage medication inventory and stock levels. Track expiration dates, monitor usage patterns, and maintain optimal stock levels.</p>
+                    </div>
+                    <div class="quick-actions">
+                        <a href="#" class="action-btn" onclick="loadInventory()">
+                            <i class="fas fa-boxes"></i> View Inventory
+                        </a>
+                        <a href="#" class="action-btn secondary" onclick="loadDispensingHistory()">
+                            <i class="fas fa-history"></i> History
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h3>Drug Safety</h3>
+                    </div>
+                    <div class="card-content">
+                        <p>Monitor drug interactions and safety alerts. Review patient medication profiles and ensure safe pharmaceutical care delivery.</p>
+                    </div>
+                    <div class="quick-actions">
+                        <a href="#" class="action-btn" onclick="loadDrugInteractions()">
+                            <i class="fas fa-exclamation-triangle"></i> Interactions
+                        </a>
+                        <a href="#" class="action-btn secondary" onclick="loadSafetyAlerts()">
+                            <i class="fas fa-bell"></i> Alerts
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Patient Dashboard -->
+        <div id="patientDashboard" class="hidden patient-theme">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="stat-number" id="upcomingAppointments">0</div>
+                    <div class="stat-label">Upcoming Appointments</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-prescription-bottle"></i>
+                    </div>
+                    <div class="stat-number" id="activePrescriptions">0</div>
+                    <div class="stat-label">Active Prescriptions</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-vial"></i>
+                    </div>
+                    <div class="stat-number" id="recentLabResults">0</div>
+                    <div class="stat-label">Recent Lab Results</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-heartbeat"></i>
+                    </div>
+                    <div class="stat-number" id="lastVitalCheck">--</div>
+                    <div class="stat-label">Days Since Last Vital</div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-file-medical"></i>
+                        </div>
+                        <h3>My Health Records</h3>
+                    </div>
+                    <div class="card-content">
+                        <p>Access your complete health records and medical history. View diagnoses, treatments, and track your health journey over time.</p>
+                    </div>
+                    <div class="quick-actions">
+                        <a href="#" class="action-btn" onclick="loadMyHealthRecords()">
+                            <i class="fas fa-folder-open"></i> View Records
+                        </a>
+                        <a href="#" class="action-btn secondary" onclick="loadMyVitalSigns()">
+                            <i class="fas fa-heartbeat"></i> Vital Signs
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-prescription-bottle"></i>
+                        </div>
+                        <h3>My Prescriptions</h3>
+                    </div>
+                    <div class="card-content">
+                        <p>View your current and past prescriptions. Track medication schedules, dosages, and ensure you're following your treatment plan.</p>
+                    </div>
+                    <div class="quick-actions">
+                        <a href="#" class="action-btn" onclick="loadMyPrescriptions()">
+                            <i class="fas fa-pills"></i> View Prescriptions
+                        </a>
+                        <a href="#" class="action-btn secondary" onclick="loadMedicationReminders()">
+                            <i class="fas fa-bell"></i> Reminders
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <h3>My Appointments</h3>
+                    </div>
+                    <div class="card-content">
+                        <p>Manage your healthcare appointments. View upcoming visits, review past consultations, and stay connected with your care team.</p>
+                    </div>
+                    <div class="quick-actions">
+                        <a href="#" class="action-btn" onclick="loadMyAppointments()">
+                            <i class="fas fa-calendar-alt"></i> View Appointments
+                        </a>
+                        <a href="#" class="action-btn secondary" onclick="requestAppointment()">
+                            <i class="fas fa-plus"></i> Request Appointment
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-vial"></i>
+                        </div>
+                        <h3>My Lab Results</h3>
+                    </div>
+                    <div class="card-content">
+                        <p>Access your laboratory test results and diagnostic reports. Track health indicators and understand your test outcomes.</p>
+                    </div>
+                    <div class="quick-actions">
+                        <a href="#" class="action-btn" onclick="loadMyLabResults()">
+                            <i class="fas fa-chart-line"></i> View Results
+                        </a>
+                        <a href="#" class="action-btn secondary" onclick="downloadLabReports()">
+                            <i class="fas fa-download"></i> Download Reports
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check authentication
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+        if (!token || !user.user_id) {
+            window.location.href = '/login.html';
+        }
+
+        // Display user info
+        document.getElementById('userName').textContent = `${user.first_name} ${user.last_name}`;
+        document.getElementById('userRole').textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1).replace('_', ' ');
+
+        // Role-specific configurations
+        const roleConfigs = {
+            'admin': {
+                gradient: 'var(--admin-gradient)',
+                title: 'System Administrator Dashboard',
+                subtitle: 'Manage users, monitor system performance, and oversee hospital operations.'
+            },
+            'doctor': {
+                gradient: 'var(--doctor-gradient)',
+                title: 'Doctor Dashboard',
+                subtitle: 'Manage patients, appointments, prescriptions, and medical records.'
+            },
+            'nurse': {
+                gradient: 'var(--nurse-gradient)',
+                title: 'Nurse Dashboard',
+                subtitle: 'Coordinate patient care, record vital signs, and manage nursing tasks.'
+            },
+            'lab_technician': {
+                gradient: 'var(--lab-gradient)',
+                title: 'Laboratory Dashboard',
+                subtitle: 'Process lab tests, manage results, and maintain quality standards.'
+            },
+            'pharmacist': {
+                gradient: 'var(--pharmacist-gradient)',
+                title: 'Pharmacy Dashboard',
+                subtitle: 'Manage prescriptions, inventory, and ensure medication safety.'
+            },
+            'patient': {
+                gradient: 'var(--patient-gradient)',
+                title: 'Patient Portal',
+                subtitle: 'Access your health records, appointments, and medical information.'
+            }
+        };
+
+        // Show appropriate dashboard based on role
+        function showDashboard() {
+            const dashboards = {
+                'admin': 'adminDashboard',
+                'doctor': 'doctorDashboard',
+                'nurse': 'nurseDashboard',
+                'lab_technician': 'labTechDashboard',
+                'pharmacist': 'pharmacistDashboard',
+                'patient': 'patientDashboard'
+            };
+
+            const dashboardId = dashboards[user.role];
+            const config = roleConfigs[user.role];
+
+            if (dashboardId && config) {
+                // Apply role-specific styling
+                const header = document.getElementById('headerSection');
+                header.style.background = config.gradient;
+
+                // Update welcome section
+                document.getElementById('welcomeTitle').textContent = config.title;
+                document.getElementById('welcomeSubtitle').textContent = config.subtitle;
+
+                // Show dashboard
+                document.getElementById(dashboardId).classList.remove('hidden');
+
+                // Apply theme to cards and stats
+                applyRoleTheme(user.role);
+
+                // Load role-specific data
+                loadDashboardData(user.role);
+            }
+        }
+
+        // Apply role-specific theming
+        function applyRoleTheme(role) {
+            const config = roleConfigs[role];
+            const root = document.documentElement;
+
+            // Update CSS custom properties for the current role
+            root.style.setProperty('--current-gradient', config.gradient);
+
+            // Update all stat cards and action buttons to use role gradient
+            const statCards = document.querySelectorAll('.stat-card::before, .card::before');
+            const actionBtns = document.querySelectorAll('.action-btn');
+            const statIcons = document.querySelectorAll('.stat-icon');
+            const cardIcons = document.querySelectorAll('.card-icon');
+
+            // Apply gradient to elements
+            document.querySelectorAll('.stat-card::before, .card::before').forEach(el => {
+                el.style.background = config.gradient;
+            });
+        }
+
+        // Load dashboard data based on role
+        async function loadDashboardData(role) {
+            try {
+                switch(role) {
+                    case 'admin':
+                        await loadAdminStats();
+                        break;
+                    case 'doctor':
+                        await loadDoctorStats();
+                        break;
+                    case 'nurse':
+                        await loadNurseStats();
+                        break;
+                    case 'lab_technician':
+                        await loadLabStats();
+                        break;
+                    case 'pharmacist':
+                        await loadPharmacyStats();
+                        break;
+                    case 'patient':
+                        await loadPatientStats();
+                        break;
+                }
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+            }
+        }
+
+        // Load admin statistics
+        async function loadAdminStats() {
+            try {
+                const [users, patients, doctors, nurses] = await Promise.all([
+                    apiCall('/users'),
+                    apiCall('/patient'),
+                    apiCall('/doctor'),
+                    apiCall('/nurse')
+                ]);
+
+                document.getElementById('totalUsers').textContent = users?.length || 0;
+                document.getElementById('totalPatients').textContent = patients?.length || 0;
+                document.getElementById('totalDoctors').textContent = doctors?.length || 0;
+                document.getElementById('totalNurses').textContent = nurses?.length || 0;
+            } catch (error) {
+                console.error('Error loading admin stats:', error);
+            }
+        }
+
+        // Load doctor statistics
+        async function loadDoctorStats() {
+            // Placeholder for doctor-specific stats
+            document.getElementById('myPatients').textContent = '12';
+            document.getElementById('todayAppointments').textContent = '5';
+            document.getElementById('activePrescriptions').textContent = '8';
+            document.getElementById('pendingLabTests').textContent = '3';
+        }
+
+        // Load nurse statistics
+        async function loadNurseStats() {
+            // Placeholder for nurse-specific stats
+            document.getElementById('assignedPatients').textContent = '15';
+            document.getElementById('vitalsRecorded').textContent = '8';
+            document.getElementById('nursingNotes').textContent = '12';
+            document.getElementById('pendingTasks').textContent = '4';
+        }
+
+        // Load lab statistics
+        async function loadLabStats() {
+            // Placeholder for lab-specific stats
+            document.getElementById('pendingTests').textContent = '7';
+            document.getElementById('inProgressTests').textContent = '3';
+            document.getElementById('completedTests').textContent = '12';
+            document.getElementById('totalTests').textContent = '22';
+        }
+
+        // Load pharmacy statistics
+        async function loadPharmacyStats() {
+            // Placeholder for pharmacy-specific stats
+            document.getElementById('activePrescriptions').textContent = '25';
+            document.getElementById('medicationsDispensed').textContent = '18';
+            document.getElementById('inventoryItems').textContent = '450';
+            document.getElementById('lowStockItems').textContent = '3';
+        }
+
+        // Load patient statistics
+        async function loadPatientStats() {
+            // Placeholder for patient-specific stats
+            document.getElementById('upcomingAppointments').textContent = '2';
+            document.getElementById('activePrescriptions').textContent = '3';
+            document.getElementById('recentLabResults').textContent = '1';
+            document.getElementById('lastVitalCheck').textContent = '5';
+        }
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/login.html';
+        }
+
+        // API helper function
+        async function apiCall(endpoint, method = 'GET', data = null) {
+            const options = {
+                method,
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            };
+
+            if (data) {
+                options.body = JSON.stringify(data);
+            }
+
+            try {
+                const response = await fetch(endpoint, options);
+                if (response.status === 401) {
+                    logout();
+                    return;
+                }
+                return await response.json();
+            } catch (error) {
+                console.error('API call failed:', error);
+                alert('Network error. Please try again.');
+            }
+        }
+
+        // Dashboard action functions - redirect to actual pages
+        function loadUsers() {
+            if (user.role === 'admin') {
+                window.location.href = '/admin/users.html';
+            } else {
+                showAlert('Access denied', 'danger');
+            }
+        }
+
+        function showCreateUser() {
+            if (user.role === 'admin') {
+                window.location.href = '/admin/users.html';
+            } else {
+                showAlert('Access denied', 'danger');
+            }
+        }
+
+        function loadAnalytics() {
+            showAlert('Analytics module coming soon!', 'info');
+        }
+
+        function loadAuditLogs() {
+            if (user.role === 'admin') {
+                showAlert('Audit logs module coming soon!', 'info');
+            } else {
+                showAlert('Access denied', 'danger');
+            }
+        }
+
+        function loadMyPatients() {
+            if (user.role === 'doctor') {
+                window.location.href = '/doctor/patients.html';
+            } else {
+                showAlert('Access denied', 'danger');
+            }
+        }
+
+        // Doctor functions
+        function loadAppointments() {
+            if (user.role === 'doctor') {
+                window.location.href = '/doctor/appointments.html';
+            } else {
+                showAlert('Access denied', 'danger');
+            }
+        }
+
+        function loadPrescriptions() {
+            if (user.role === 'doctor') {
+                window.location.href = '/doctor/prescriptions.html';
+            } else {
+                showAlert('Access denied', 'danger');
+            }
+        }
+
+        function createPrescription() {
+            if (user.role === 'doctor') {
+                window.location.href = '/doctor/prescriptions.html';
+            } else {
+                showAlert('Access denied', 'danger');
+            }
+        }
+
+        function loadLabTests() {
+            if (user.role === 'doctor') {
+                window.location.href = '/doctor/lab-tests.html';
+            } else if (user.role === 'lab_technician') {
+                window.location.href = '/lab/tests.html';
+            } else {
+                showAlert('Access denied', 'danger');
+            }
+        }
+
+        function requestLabTest() {
+            if (user.role === 'doctor') {
+                window.location.href = '/doctor/lab-tests.html';
+            } else {
+                showAlert('Access denied', 'danger');
+            }
+        }
+
+        function loadMedicalNotes() {
+            if (user.role === 'doctor') {
+                window.location.href = '/doctor/medical-notes.html';
+            } else {
+                showAlert('Access denied', 'danger');
+            }
+        }
+
+        function createMedicalNote() {
+            if (user.role === 'doctor') {
+                window.location.href = '/doctor/medical-notes.html';
+            } else {
+                showAlert('Access denied', 'danger');
+            }
+        }
+
+        // Nurse functions
+        function loadAssignedPatients() {
+            if (user.role === 'nurse') {
+                window.location.href = '/nurse/patients.html';
+            } else {
+                showAlert('Access denied', 'danger');
+            }
+        }
+
+        function loadPatientAssignments() {
+            if (user.role === 'nurse') {
+                window.location.href = '/nurse/assignments.html';
+            } else {
+                showAlert('Access denied', 'danger');
+            }
+        }
+
+        function loadVitalSigns() {
+            if (user.role === 'nurse') {
+                window.location.href = '/nurse/vital-signs.html';
+            } else {
+                showAlert('Access denied', 'danger');
+            }
+        }
+
+        function recordVitalSigns() {
+            if (user.role === 'nurse') {
+                window.location.href = '/nurse/vital-signs.html';
+            } else {
+                showAlert('Access denied', 'danger');
+            }
+        }
+
+        function loadNursingNotes() {
+            if (user.role === 'nurse') {
+                window.location.href = '/nurse/nursing-notes.html';
+            } else {
+                showAlert('Access denied', 'danger');
+            }
+        }
+
+        function createNursingNote() {
+            if (user.role === 'nurse') {
+                window.location.href = '/nurse/nursing-notes.html';
+            } else {
+                showAlert('Access denied', 'danger');
+            }
+        }
+
+        // Lab Technician functions
+        function loadPendingTests() {
+            if (user.role === 'lab_technician') {
+                window.location.href = '/lab/pending-tests.html';
+            } else {
+                showAlert('Access denied', 'danger');
+            }
+        }
+
+        function loadInProgressTests() {
+            if (user.role === 'lab_technician') {
+                window.location.href = '/lab/in-progress-tests.html';
+            } else {
+                showAlert('Access denied', 'danger');
+            }
+        }
+
+        function loadTestResults() {
+            if (user.role === 'lab_technician') {
+                window.location.href = '/lab/test-results.html';
+            } else {
+                showAlert('Access denied', 'danger');
+            }
+        }
+
+        function enterTestResult() {
+            if (user.role === 'lab_technician') {
+                window.location.href = '/lab/enter-results.html';
+            } else {
+                showAlert('Access denied', 'danger');
+            }
+        }
+
+        // Pharmacist functions
+        function loadActivePrescriptions() {
+            if (user.role === 'pharmacist') {
+                window.location.href = '/pharmacy/prescriptions.html';
+            } else {
+                showAlert('Access denied', 'danger');
+            }
+        }
+
+        function dispenseMedication() {
+            if (user.role === 'pharmacist') {
+                window.location.href = '/pharmacy/dispense.html';
+            } else {
+                showAlert('Access denied', 'danger');
+            }
+        }
+
+        function loadInventory() {
+            if (user.role === 'pharmacist') {
+                window.location.href = '/pharmacy/inventory.html';
+            } else {
+                showAlert('Access denied', 'danger');
+            }
+        }
+
+        function loadDispensingHistory() {
+            if (user.role === 'pharmacist') {
+                window.location.href = '/pharmacy/history.html';
+            } else {
+                showAlert('Access denied', 'danger');
+            }
+        }
+
+        // Patient functions
+        function loadMyHealthRecords() {
+            if (user.role === 'patient') {
+                window.location.href = '/patient/health-records.html';
+            } else {
+                showAlert('Access denied', 'danger');
+            }
+        }
+
+        function loadMyVitalSigns() {
+            if (user.role === 'patient') {
+                window.location.href = '/patient/vital-signs.html';
+            } else {
+                showAlert('Access denied', 'danger');
+            }
+        }
+
+        function loadMyPrescriptions() {
+            if (user.role === 'patient') {
+                window.location.href = '/patient/prescriptions.html';
+            } else {
+                showAlert('Access denied', 'danger');
+            }
+        }
+
+        function loadMyAppointments() {
+            if (user.role === 'patient') {
+                window.location.href = '/patient/appointments.html';
+            } else {
+                showAlert('Access denied', 'danger');
+            }
+        }
+
+        function loadMyLabResults() {
+            if (user.role === 'patient') {
+                window.location.href = '/patient/lab-results.html';
+            } else {
+                showAlert('Access denied', 'danger');
+            }
+        }
+
+        // Helper function to show alerts
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alertDiv);
+
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.parentNode.removeChild(alertDiv);
+                }
+            }, 5000);
+        }
+
+        // Add missing function stubs for new dashboard features
+        function loadSystemSettings() { showAlert('System settings module coming soon!', 'info'); }
+        function loadBackupRestore() { showAlert('Backup & restore module coming soon!', 'info'); }
+        function loadCareTasks() { showAlert('Care tasks module coming soon!', 'info'); }
+        function createCareTask() { showAlert('Create care task module coming soon!', 'info'); }
+        function loadQualityControl() { showAlert('Quality control module coming soon!', 'info'); }
+        function loadEquipmentStatus() { showAlert('Equipment status module coming soon!', 'info'); }
+        function loadDrugInteractions() { showAlert('Drug interactions module coming soon!', 'info'); }
+        function loadSafetyAlerts() { showAlert('Safety alerts module coming soon!', 'info'); }
+        function loadMedicationReminders() { showAlert('Medication reminders coming soon!', 'info'); }
+        function requestAppointment() { showAlert('Appointment request module coming soon!', 'info'); }
+        function downloadLabReports() { showAlert('Lab report download coming soon!', 'info'); }
+
+        // Initialize dashboard
+        showDashboard();
+    </script>
+</body>
+</html>

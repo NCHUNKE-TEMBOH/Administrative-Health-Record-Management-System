@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nursing Notes - HMS Nurse</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+        }
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 0.75rem 1rem;
+            margin: 0.25rem 0;
+            border-radius: 0.5rem;
+        }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            color: white;
+            background-color: rgba(255,255,255,0.1);
+        }
+        .main-content {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+        .feature-card {
+            transition: transform 0.2s;
+        }
+        .feature-card:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar p-3">
+                <div class="d-flex align-items-center mb-4">
+                    <i class="fas fa-notes-medical text-white me-2"></i>
+                    <h5 class="text-white mb-0">HMS Nurse</h5>
+                </div>
+
+                <nav class="nav flex-column">
+                    <a class="nav-link" href="/dashboard.html">
+                        <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                    </a>
+                    <!-- Role-specific navigation will be added here -->
+                    <hr class="text-white-50">
+                    <a class="nav-link" href="#" onclick="logout()">
+                        <i class="fas fa-sign-out-alt me-2"></i> Logout
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 main-content p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2><i class="fas fa-notes-medical me-2"></i>Nursing Notes</h2>
+                    <button class="btn btn-outline-primary" onclick="refreshPage()">
+                        <i class="fas fa-sync-alt me-2"></i>Refresh
+                    </button>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row align-items-center">
+                                    <div class="col-md-8">
+                                        <h5 class="mb-2">
+                                            <i class="fas fa-notes-medical me-2"></i>Nursing Notes Management
+                                        </h5>
+                                        <p class="text-muted mb-0">Document patient care, observations, and nursing interventions</p>
+                                    </div>
+                                    <div class="col-md-4 text-end">
+                                        <button class="btn btn-primary" onclick="showCreateNoteModal()">
+                                            <i class="fas fa-plus me-2"></i>New Note
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Statistics -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h3 class="text-primary" id="totalNotes">0</h3>
+                                <p class="mb-0">Total Notes</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h3 class="text-success" id="todayNotes">0</h3>
+                                <p class="mb-0">Today's Notes</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h3 class="text-warning" id="criticalNotes">0</h3>
+                                <p class="mb-0">Critical Notes</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h3 class="text-info" id="myNotes">0</h3>
+                                <p class="mb-0">My Notes</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filter and Search -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <label class="form-label">Filter by Patient</label>
+                                        <select class="form-select" id="patientFilter" onchange="filterNotes()">
+                                            <option value="">All Patients</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Filter by Type</label>
+                                        <select class="form-select" id="typeFilter" onchange="filterNotes()">
+                                            <option value="">All Types</option>
+                                            <option value="assessment">Assessment</option>
+                                            <option value="intervention">Intervention</option>
+                                            <option value="observation">Observation</option>
+                                            <option value="medication">Medication</option>
+                                            <option value="discharge">Discharge</option>
+                                            <option value="admission">Admission</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Filter by Priority</label>
+                                        <select class="form-select" id="priorityFilter" onchange="filterNotes()">
+                                            <option value="">All Priorities</option>
+                                            <option value="critical">Critical</option>
+                                            <option value="high">High</option>
+                                            <option value="normal">Normal</option>
+                                            <option value="low">Low</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Search Notes</label>
+                                        <input type="text" class="form-control" id="searchInput" placeholder="Search notes..." onkeyup="filterNotes()">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Nursing Notes List -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-list me-2"></i>Nursing Notes
+                                </h5>
+                                <div>
+                                    <button class="btn btn-outline-info btn-sm me-2" onclick="exportNotes()">
+                                        <i class="fas fa-download me-1"></i>Export
+                                    </button>
+                                    <button class="btn btn-outline-primary btn-sm" onclick="refreshNotes()">
+                                        <i class="fas fa-sync-alt me-1"></i>Refresh
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div id="loadingIndicator" class="text-center py-4">
+                                    <i class="fas fa-spinner fa-spin fa-2x text-info"></i>
+                                    <p class="mt-3">Loading nursing notes...</p>
+                                </div>
+
+                                <div id="notesContainer" style="display: none;">
+                                    <div id="notesList">
+                                        <!-- Notes will be loaded here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create/Edit Note Modal -->
+    <div class="modal fade" id="noteModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="noteModalTitle">Create New Nursing Note</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="noteForm">
+                        <input type="hidden" id="noteId" name="note_id">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Patient *</label>
+                                    <select class="form-select" id="notePatientId" name="patient_id" required>
+                                        <option value="">Select Patient</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Note Type *</label>
+                                    <select class="form-select" id="noteType" name="note_type" required>
+                                        <option value="">Select Type</option>
+                                        <option value="assessment">Assessment</option>
+                                        <option value="intervention">Intervention</option>
+                                        <option value="observation">Observation</option>
+                                        <option value="medication">Medication</option>
+                                        <option value="discharge">Discharge</option>
+                                        <option value="admission">Admission</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Priority *</label>
+                                    <select class="form-select" id="notePriority" name="priority" required>
+                                        <option value="normal">Normal</option>
+                                        <option value="high">High</option>
+                                        <option value="critical">Critical</option>
+                                        <option value="low">Low</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Date & Time *</label>
+                                    <input type="datetime-local" class="form-control" id="noteDateTime" name="note_date" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Subject/Title *</label>
+                            <input type="text" class="form-control" id="noteSubject" name="subject" required placeholder="Brief description of the note">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Note Content *</label>
+                            <textarea class="form-control" id="noteContent" name="content" rows="6" required placeholder="Detailed nursing note content..."></textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Vital Signs Reference</label>
+                                    <input type="text" class="form-control" id="vitalSignsRef" name="vital_signs_ref" placeholder="Reference to vital signs if applicable">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Follow-up Required</label>
+                                    <select class="form-select" id="followUpRequired" name="follow_up_required">
+                                        <option value="no">No</option>
+                                        <option value="yes">Yes</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3" id="followUpSection" style="display: none;">
+                            <label class="form-label">Follow-up Instructions</label>
+                            <textarea class="form-control" id="followUpInstructions" name="follow_up_instructions" rows="3" placeholder="Follow-up instructions..."></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="saveNote()">Save Note</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Authentication check
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+        if (!token || user.role !== 'nurse') {
+            window.location.href = '/login.html';
+        }
+
+        let allNotes = [];
+        let allPatients = [];
+
+        // Load data on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadNotes();
+            loadPatients();
+            setCurrentDateTime();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            document.getElementById('followUpRequired').addEventListener('change', function() {
+                const followUpSection = document.getElementById('followUpSection');
+                followUpSection.style.display = this.value === 'yes' ? 'block' : 'none';
+            });
+        }
+
+        function setCurrentDateTime() {
+            const now = new Date();
+            const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+            document.getElementById('noteDateTime').value = localDateTime;
+        }
+
+        async function loadNotes() {
+            try {
+                const response = await fetch('/nursing-notes', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    allNotes = await response.json();
+                } else {
+                    allNotes = generateMockNotes();
+                }
+
+                displayNotes(allNotes);
+                updateStats();
+            } catch (error) {
+                console.error('Error loading notes:', error);
+                allNotes = generateMockNotes();
+                displayNotes(allNotes);
+                updateStats();
+            }
+        }
+
+        async function loadPatients() {
+            try {
+                const response = await fetch('/patient', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    allPatients = await response.json();
+                } else {
+                    allPatients = generateMockPatients();
+                }
+
+                populatePatientSelects();
+            } catch (error) {
+                console.error('Error loading patients:', error);
+                allPatients = generateMockPatients();
+                populatePatientSelects();
+            }
+        }
+
+        function generateMockNotes() {
+            const noteTypes = ['assessment', 'intervention', 'observation', 'medication', 'discharge', 'admission'];
+            const priorities = ['normal', 'high', 'critical', 'low'];
+            const subjects = [
+                'Patient Assessment - Admission',
+                'Medication Administration',
+                'Vital Signs Monitoring',
+                'Pain Assessment',
+                'Wound Care',
+                'Patient Education',
+                'Discharge Planning',
+                'Fall Risk Assessment'
+            ];
+            const mockData = [];
+
+            for (let i = 0; i < 20; i++) {
+                const noteDate = new Date();
+                noteDate.setDate(noteDate.getDate() - Math.floor(Math.random() * 30));
+
+                mockData.push({
+                    note_id: i + 1,
+                    patient_id: Math.floor(Math.random() * 5) + 1,
+                    pat_first_name: ['John', 'Jane', 'Bob', 'Alice', 'Charlie'][Math.floor(Math.random() * 5)],
+                    pat_last_name: ['Doe', 'Smith', 'Johnson', 'Brown', 'Wilson'][Math.floor(Math.random() * 5)],
+                    note_type: noteTypes[Math.floor(Math.random() * noteTypes.length)],
+                    priority: priorities[Math.floor(Math.random() * priorities.length)],
+                    subject: subjects[Math.floor(Math.random() * subjects.length)],
+                    content: 'Patient appears comfortable and alert. Vital signs stable. No acute distress noted. Continue current care plan.',
+                    note_date: noteDate.toISOString(),
+                    nurse_first_name: user.first_name || 'Current',
+                    nurse_last_name: user.last_name || 'Nurse',
+                    follow_up_required: Math.random() > 0.7 ? 'yes' : 'no',
+                    follow_up_instructions: Math.random() > 0.7 ? 'Monitor vital signs every 4 hours' : null
+                });
+            }
+
+            return mockData.sort((a, b) => new Date(b.note_date) - new Date(a.note_date));
+        }
+
+        function generateMockPatients() {
+            return [
+                {pat_id: 1, pat_first_name: 'John', pat_last_name: 'Doe', pat_insurance_no: 'INS001'},
+                {pat_id: 2, pat_first_name: 'Jane', pat_last_name: 'Smith', pat_insurance_no: 'INS002'},
+                {pat_id: 3, pat_first_name: 'Bob', pat_last_name: 'Johnson', pat_insurance_no: 'INS003'},
+                {pat_id: 4, pat_first_name: 'Alice', pat_last_name: 'Brown', pat_insurance_no: 'INS004'},
+                {pat_id: 5, pat_first_name: 'Charlie', pat_last_name: 'Wilson', pat_insurance_no: 'INS005'}
+            ];
+        }
+
+        function populatePatientSelects() {
+            const patientSelect = document.getElementById('notePatientId');
+            const patientFilter = document.getElementById('patientFilter');
+
+            // Clear existing options
+            patientSelect.innerHTML = '<option value="">Select Patient</option>';
+            patientFilter.innerHTML = '<option value="">All Patients</option>';
+
+            allPatients.forEach(patient => {
+                const option1 = document.createElement('option');
+                option1.value = patient.pat_id;
+                option1.textContent = `${patient.pat_first_name} ${patient.pat_last_name} (${patient.pat_insurance_no})`;
+                patientSelect.appendChild(option1);
+
+                const option2 = document.createElement('option');
+                option2.value = patient.pat_id;
+                option2.textContent = `${patient.pat_first_name} ${patient.pat_last_name}`;
+                patientFilter.appendChild(option2);
+            });
+        }
+
+        function displayNotes(notes) {
+            const container = document.getElementById('notesList');
+
+            if (notes.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-5">
+                        <i class="fas fa-notes-medical fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No nursing notes found</h5>
+                        <p class="text-muted">No notes match the current filters.</p>
+                        <button class="btn btn-primary" onclick="showCreateNoteModal()">
+                            <i class="fas fa-plus me-2"></i>Create First Note
+                        </button>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = notes.map(note => `
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <span class="badge ${getPriorityBadgeClass(note.priority)} me-2">${note.priority.toUpperCase()}</span>
+                                        <span class="badge bg-secondary me-2">${note.note_type.toUpperCase()}</span>
+                                        <h6 class="mb-0">${note.subject}</h6>
+                                    </div>
+                                    <p class="text-muted mb-2">
+                                        <strong>Patient:</strong> ${note.pat_first_name} ${note.pat_last_name} |
+                                        <strong>Date:</strong> ${formatDateTime(note.note_date)} |
+                                        <strong>Nurse:</strong> ${note.nurse_first_name} ${note.nurse_last_name}
+                                    </p>
+                                    <p class="mb-2">${truncateText(note.content, 150)}</p>
+                                    ${note.follow_up_required === 'yes' ? `
+                                        <div class="alert alert-warning py-2 mb-0">
+                                            <i class="fas fa-exclamation-triangle me-1"></i>
+                                            <small><strong>Follow-up Required:</strong> ${note.follow_up_instructions || 'See note details'}</small>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                                <div class="col-md-4 text-end">
+                                    <div class="btn-group btn-group-sm mb-2">
+                                        <button class="btn btn-outline-primary" onclick="viewNote(${note.note_id})" title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="btn btn-outline-success" onclick="editNote(${note.note_id})" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-outline-info" onclick="printNote(${note.note_id})" title="Print">
+                                            <i class="fas fa-print"></i>
+                                        </button>
+                                    </div>
+                                    <div class="text-muted small">
+                                        ${getTimeAgo(note.note_date)}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Show container and hide loading
+            document.getElementById('loadingIndicator').style.display = 'none';
+            document.getElementById('notesContainer').style.display = 'block';
+        }
+
+        function updateStats() {
+            const total = allNotes.length;
+            const today = new Date().toISOString().split('T')[0];
+            const todayCount = allNotes.filter(note => note.note_date.startsWith(today)).length;
+            const critical = allNotes.filter(note => note.priority === 'critical').length;
+            const myNotes = allNotes.filter(note =>
+                note.nurse_first_name === (user.first_name || 'Current') &&
+                note.nurse_last_name === (user.last_name || 'Nurse')
+            ).length;
+
+            document.getElementById('totalNotes').textContent = total;
+            document.getElementById('todayNotes').textContent = todayCount;
+            document.getElementById('criticalNotes').textContent = critical;
+            document.getElementById('myNotes').textContent = myNotes;
+        }
+
+        function getPriorityBadgeClass(priority) {
+            switch (priority) {
+                case 'critical': return 'bg-danger';
+                case 'high': return 'bg-warning';
+                case 'normal': return 'bg-success';
+                case 'low': return 'bg-info';
+                default: return 'bg-secondary';
+            }
+        }
+
+        function truncateText(text, maxLength) {
+            if (text.length <= maxLength) return text;
+            return text.substring(0, maxLength) + '...';
+        }
+
+        function getTimeAgo(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffInHours = Math.floor((now - date) / (1000 * 60 * 60));
+
+            if (diffInHours < 1) return 'Less than an hour ago';
+            if (diffInHours < 24) return `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`;
+
+            const diffInDays = Math.floor(diffInHours / 24);
+            return `${diffInDays} day${diffInDays > 1 ? 's' : ''} ago`;
+        }
+
+        function formatDateTime(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        }
+
+        function showCreateNoteModal() {
+            document.getElementById('noteForm').reset();
+            document.getElementById('noteModalTitle').textContent = 'Create New Nursing Note';
+            document.getElementById('noteId').value = '';
+            setCurrentDateTime();
+            document.getElementById('followUpSection').style.display = 'none';
+            new bootstrap.Modal(document.getElementById('noteModal')).show();
+        }
+
+        async function saveNote() {
+            const form = document.getElementById('noteForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const formData = new FormData(form);
+            const noteData = {};
+
+            for (let [key, value] of formData.entries()) {
+                if (value.trim() !== '') {
+                    noteData[key] = value;
+                }
+            }
+
+            // Add nurse info
+            noteData.nurse_id = user.user_id;
+
+            try {
+                const noteId = document.getElementById('noteId').value;
+                const method = noteId ? 'PUT' : 'POST';
+                const endpoint = noteId ? `/nursing-notes/${noteId}` : '/nursing-notes';
+
+                const response = await fetch(endpoint, {
+                    method: method,
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(noteData)
+                });
+
+                if (response.ok) {
+                    showAlert(noteId ? 'Note updated successfully!' : 'Note created successfully!', 'success');
+                    bootstrap.Modal.getInstance(document.getElementById('noteModal')).hide();
+                    loadNotes();
+                } else {
+                    const error = await response.json();
+                    showAlert('Error saving note: ' + (error.message || 'Unknown error'), 'danger');
+                }
+            } catch (error) {
+                console.error('Error saving note:', error);
+                showAlert('Error saving note: ' + error.message, 'danger');
+            }
+        }
+
+        function filterNotes() {
+            const patientFilter = document.getElementById('patientFilter').value;
+            const typeFilter = document.getElementById('typeFilter').value;
+            const priorityFilter = document.getElementById('priorityFilter').value;
+            const searchInput = document.getElementById('searchInput').value.toLowerCase();
+
+            let filtered = allNotes.filter(note => {
+                const matchesPatient = !patientFilter || note.patient_id == patientFilter;
+                const matchesType = !typeFilter || note.note_type === typeFilter;
+                const matchesPriority = !priorityFilter || note.priority === priorityFilter;
+                const matchesSearch = !searchInput ||
+                    note.subject.toLowerCase().includes(searchInput) ||
+                    note.content.toLowerCase().includes(searchInput) ||
+                    `${note.pat_first_name} ${note.pat_last_name}`.toLowerCase().includes(searchInput);
+
+                return matchesPatient && matchesType && matchesPriority && matchesSearch;
+            });
+
+            displayNotes(filtered);
+        }
+
+        function viewNote(noteId) {
+            showAlert('View note details functionality will be implemented soon', 'info');
+        }
+
+        function editNote(noteId) {
+            showAlert('Edit note functionality will be implemented soon', 'info');
+        }
+
+        function printNote(noteId) {
+            showAlert('Print note functionality will be implemented soon', 'info');
+        }
+
+        function exportNotes() {
+            showAlert('Export functionality will be implemented soon', 'info');
+        }
+
+        function refreshNotes() {
+            document.getElementById('loadingIndicator').style.display = 'block';
+            document.getElementById('notesContainer').style.display = 'none';
+            loadNotes();
+        }
+
+        function refreshPage() {
+            location.reload();
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/login.html';
+        }
+
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+
+            const mainContent = document.querySelector('.main-content');
+            mainContent.insertBefore(alertDiv, mainContent.firstChild);
+
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.remove();
+                }
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

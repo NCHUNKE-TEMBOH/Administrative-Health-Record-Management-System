@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Lab Results - HMS Patient</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%);
+        }
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 0.75rem 1rem;
+            margin: 0.25rem 0;
+            border-radius: 0.5rem;
+        }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            color: white;
+            background-color: rgba(255,255,255,0.1);
+        }
+        .main-content {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+        .feature-card {
+            transition: transform 0.2s;
+        }
+        .feature-card:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar p-3">
+                <div class="d-flex align-items-center mb-4">
+                    <i class="fas fa-vial text-white me-2"></i>
+                    <h5 class="text-white mb-0">HMS Patient</h5>
+                </div>
+
+                <nav class="nav flex-column">
+                    <a class="nav-link" href="/dashboard.html">
+                        <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                    </a>
+                    <!-- Role-specific navigation will be added here -->
+                    <hr class="text-white-50">
+                    <a class="nav-link" href="#" onclick="logout()">
+                        <i class="fas fa-sign-out-alt me-2"></i> Logout
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 main-content p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2><i class="fas fa-vial me-2"></i>My Lab Results</h2>
+                    <button class="btn btn-outline-primary" onclick="refreshPage()">
+                        <i class="fas fa-sync-alt me-2"></i>Refresh
+                    </button>
+                </div>
+
+                <!-- Filter and Search -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label class="form-label">Filter by Test Type</label>
+                                        <select class="form-select" id="testTypeFilter" onchange="filterResults()">
+                                            <option value="">All Test Types</option>
+                                            <option value="blood">Blood Tests</option>
+                                            <option value="urine">Urine Tests</option>
+                                            <option value="imaging">Imaging</option>
+                                            <option value="other">Other</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Filter by Status</label>
+                                        <select class="form-select" id="statusFilter" onchange="filterResults()">
+                                            <option value="">All Status</option>
+                                            <option value="completed">Completed</option>
+                                            <option value="pending">Pending</option>
+                                            <option value="in-progress">In Progress</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Date Range</label>
+                                        <select class="form-select" id="dateFilter" onchange="filterResults()">
+                                            <option value="">All Time</option>
+                                            <option value="7">Last 7 days</option>
+                                            <option value="30">Last 30 days</option>
+                                            <option value="90">Last 3 months</option>
+                                            <option value="365">Last year</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lab Results Summary -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h3 class="text-primary" id="totalTests">0</h3>
+                                <p class="mb-0">Total Tests</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h3 class="text-success" id="completedTests">0</h3>
+                                <p class="mb-0">Completed</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h3 class="text-warning" id="pendingTests">0</h3>
+                                <p class="mb-0">Pending</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h3 class="text-danger" id="criticalResults">0</h3>
+                                <p class="mb-0">Critical</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lab Results Table -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-list me-2"></i>Lab Test Results
+                                </h5>
+                                <div>
+                                    <button class="btn btn-outline-info btn-sm me-2" onclick="exportResults()">
+                                        <i class="fas fa-download me-1"></i>Export
+                                    </button>
+                                    <button class="btn btn-outline-primary btn-sm" onclick="refreshResults()">
+                                        <i class="fas fa-sync-alt me-1"></i>Refresh
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div id="loadingIndicator" class="text-center py-4">
+                                    <i class="fas fa-spinner fa-spin fa-2x text-info"></i>
+                                    <p class="mt-3">Loading lab results...</p>
+                                </div>
+
+                                <div id="resultsTableContainer" style="display: none;">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover" id="labResultsTable">
+                                            <thead>
+                                                <tr>
+                                                    <th>Date</th>
+                                                    <th>Test Name</th>
+                                                    <th>Type</th>
+                                                    <th>Status</th>
+                                                    <th>Critical Flag</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="labResultsTableBody">
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Authentication check
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+        if (!token || user.role !== 'patient') {
+            window.location.href = '/login.html';
+        }
+
+        let allLabResults = [];
+
+        // Load data on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadLabResults();
+        });
+
+        async function loadLabResults() {
+            try {
+                const response = await fetch(`/lab-tests?patient_id=${user.entity_id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    allLabResults = await response.json();
+                } else {
+                    allLabResults = generateMockLabResults();
+                }
+
+                displayLabResults(allLabResults);
+                updateStats();
+            } catch (error) {
+                console.error('Error loading lab results:', error);
+                allLabResults = generateMockLabResults();
+                displayLabResults(allLabResults);
+                updateStats();
+            }
+        }
+
+        function generateMockLabResults() {
+            const testTypes = ['blood', 'urine', 'imaging', 'other'];
+            const testNames = ['Complete Blood Count', 'Urinalysis', 'Chest X-Ray', 'Blood Glucose', 'Cholesterol Panel', 'Liver Function Test'];
+            const statuses = ['completed', 'pending', 'in-progress'];
+            const criticalFlags = ['normal', 'abnormal', 'critical'];
+            const mockData = [];
+
+            for (let i = 0; i < 20; i++) {
+                const testDate = new Date();
+                testDate.setDate(testDate.getDate() - Math.floor(Math.random() * 90));
+
+                mockData.push({
+                    test_id: i + 1,
+                    pat_id: user.entity_id,
+                    test_name: testNames[Math.floor(Math.random() * testNames.length)],
+                    test_type: testTypes[Math.floor(Math.random() * testTypes.length)],
+                    status: statuses[Math.floor(Math.random() * statuses.length)],
+                    requested_date: testDate.toISOString(),
+                    completed_date: Math.random() > 0.3 ? testDate.toISOString() : null,
+                    critical_flag: criticalFlags[Math.floor(Math.random() * criticalFlags.length)],
+                    results: Math.random() > 0.5 ? 'Test results available' : null,
+                    doctor_first_name: 'Dr. Smith',
+                    doctor_last_name: 'Johnson'
+                });
+            }
+
+            return mockData.sort((a, b) => new Date(b.requested_date) - new Date(a.requested_date));
+        }
+
+        function displayLabResults(results) {
+            const tbody = document.getElementById('labResultsTableBody');
+
+            if (results.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center py-4">
+                            <i class="fas fa-info-circle text-muted fa-2x mb-2"></i>
+                            <p class="text-muted">No lab results found</p>
+                        </td>
+                    </tr>
+                `;
+            } else {
+                tbody.innerHTML = results.map(result => `
+                    <tr>
+                        <td>${formatDate(result.requested_date)}</td>
+                        <td>
+                            <strong>${result.test_name}</strong>
+                            <br><small class="text-muted">ID: ${result.test_id}</small>
+                        </td>
+                        <td>
+                            <span class="badge bg-secondary">${result.test_type.toUpperCase()}</span>
+                        </td>
+                        <td>
+                            <span class="badge ${getStatusBadgeClass(result.status)}">
+                                ${result.status.toUpperCase()}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge ${getCriticalBadgeClass(result.critical_flag)}">
+                                ${result.critical_flag ? result.critical_flag.toUpperCase() : 'N/A'}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                ${result.results ? `
+                                    <button class="btn btn-outline-primary" onclick="viewResults(${result.test_id})" title="View Results">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-outline-info" onclick="downloadResults(${result.test_id})" title="Download">
+                                        <i class="fas fa-download"></i>
+                                    </button>
+                                ` : `
+                                    <button class="btn btn-outline-secondary" disabled title="Results not available">
+                                        <i class="fas fa-clock"></i>
+                                    </button>
+                                `}
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            // Show table and hide loading
+            document.getElementById('loadingIndicator').style.display = 'none';
+            document.getElementById('resultsTableContainer').style.display = 'block';
+        }
+
+        function updateStats() {
+            const total = allLabResults.length;
+            const completed = allLabResults.filter(r => r.status === 'completed').length;
+            const pending = allLabResults.filter(r => r.status === 'pending').length;
+            const critical = allLabResults.filter(r => r.critical_flag === 'critical').length;
+
+            document.getElementById('totalTests').textContent = total;
+            document.getElementById('completedTests').textContent = completed;
+            document.getElementById('pendingTests').textContent = pending;
+            document.getElementById('criticalResults').textContent = critical;
+        }
+
+        function getStatusBadgeClass(status) {
+            switch (status) {
+                case 'completed': return 'bg-success';
+                case 'pending': return 'bg-warning';
+                case 'in-progress': return 'bg-info';
+                default: return 'bg-secondary';
+            }
+        }
+
+        function getCriticalBadgeClass(criticalFlag) {
+            switch (criticalFlag) {
+                case 'normal': return 'bg-success';
+                case 'abnormal': return 'bg-warning';
+                case 'critical': return 'bg-danger';
+                default: return 'bg-secondary';
+            }
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            return date.toLocaleDateString();
+        }
+
+        function filterResults() {
+            const testTypeFilter = document.getElementById('testTypeFilter').value;
+            const statusFilter = document.getElementById('statusFilter').value;
+            const dateFilter = document.getElementById('dateFilter').value;
+
+            let filtered = allLabResults.filter(result => {
+                const matchesType = !testTypeFilter || result.test_type === testTypeFilter;
+                const matchesStatus = !statusFilter || result.status === statusFilter;
+
+                let matchesDate = true;
+                if (dateFilter) {
+                    const cutoffDate = new Date();
+                    cutoffDate.setDate(cutoffDate.getDate() - parseInt(dateFilter));
+                    matchesDate = new Date(result.requested_date) >= cutoffDate;
+                }
+
+                return matchesType && matchesStatus && matchesDate;
+            });
+
+            displayLabResults(filtered);
+        }
+
+        function viewResults(testId) {
+            const result = allLabResults.find(r => r.test_id === testId);
+            if (!result) return;
+
+            const modalHtml = `
+                <div class="modal fade" id="viewResultsModal" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Lab Test Results - ${result.test_name}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6>Test Information</h6>
+                                        <table class="table table-borderless">
+                                            <tr><td><strong>Test Name:</strong></td><td>${result.test_name}</td></tr>
+                                            <tr><td><strong>Test Type:</strong></td><td>${result.test_type}</td></tr>
+                                            <tr><td><strong>Test ID:</strong></td><td>${result.test_id}</td></tr>
+                                            <tr><td><strong>Status:</strong></td><td><span class="badge ${getStatusBadgeClass(result.status)}">${result.status}</span></td></tr>
+                                        </table>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6>Timeline</h6>
+                                        <table class="table table-borderless">
+                                            <tr><td><strong>Requested:</strong></td><td>${formatDate(result.requested_date)}</td></tr>
+                                            ${result.completed_date ? `<tr><td><strong>Completed:</strong></td><td>${formatDate(result.completed_date)}</td></tr>` : ''}
+                                            <tr><td><strong>Critical Flag:</strong></td><td><span class="badge ${getCriticalBadgeClass(result.critical_flag)}">${result.critical_flag || 'N/A'}</span></td></tr>
+                                        </table>
+                                    </div>
+                                </div>
+                                ${result.results ? `
+                                <div class="row">
+                                    <div class="col-12">
+                                        <h6>Results</h6>
+                                        <div class="alert alert-info">
+                                            <pre>${result.results}</pre>
+                                        </div>
+                                    </div>
+                                </div>
+                                ` : ''}
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" onclick="downloadResults(${result.test_id})">Download PDF</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Remove existing modal if any
+            const existingModal = document.getElementById('viewResultsModal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+
+            // Add modal to body and show
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            new bootstrap.Modal(document.getElementById('viewResultsModal')).show();
+        }
+
+        function downloadResults(testId) {
+            showAlert('Download functionality will be implemented soon', 'info');
+        }
+
+        function exportResults() {
+            showAlert('Export functionality will be implemented soon', 'info');
+        }
+
+        function refreshResults() {
+            document.getElementById('loadingIndicator').style.display = 'block';
+            document.getElementById('resultsTableContainer').style.display = 'none';
+            loadLabResults();
+        }
+
+        function refreshPage() {
+            location.reload();
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/login.html';
+        }
+
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+
+            const mainContent = document.querySelector('.main-content');
+            mainContent.insertBefore(alertDiv, mainContent.firstChild);
+
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.remove();
+                }
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

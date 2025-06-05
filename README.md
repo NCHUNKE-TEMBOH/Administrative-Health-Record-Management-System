@@ -2,7 +2,7 @@
 
 ## 🏥 Overview
 
-PulseCare is a comprehensive Hospital Management System designed to streamline healthcare operations across multiple user roles. The system provides secure, role-based access to patient data, medical records, appointments, prescriptions, lab tests, and more.
+MediCare is a comprehensive Hospital Management System designed to streamline healthcare operations across multiple user roles. The system provides secure, role-based access to patient data, medical records, appointments, prescriptions, lab tests, and more.
 
 ## ✨ Features
 

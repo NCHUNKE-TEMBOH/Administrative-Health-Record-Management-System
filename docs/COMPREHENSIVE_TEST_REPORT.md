@@ -1,4 +1,4 @@
-# PulseCare Hospital Management System - Comprehensive Test Report
+# MediCare Hospital Management System - Comprehensive Test Report
 
 ## Executive Summary
 

@@ -226,7 +226,7 @@ if __name__ == '__main__':
     port = int(os.getenv('FLASK_PORT', config['port']))
     debug = os.getenv('FLASK_ENV', 'production') != 'production'
 
-    print(f"🏥 Starting PulseCare Hospital Management System...")
+    print(f"🏥 Starting medicare Health Record Management System...")
     print(f"🌐 Server: http://{host}:{port}")
     print(f"🔧 Environment: {'Development' if debug else 'Production'}")
 

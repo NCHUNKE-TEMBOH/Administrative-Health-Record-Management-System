@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Full Workflow Testing for PulseCare Hospital Management System
+Full Workflow Testing for medicare Health Record Management System
 Tests complete patient care workflows with actual data creation
 """
 
@@ -92,7 +92,7 @@ class FullWorkflowTest:
         appointment_data = {
             "pat_id": patient_id,
             "doc_id": 1,  # Dr. Smith
-            "appointment_date": "2024-12-10",
+            "appointment_date": "2025-12-10",
             "appointment_time": "10:00:00",
             "reason": "Regular checkup"
         }
@@ -243,7 +243,7 @@ class FullWorkflowTest:
     
     def run_full_workflow_test(self):
         """Run complete workflow test"""
-        print("🏥 PulseCare Full Workflow Test")
+        print("🏥 medicare Full Workflow Test")
         print("="*50)
         
         if not self.login_all_users():

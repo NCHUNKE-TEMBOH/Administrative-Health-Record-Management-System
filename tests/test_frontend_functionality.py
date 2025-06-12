@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Frontend Functionality Test for PulseCare Hospital Management System
+Frontend Functionality Test for medicare Health Record Management System
 Tests frontend pages and their content
 """
 
@@ -51,7 +51,7 @@ class FrontendTest:
     def test_login_page(self):
         """Test login page functionality"""
         print("\n🔐 Testing Login Page...")
-        expected_elements = ["username", "password", "login", "PulseCare"]
+        expected_elements = ["username", "password", "login", "medicare"]
         return self.test_page_content("/login.html", expected_elements)
     
     def test_dashboard_page(self):
@@ -165,7 +165,7 @@ class FrontendTest:
     
     def run_all_frontend_tests(self):
         """Run all frontend tests"""
-        print("🌐 PulseCare Frontend Functionality Test")
+        print("🌐 medicare Frontend Functionality Test")
         print("="*50)
         
         # Test core pages

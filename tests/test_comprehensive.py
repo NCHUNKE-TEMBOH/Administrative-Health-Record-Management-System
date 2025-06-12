@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Comprehensive Testing Script for PulseCare Hospital Management System
+Comprehensive Testing Script for medicare Health Record Management System
 Tests all functionalities, API endpoints, user workflows, and inter-portal interactions
 """
 
@@ -10,7 +10,7 @@ import time
 from datetime import datetime, timedelta
 import random
 
-class PulseCareTestSuite:
+class medicareTestSuite:
     def __init__(self, base_url="http://127.0.0.1:5001"):
         self.base_url = base_url
         self.tokens = {}
@@ -649,7 +649,7 @@ class PulseCareTestSuite:
 
     def run_all_tests(self):
         """Run all test suites"""
-        print("🏥 PulseCare Hospital Management System - Comprehensive Test Suite")
+        print("🏥 medicare Health Record Management System - Comprehensive Test Suite")
         print("="*70)
         print(f"Testing server at: {self.base_url}")
         print(f"Test started at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
@@ -699,5 +699,5 @@ class PulseCareTestSuite:
         print(f"\nDetailed results saved to: test_results.json")
 
 if __name__ == "__main__":
-    test_suite = PulseCareTestSuite()
+    test_suite = medicareTestSuite()
     test_suite.run_all_tests()

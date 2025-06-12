@@ -15,7 +15,7 @@ from package.prescribes import Prescribes, Prescribe
 from package.undergoes import Undergoess, Undergoes
 
 # New health record management modules
-from package.user_management import UserLogin, UserProfile, Users, User, ChangePassword
+from package.user_management import UserLogin, UserProfile, Users, User, ChangePassword, UserRegistration, UserRegistration
 from package.health_records import HealthRecords, HealthRecord, VitalSigns
 from package.lab_results import LabTests, LabTest, LabTestsByPatient, PendingLabTests
 from package.prescriptions_enhanced import Prescriptions as PrescriptionsEnhanced, Prescription as PrescriptionEnhanced, MedicationDispensing
@@ -54,6 +54,7 @@ api.add_resource(Undergoess, '/undergoes')
 
 # Authentication and User Management
 api.add_resource(UserLogin, '/auth/login')
+api.add_resource(UserRegistration, '/auth/register')
 api.add_resource(UserProfile, '/auth/profile')
 api.add_resource(ChangePassword, '/auth/change-password')
 api.add_resource(Users, '/users')

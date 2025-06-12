@@ -3,617 +3,633 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up - medicare Health Record Management System</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Join medicare - Healthcare Registration</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="login.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Enhanced Background with Animation */
-        .signup-container {
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --light: #f8fafc;
+            --white: #ffffff;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-            background-size: 400% 400%;
-            animation: gradientShift 15s ease infinite;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 2rem 1rem;
+        }
+
+        .signup-container {
+            width: 100%;
+            max-width: 1400px;
+            background: var(--white);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            min-height: 600px;
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            padding: 3rem 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            color: var(--white);
             position: relative;
             overflow: hidden;
         }
 
-        /* Floating particles background */
-        .signup-container::before {
+        .hero-section::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background-image:
-                radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 2px, transparent 2px),
-                radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 2px, transparent 2px),
-                radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-            background-size: 100px 100px, 150px 150px, 80px 80px;
-            animation: float 20s linear infinite;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
         }
 
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        @keyframes float {
-            0% { transform: translateY(0px) rotate(0deg); }
-            100% { transform: translateY(-100px) rotate(360deg); }
-        }
-
-        .signup-card {
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(20px);
-            border-radius: 25px;
-            box-shadow:
-                0 25px 50px rgba(0, 0, 0, 0.15),
-                0 0 0 1px rgba(255, 255, 255, 0.1);
-            overflow: hidden;
-            max-width: 900px;
-            width: 100%;
+        .hero-content {
             position: relative;
-            animation: slideUp 0.8s ease-out;
+            z-index: 2;
         }
 
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .signup-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-            color: white;
-            padding: 3rem 2rem;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .signup-header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-            animation: shine 3s infinite;
-        }
-
-        @keyframes shine {
-            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
-        }
-
-        .signup-header h2 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .signup-header p {
-            font-size: 1.1rem;
-            opacity: 0.9;
-        }
-
-        .signup-body {
-            padding: 3rem 2rem;
-        }
-
-        .form-floating {
-            margin-bottom: 1.5rem;
-            position: relative;
-        }
-
-        .form-floating .form-control,
-        .form-floating .form-select {
-            border: 2px solid #e9ecef;
-            border-radius: 15px;
-            padding: 1rem 0.75rem;
-            transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.9);
-        }
-
-        .form-floating .form-control:focus,
-        .form-floating .form-select:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
-            background: white;
-        }
-
-        .form-floating label {
-            color: #6c757d;
-            font-weight: 500;
-        }
-
-        .btn-signup {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-            border: none;
-            padding: 15px 40px;
-            border-radius: 30px;
-            font-weight: 700;
-            font-size: 1.1rem;
-            transition: all 0.4s ease;
-            position: relative;
-            overflow: hidden;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .btn-signup::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s;
-        }
-
-        .btn-signup:hover::before {
-            left: 100%;
-        }
-
-        .btn-signup:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-signup:active {
-            transform: translateY(-1px);
-        }
-
-        .role-selection {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 1.5rem;
+        .hero-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
             margin-bottom: 2rem;
         }
 
+        .hero-logo i {
+            font-size: 2.5rem;
+            color: var(--secondary);
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .hero-features {
+            list-style: none;
+        }
+
+        .hero-feature {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        .hero-feature i {
+            width: 20px;
+            color: var(--secondary);
+        }
+
+        .form-section {
+            padding: 3rem;
+            overflow-y: auto;
+            max-height: 600px;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .form-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-subtitle {
+            color: var(--gray-600);
+            font-size: 1rem;
+        }
+
+        .role-selection {
+            margin-bottom: 2rem;
+        }
+
+        .role-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
         .role-card {
-            border: 3px solid #e9ecef;
-            border-radius: 20px;
-            padding: 1.5rem 1rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 12px;
+            padding: 1.25rem 0.75rem;
             text-align: center;
             cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            background: linear-gradient(145deg, #ffffff, #f8f9fa);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .role-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .role-card i {
-            position: relative;
-            z-index: 2;
             transition: all 0.3s ease;
-        }
-
-        .role-card div {
-            position: relative;
-            z-index: 2;
-            font-weight: 600;
-            margin-top: 0.5rem;
+            background: var(--white);
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
 
         .role-card:hover {
-            border-color: #667eea;
-            transform: translateY(-5px) scale(1.02);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
-        }
-
-        .role-card:hover::before {
-            opacity: 0.1;
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.15);
         }
 
         .role-card.selected {
-            border-color: #667eea;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.3);
-        }
-
-        .role-card.selected::before {
-            opacity: 0;
+            border-color: var(--primary);
+            background: var(--primary);
+            color: var(--white);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.3);
         }
 
         .role-card input[type="radio"] {
             display: none;
         }
 
-        .password-strength {
-            margin-top: 0.75rem;
+        .role-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
         }
 
-        .strength-bar {
-            height: 6px;
-            border-radius: 3px;
-            transition: all 0.5s ease;
-            background: #e9ecef;
-            position: relative;
-            overflow: hidden;
+        .role-card.selected .role-icon {
+            color: var(--white);
         }
 
-        .strength-bar::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 100%;
-            border-radius: 3px;
-            transition: all 0.5s ease;
+        .role-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
         }
 
-        .strength-weak::after {
-            background: linear-gradient(90deg, #dc3545, #ff6b6b);
-            width: 33%;
+        .role-description {
+            font-size: 0.75rem;
+            opacity: 0.8;
+            line-height: 1.3;
         }
-        .strength-medium::after {
-            background: linear-gradient(90deg, #ffc107, #ffeb3b);
-            width: 66%;
+
+        .form-group {
+            margin-bottom: 1.5rem;
         }
-        .strength-strong::after {
-            background: linear-gradient(90deg, #28a745, #4caf50);
+
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--gray-700);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control, .form-select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            background: var(--white);
+        }
+
+        .form-control:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            border: none;
+            padding: 0.875rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--white);
+            cursor: pointer;
+            transition: all 0.3s ease;
             width: 100%;
         }
 
-        /* Enhanced form sections */
-        .form-section {
-            background: rgba(102, 126, 234, 0.02);
-            border-radius: 20px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            border: 1px solid rgba(102, 126, 234, 0.1);
-            transition: all 0.3s ease;
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
         }
 
-        .form-section:hover {
-            background: rgba(102, 126, 234, 0.05);
-            border-color: rgba(102, 126, 234, 0.2);
+        .login-link {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: var(--gray-600);
+            font-size: 0.875rem;
         }
 
-        .section-title {
-            color: #667eea;
-            font-weight: 700;
-            font-size: 1.2rem;
-            margin-bottom: 1.5rem;
+        .login-link a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .form-check {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
         }
 
-        .section-title i {
-            margin-right: 0.5rem;
-            font-size: 1.3rem;
-        }
-
-        /* Enhanced checkbox */
-        .form-check-input:checked {
-            background-color: #667eea;
-            border-color: #667eea;
+        .form-check-input {
+            margin-top: 0.25rem;
         }
 
         .form-check-label {
-            font-weight: 500;
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            line-height: 1.4;
         }
 
-        /* Link styling */
-        a {
-            color: #667eea !important;
-            transition: color 0.3s ease;
+        .form-check-label a {
+            color: var(--primary);
+            text-decoration: none;
         }
 
-        a:hover {
-            color: #764ba2 !important;
+        .form-check-label a:hover {
+            text-decoration: underline;
         }
 
-        /* Responsive improvements */
+        textarea.form-control {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .alert {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border: none;
+        }
+
+        .alert-success {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .alert-danger {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .signup-container {
+                grid-template-columns: 1fr;
+                max-width: 800px;
+            }
+            
+            .hero-section {
+                padding: 2rem;
+                text-align: center;
+            }
+            
+            .role-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
         @media (max-width: 768px) {
-            .signup-header {
-                padding: 2rem 1rem;
+            .form-section {
+                padding: 2rem 1.5rem;
             }
-
-            .signup-body {
-                padding: 2rem 1rem;
-            }
-
-            .role-selection {
+            
+            .role-grid {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 1rem;
+                gap: 0.75rem;
             }
-
+            
             .role-card {
                 padding: 1rem 0.5rem;
+                min-height: 100px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .role-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
     <div class="signup-container">
-        <div class="signup-card">
-            <div class="signup-header">
-                <h2><i class="fas fa-heartbeat me-2"></i>medicare</h2>
-                <p class="mb-0">Join Our Healthcare Community</p>
-                <small>Create your account to access our comprehensive healthcare management system</small>
+        <!-- Hero Section -->
+        <div class="hero-section">
+            <div class="hero-content">
+                <div class="hero-logo">
+                    <i class="fas fa-heartbeat"></i>
+                    <h1 class="hero-title">medicare</h1>
+                </div>
+                <p class="hero-subtitle">Join the future of healthcare management. Secure, efficient, and designed for modern medical practice.</p>
+                
+                <ul class="hero-features">
+                    <li class="hero-feature">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>HIPAA Compliant & Secure</span>
+                    </li>
+                    <li class="hero-feature">
+                        <i class="fas fa-users-cog"></i>
+                        <span>Role-Based Access Control</span>
+                    </li>
+                    <li class="hero-feature">
+                        <i class="fas fa-clock"></i>
+                        <span>24/7 System Availability</span>
+                    </li>
+                    <li class="hero-feature">
+                        <i class="fas fa-mobile-alt"></i>
+                        <span>Mobile-Responsive Design</span>
+                    </li>
+                    <li class="hero-feature">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Advanced Analytics & Reporting</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Form Section -->
+        <div class="form-section">
+            <div class="form-header">
+                <h2 class="form-title">Create Your Account</h2>
+                <p class="form-subtitle">Choose your role and join thousands of healthcare professionals</p>
             </div>
 
-            <div class="signup-body">
-                <form id="signupForm">
-                    <!-- Role Selection Section -->
-                    <div class="form-section">
-                        <div class="section-title">
-                            <i class="fas fa-user-tag"></i>
-                            Choose Your Role
+            <form id="signupForm">
+                <!-- Role Selection -->
+                <div class="role-selection">
+                    <label class="form-label">Select Your Role</label>
+                    <div class="role-grid">
+                        <div class="role-card" onclick="selectRole('patient')">
+                            <input type="radio" name="role" value="patient" id="role-patient">
+                            <div class="role-icon">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="role-title">Patient</div>
+                            <div class="role-description">Access records & appointments</div>
                         </div>
-                        <div class="role-selection">
-                            <div class="role-card" onclick="selectRole('patient')">
-                                <input type="radio" name="role" value="patient" id="role-patient">
-                                <i class="fas fa-user fa-2x mb-2"></i>
-                                <div>Patient</div>
-                                <small class="text-muted">Access medical records & appointments</small>
+                        <div class="role-card" onclick="selectRole('doctor')">
+                            <input type="radio" name="role" value="doctor" id="role-doctor">
+                            <div class="role-icon">
+                                <i class="fas fa-user-md"></i>
                             </div>
-                            <div class="role-card" onclick="selectRole('doctor')">
-                                <input type="radio" name="role" value="doctor" id="role-doctor">
-                                <i class="fas fa-user-md fa-2x mb-2"></i>
-                                <div>Doctor</div>
-                                <small class="text-muted">Manage patients & prescriptions</small>
+                            <div class="role-title">Doctor</div>
+                            <div class="role-description">Manage patients & treatments</div>
+                        </div>
+                        <div class="role-card" onclick="selectRole('nurse')">
+                            <input type="radio" name="role" value="nurse" id="role-nurse">
+                            <div class="role-icon">
+                                <i class="fas fa-user-nurse"></i>
                             </div>
-                            <div class="role-card" onclick="selectRole('nurse')">
-                                <input type="radio" name="role" value="nurse" id="role-nurse">
-                                <i class="fas fa-user-nurse fa-2x mb-2"></i>
-                                <div>Nurse</div>
-                                <small class="text-muted">Patient care & vital signs</small>
+                            <div class="role-title">Nurse</div>
+                            <div class="role-description">Patient care & monitoring</div>
+                        </div>
+                        <div class="role-card" onclick="selectRole('lab_technician')">
+                            <input type="radio" name="role" value="lab_technician" id="role-lab">
+                            <div class="role-icon">
+                                <i class="fas fa-flask"></i>
                             </div>
-                            <div class="role-card" onclick="selectRole('lab_technician')">
-                                <input type="radio" name="role" value="lab_technician" id="role-lab">
-                                <i class="fas fa-flask fa-2x mb-2"></i>
-                                <div>Lab Tech</div>
-                                <small class="text-muted">Laboratory tests & results</small>
+                            <div class="role-title">Lab Tech</div>
+                            <div class="role-description">Tests & lab results</div>
+                        </div>
+                        <div class="role-card" onclick="selectRole('pharmacist')">
+                            <input type="radio" name="role" value="pharmacist" id="role-pharmacist">
+                            <div class="role-icon">
+                                <i class="fas fa-pills"></i>
                             </div>
-                            <div class="role-card" onclick="selectRole('pharmacist')">
-                                <input type="radio" name="role" value="pharmacist" id="role-pharmacist">
-                                <i class="fas fa-pills fa-2x mb-2"></i>
-                                <div>Pharmacist</div>
-                                <small class="text-muted">Medication management</small>
+                            <div class="role-title">Pharmacist</div>
+                            <div class="role-description">Medication management</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Personal Information -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label" for="firstName">First Name</label>
+                            <input type="text" class="form-control" id="firstName" name="firstName" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label" for="lastName">Last Name</label>
+                            <input type="text" class="form-control" id="lastName" name="lastName" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label" for="email">Email Address</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label" for="phone">Phone Number</label>
+                            <input type="tel" class="form-control" id="phone" name="phone" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Account Security -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label" for="username">Username</label>
+                            <input type="text" class="form-control" id="username" name="username" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label" for="password">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Role-Specific Fields -->
+                <div id="medicalStaffFields" class="hidden">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="licenseNumber">License Number</label>
+                                <input type="text" class="form-control" id="licenseNumber" name="licenseNumber">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="department">Department</label>
+                                <select class="form-select" id="department" name="department">
+                                    <option value="">Select Department</option>
+                                    <option value="cardiology">Cardiology</option>
+                                    <option value="neurology">Neurology</option>
+                                    <option value="orthopedics">Orthopedics</option>
+                                    <option value="pediatrics">Pediatrics</option>
+                                    <option value="emergency">Emergency</option>
+                                    <option value="surgery">Surgery</option>
+                                    <option value="laboratory">Laboratory</option>
+                                    <option value="pharmacy">Pharmacy</option>
+                                    <option value="general_medicine">General Medicine</option>
+                                    <option value="dermatology">Dermatology</option>
+                                </select>
                             </div>
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label class="form-label" for="specialization">Specialization (Optional)</label>
+                        <input type="text" class="form-control" id="specialization" name="specialization">
+                    </div>
+                </div>
 
-                    <!-- Personal Information Section -->
-                    <div class="form-section">
-                        <div class="section-title">
-                            <i class="fas fa-user"></i>
-                            Personal Information
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control" id="firstName" name="firstName" placeholder="First Name" required>
-                                    <label for="firstName"><i class="fas fa-user me-2"></i>First Name</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Last Name" required>
-                                    <label for="lastName"><i class="fas fa-user me-2"></i>Last Name</label>
-                                </div>
+                <div id="patientFields" class="hidden">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="dateOfBirth">Date of Birth</label>
+                                <input type="date" class="form-control" id="dateOfBirth" name="dateOfBirth">
                             </div>
                         </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
-                                    <label for="email"><i class="fas fa-envelope me-2"></i>Email Address</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input type="tel" class="form-control" id="phone" name="phone" placeholder="Phone" required>
-                                    <label for="phone"><i class="fas fa-phone me-2"></i>Phone Number</label>
-                                </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="gender">Gender</label>
+                                <select class="form-select" id="gender" name="gender">
+                                    <option value="">Select Gender</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                    <option value="other">Other</option>
+                                    <option value="prefer_not_to_say">Prefer not to say</option>
+                                </select>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Account Security Section -->
-                    <div class="form-section">
-                        <div class="section-title">
-                            <i class="fas fa-shield-alt"></i>
-                            Account Security
-                        </div>
-                        <div class="form-floating">
-                            <input type="text" class="form-control" id="username" name="username" placeholder="Username" required>
-                            <label for="username"><i class="fas fa-user-circle me-2"></i>Username</label>
-                            <small class="text-muted">Choose a unique username for your account</small>
-                        </div>
-
-                        <div class="form-floating">
-                            <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
-                            <label for="password"><i class="fas fa-lock me-2"></i>Password</label>
-                            <div class="password-strength">
-                                <div class="strength-bar" id="strengthBar"></div>
-                                <small class="text-muted" id="strengthText">Password strength will appear here</small>
-                            </div>
-                        </div>
-
-                        <div class="form-floating">
-                            <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password" required>
-                            <label for="confirmPassword"><i class="fas fa-lock me-2"></i>Confirm Password</label>
-                        </div>
+                    <div class="form-group">
+                        <label class="form-label" for="address">Address</label>
+                        <textarea class="form-control" id="address" name="address" rows="3"></textarea>
                     </div>
-
-                    <!-- Professional Information Section (Medical Staff) -->
-                    <div id="medicalStaffFields" class="form-section" style="display: none;">
-                        <div class="section-title">
-                            <i class="fas fa-stethoscope"></i>
-                            Professional Information
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control" id="licenseNumber" name="licenseNumber" placeholder="License Number">
-                                    <label for="licenseNumber"><i class="fas fa-id-card me-2"></i>License Number</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <select class="form-select" id="department" name="department">
-                                        <option value="">Select Department</option>
-                                        <option value="cardiology">Cardiology</option>
-                                        <option value="neurology">Neurology</option>
-                                        <option value="orthopedics">Orthopedics</option>
-                                        <option value="pediatrics">Pediatrics</option>
-                                        <option value="emergency">Emergency</option>
-                                        <option value="surgery">Surgery</option>
-                                        <option value="laboratory">Laboratory</option>
-                                        <option value="pharmacy">Pharmacy</option>
-                                        <option value="general_medicine">General Medicine</option>
-                                        <option value="dermatology">Dermatology</option>
-                                    </select>
-                                    <label for="department"><i class="fas fa-building me-2"></i>Department</label>
-                                </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="emergencyContact">Emergency Contact</label>
+                                <input type="text" class="form-control" id="emergencyContact" name="emergencyContact">
                             </div>
                         </div>
-                        <div class="form-floating">
-                            <input type="text" class="form-control" id="specialization" name="specialization" placeholder="Specialization">
-                            <label for="specialization"><i class="fas fa-user-md me-2"></i>Specialization (Optional)</label>
-                        </div>
-                    </div>
-
-                    <!-- Patient Information Section -->
-                    <div id="patientFields" class="form-section" style="display: none;">
-                        <div class="section-title">
-                            <i class="fas fa-user-injured"></i>
-                            Patient Information
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input type="date" class="form-control" id="dateOfBirth" name="dateOfBirth">
-                                    <label for="dateOfBirth"><i class="fas fa-calendar me-2"></i>Date of Birth</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <select class="form-select" id="gender" name="gender">
-                                        <option value="">Select Gender</option>
-                                        <option value="male">Male</option>
-                                        <option value="female">Female</option>
-                                        <option value="other">Other</option>
-                                        <option value="prefer_not_to_say">Prefer not to say</option>
-                                    </select>
-                                    <label for="gender"><i class="fas fa-venus-mars me-2"></i>Gender</label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-floating">
-                            <textarea class="form-control" id="address" name="address" placeholder="Address" style="height: 100px;"></textarea>
-                            <label for="address"><i class="fas fa-map-marker-alt me-2"></i>Complete Address</label>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control" id="emergencyContact" name="emergencyContact" placeholder="Emergency Contact">
-                                    <label for="emergencyContact"><i class="fas fa-phone-alt me-2"></i>Emergency Contact</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control" id="insuranceNumber" name="insuranceNumber" placeholder="Insurance Number">
-                                    <label for="insuranceNumber"><i class="fas fa-id-card-alt me-2"></i>Insurance Number (Optional)</label>
-                                </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="insuranceNumber">Insurance Number (Optional)</label>
+                                <input type="text" class="form-control" id="insuranceNumber" name="insuranceNumber">
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Terms and Agreement Section -->
-                    <div class="form-section">
-                        <div class="section-title">
-                            <i class="fas fa-file-contract"></i>
-                            Terms & Agreement
-                        </div>
-                        <div class="form-check mb-3">
-                            <input class="form-check-input" type="checkbox" id="agreeTerms" required>
-                            <label class="form-check-label" for="agreeTerms">
-                                I agree to the <a href="#" class="text-decoration-none fw-bold">Terms and Conditions</a> and <a href="#" class="text-decoration-none fw-bold">Privacy Policy</a>
-                            </label>
-                        </div>
-                        <div class="form-check mb-3">
-                            <input class="form-check-input" type="checkbox" id="agreeNewsletter">
-                            <label class="form-check-label" for="agreeNewsletter">
-                                I would like to receive health tips and updates via email
-                            </label>
-                        </div>
+                <!-- Terms and Conditions -->
+                <div class="form-group">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="agreeTerms" required>
+                        <label class="form-check-label" for="agreeTerms">
+                            I agree to the <a href="#" class="text-decoration-none">Terms and Conditions</a> and <a href="#" class="text-decoration-none">Privacy Policy</a>
+                        </label>
                     </div>
+                </div>
 
-                    <!-- Submit Button -->
-                    <div class="d-grid mb-4">
-                        <button type="submit" class="btn btn-primary btn-signup">
-                            <i class="fas fa-user-plus me-2"></i>Create My Account
-                        </button>
-                    </div>
+                <!-- Submit Button -->
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-user-plus me-2"></i>Create My Account
+                    </button>
+                </div>
 
-                    <!-- Login Link -->
-                    <div class="text-center">
-                        <div class="d-flex align-items-center justify-content-center mb-3">
-                            <hr class="flex-grow-1">
-                            <span class="px-3 text-muted">OR</span>
-                            <hr class="flex-grow-1">
-                        </div>
-                        <p class="mb-0">Already have an account?
-                            <a href="login.html" class="text-decoration-none fw-bold">Sign In Here</a>
-                        </p>
-                    </div>
-                </form>
-            </div>
+                <!-- Login Link -->
+                <div class="login-link">
+                    Already have an account? <a href="login.html">Sign in here</a>
+                </div>
+            </form>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         let selectedRole = '';
 
         function selectRole(role) {
-            // Remove previous selection
+            selectedRole = role;
+
+            // Remove selected class from all cards
             document.querySelectorAll('.role-card').forEach(card => {
                 card.classList.remove('selected');
             });
-            
-            // Add selection to clicked card
-            event.currentTarget.classList.add('selected');
+
+            // Add selected class to clicked card
+            document.querySelector(`#role-${role}`).closest('.role-card').classList.add('selected');
+
+            // Check the radio button
             document.getElementById(`role-${role}`).checked = true;
-            selectedRole = role;
-            
+
             // Show/hide role-specific fields
             showRoleSpecificFields(role);
         }
@@ -621,115 +637,35 @@
         function showRoleSpecificFields(role) {
             const medicalStaffFields = document.getElementById('medicalStaffFields');
             const patientFields = document.getElementById('patientFields');
-            
+
             // Hide all fields first
-            medicalStaffFields.style.display = 'none';
-            patientFields.style.display = 'none';
-            
+            medicalStaffFields.classList.add('hidden');
+            patientFields.classList.add('hidden');
+
             // Show relevant fields
             if (role === 'patient') {
-                patientFields.style.display = 'block';
+                patientFields.classList.remove('hidden');
             } else if (['doctor', 'nurse', 'lab_technician', 'pharmacist'].includes(role)) {
-                medicalStaffFields.style.display = 'block';
+                medicalStaffFields.classList.remove('hidden');
             }
         }
 
-        // Password strength checker
-        document.getElementById('password').addEventListener('input', function() {
-            const password = this.value;
-            const strengthBar = document.getElementById('strengthBar');
-            const strengthText = document.getElementById('strengthText');
-            
-            let strength = 0;
-            let feedback = '';
-            
-            // Check password criteria
-            if (password.length >= 8) strength++;
-            if (/[a-z]/.test(password)) strength++;
-            if (/[A-Z]/.test(password)) strength++;
-            if (/[0-9]/.test(password)) strength++;
-            if (/[^A-Za-z0-9]/.test(password)) strength++;
-            
-            // Update strength bar and text
-            strengthBar.className = 'strength-bar';
-            if (strength < 3) {
-                strengthBar.classList.add('strength-weak');
-                feedback = 'Weak password';
-            } else if (strength < 5) {
-                strengthBar.classList.add('strength-medium');
-                feedback = 'Medium strength';
-            } else {
-                strengthBar.classList.add('strength-strong');
-                feedback = 'Strong password';
+        function showAlert(message, type) {
+            // Remove existing alerts
+            const existingAlert = document.querySelector('.alert');
+            if (existingAlert) {
+                existingAlert.remove();
             }
-            
-            strengthText.textContent = feedback;
-        });
 
-        // Form submission
-        document.getElementById('signupForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            // Validate form
-            if (!selectedRole) {
-                showNotification('Please select a role', 'error');
-                return;
-            }
-            
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            
-            if (password !== confirmPassword) {
-                showNotification('Passwords do not match', 'error');
-                return;
-            }
-            
-            // Collect form data
-            const formData = new FormData(this);
-            const userData = Object.fromEntries(formData.entries());
-            userData.role = selectedRole;
-            
-            try {
-                const response = await fetch('/auth/register', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(userData)
-                });
-                
-                if (response.ok) {
-                    showNotification('Account created successfully! Please login.', 'success');
-                    setTimeout(() => {
-                        window.location.href = 'login.html';
-                    }, 2000);
-                } else {
-                    const error = await response.json();
-                    showNotification(error.error || 'Registration failed', 'error');
-                }
-            } catch (error) {
-                console.error('Registration error:', error);
-                showNotification('Registration failed. Please try again.', 'error');
-            }
-        });
-
-        function showNotification(message, type) {
-            const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
-            const iconClass = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle';
-            
+            // Create new alert
             const alert = document.createElement('div');
-            alert.className = `alert ${alertClass} alert-dismissible fade show position-fixed`;
-            alert.style.top = '20px';
-            alert.style.right = '20px';
-            alert.style.zIndex = '9999';
-            alert.style.minWidth = '300px';
-            alert.innerHTML = `
-                <i class="fas ${iconClass} me-2"></i>
-                ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            `;
-            document.body.appendChild(alert);
-            
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+
+            // Insert at the top of the form
+            const form = document.getElementById('signupForm');
+            form.insertBefore(alert, form.firstChild);
+
             // Auto-remove after 5 seconds
             setTimeout(() => {
                 if (alert.parentNode) {
@@ -737,6 +673,73 @@
                 }
             }, 5000);
         }
+
+        // Form submission
+        document.getElementById('signupForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            // Show loading state
+            const submitBtn = document.querySelector('.btn-primary');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Creating Account...';
+            submitBtn.disabled = true;
+
+            try {
+                // Validation
+                if (!selectedRole) {
+                    throw new Error('Please select a role');
+                }
+
+                // Basic validation only (role-specific fields are optional for now)
+
+                const formData = new FormData(this);
+                const userData = Object.fromEntries(formData.entries());
+                userData.role = selectedRole;
+
+                const response = await fetch('/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(userData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    showAlert('Account created successfully! Redirecting to login...', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 2000);
+                } else {
+                    throw new Error(result.error || 'Registration failed');
+                }
+
+            } catch (error) {
+                console.error('Registration error:', error);
+                showAlert(error.message || 'Registration failed. Please try again.', 'danger');
+            } finally {
+                // Reset button state
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+
+        // Check if user is already logged in
+        function checkExistingLogin() {
+            const token = localStorage.getItem('token');
+            const user = localStorage.getItem('user');
+            
+            if (token && user) {
+                alert('You are already logged in. Redirecting to dashboard...');
+                setTimeout(() => {
+                    window.location.href = '/dashboard.html';
+                }, 2000);
+            }
+        }
+
+        // Initialize
+        checkExistingLogin();
     </script>
 </body>
 </html>

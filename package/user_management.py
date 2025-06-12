@@ -354,3 +354,119 @@ class ChangePassword(Resource):
 
         except Exception as e:
             return {'error': 'Failed to change password'}, 500
+
+class UserRegistration(Resource):
+    """Handle user registration"""
+
+    def post(self):
+        """Register a new user"""
+        try:
+            data = request.get_json(force=True)
+
+            # Required fields
+            required_fields = ['username', 'email', 'password', 'role', 'firstName', 'lastName']
+            for field in required_fields:
+                if field not in data or not data[field]:
+                    return {'error': f'{field} is required'}, 400
+
+            # Validate role
+            valid_roles = ['admin', 'doctor', 'nurse', 'lab_technician', 'pharmacist', 'patient']
+            if data['role'] not in valid_roles:
+                return {'error': 'Invalid role'}, 400
+
+            # Validate email format
+            if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', data['email']):
+                return {'error': 'Invalid email format'}, 400
+
+            # Validate username length
+            if len(data['username']) < 3:
+                return {'error': 'Username must be at least 3 characters long'}, 400
+
+            # Validate password strength
+            if len(data['password']) < 8:
+                return {'error': 'Password must be at least 8 characters long'}, 400
+
+            # Check if username or email already exists
+            existing_user = conn.execute(
+                "SELECT user_id FROM users WHERE username = ? OR email = ?",
+                (data['username'], data['email'])
+            ).fetchone()
+
+            if existing_user:
+                return {'error': 'Username or email already exists'}, 400
+
+            # Hash password
+            password_hash = generate_password_hash(data['password'])
+
+            # Create role-specific entity first
+            entity_id = None
+            role = data['role']
+
+            if role == 'patient':
+                # Insert into patient table (using correct column names from model.py)
+                entity_id = conn.execute("""
+                    INSERT INTO patient (pat_first_name, pat_last_name, pat_insurance_no,
+                                       pat_ph_no, pat_address)
+                    VALUES (?, ?, ?, ?, ?)
+                """, (
+                    data['firstName'],
+                    data['lastName'],
+                    data.get('insuranceNumber', 'N/A'),
+                    data.get('phone', ''),
+                    data.get('address', '')
+                )).lastrowid
+
+            elif role == 'doctor':
+                # Insert into doctor table (using correct column names from model.py)
+                entity_id = conn.execute("""
+                    INSERT INTO doctor (doc_first_name, doc_last_name, doc_ph_no, doc_address)
+                    VALUES (?, ?, ?, ?)
+                """, (
+                    data['firstName'],
+                    data['lastName'],
+                    data.get('phone', ''),
+                    data.get('address', 'N/A')
+                )).lastrowid
+
+            elif role == 'nurse':
+                # Insert into nurse table (using correct column names from model.py)
+                entity_id = conn.execute("""
+                    INSERT INTO nurse (nur_first_name, nur_last_name, nur_ph_no, nur_address)
+                    VALUES (?, ?, ?, ?)
+                """, (
+                    data['firstName'],
+                    data['lastName'],
+                    data.get('phone', ''),
+                    data.get('address', 'N/A')
+                )).lastrowid
+
+            # Insert user record
+            user_id = conn.execute("""
+                INSERT INTO users (username, email, password_hash, role, first_name, last_name,
+                                 phone_number, entity_id, is_active)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)
+            """, (
+                data['username'],
+                data['email'],
+                password_hash,
+                role,
+                data['firstName'],
+                data['lastName'],
+                data.get('phone'),
+                entity_id
+            )).lastrowid
+
+            conn.commit()
+
+            # Log the registration
+            log_access(user_id, 'REGISTER', 'AUTH', success=True)
+
+            return {
+                'message': 'Registration successful! Please login with your credentials.',
+                'user_id': user_id
+            }, 201
+
+        except Exception as e:
+            conn.rollback()
+            print(f"Registration error: {str(e)}")  # For debugging
+            return {'error': 'Registration failed. Please try again.'}, 500

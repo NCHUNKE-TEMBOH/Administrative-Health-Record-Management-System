@@ -347,7 +347,7 @@ def print_login_credentials():
     print("="*60)
 
 if __name__ == "__main__":
-    print("Initializing Hospital Management System with sample data...")
+    print("Initializing Health Record Management System with sample data...")
     print("="*60)
 
     try:

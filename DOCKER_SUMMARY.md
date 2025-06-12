@@ -1,8 +1,8 @@
-# 🐳 PulseCare Docker Deployment Summary
+# 🐳 medicare Docker Deployment Summary
 
 ## ✅ Successfully Dockerized
 
-The PulseCare Hospital Management System has been successfully containerized with Docker and is ready for production deployment.
+The medicare Health Record Management System has been successfully containerized with Docker and is ready for production deployment.
 
 ## 📦 What's Included
 
@@ -35,10 +35,10 @@ open http://localhost:5001
 ### Option 2: Docker Build & Run
 ```bash
 # Build image
-docker build -t pulsecare:latest .
+docker build -t medicare:latest .
 
 # Run container
-docker run -d -p 5001:5001 --name pulsecare-app pulsecare:latest
+docker run -d -p 5001:5001 --name medicare-app medicare:latest
 
 # Access application
 open http://localhost:5001
@@ -97,10 +97,10 @@ curl -f http://localhost:5001/login.html
 docker ps
 
 # Check container logs
-docker logs pulsecare-app
+docker logs medicare-app
 
 # Monitor container health
-docker inspect pulsecare-app | grep Health
+docker inspect medicare-app | grep Health
 ```
 
 ## 🛠 Management Commands
@@ -120,16 +120,16 @@ docker-compose restart
 docker-compose logs -f
 
 # Access container shell
-docker exec -it pulsecare-app /bin/bash
+docker exec -it medicare-app /bin/bash
 ```
 
 ### Database Operations
 ```bash
 # Backup database
-docker exec pulsecare-app sqlite3 /app/database/database.db ".backup /app/database/backup.db"
+docker exec medicare-app sqlite3 /app/database/database.db ".backup /app/database/backup.db"
 
 # Copy backup to host
-docker cp pulsecare-app:/app/database/backup.db ./backup.db
+docker cp medicare-app:/app/database/backup.db ./backup.db
 ```
 
 ## 🔒 Security Features
@@ -166,7 +166,7 @@ docker cp pulsecare-app:/app/database/backup.db ./backup.db
 ```yaml
 # docker-compose.yml scaling
 services:
-  pulsecare:
+  medicare:
     deploy:
       replicas: 3
       resources:
@@ -179,7 +179,7 @@ services:
 ### Load Balancer Integration
 ```nginx
 # Nginx configuration
-upstream pulsecare {
+upstream medicare {
     server localhost:5001;
     server localhost:5002;
     server localhost:5003;
@@ -188,7 +188,7 @@ upstream pulsecare {
 server {
     listen 80;
     location / {
-        proxy_pass http://pulsecare;
+        proxy_pass http://medicare;
     }
 }
 ```
@@ -207,13 +207,13 @@ server {
 docker ps -a
 
 # View detailed logs
-docker logs --details pulsecare-app
+docker logs --details medicare-app
 
 # Inspect container configuration
-docker inspect pulsecare-app
+docker inspect medicare-app
 
 # Test network connectivity
-docker exec pulsecare-app curl localhost:5001/login.html
+docker exec medicare-app curl localhost:5001/login.html
 ```
 
 ## ✅ Deployment Checklist
@@ -231,7 +231,7 @@ docker exec pulsecare-app curl localhost:5001/login.html
 
 ## 🎉 Success!
 
-The PulseCare Hospital Management System is now fully containerized and ready for deployment in any Docker-compatible environment. The system provides a complete healthcare management solution with modern security, scalability, and ease of deployment.
+The medicare Health Record Management System is now fully containerized and ready for deployment in any Docker-compatible environment. The system provides a complete healthcare management solution with modern security, scalability, and ease of deployment.
 
 ### Next Steps
 1. Deploy to your preferred cloud platform

@@ -1,8 +1,8 @@
-# MediCare Hospital Management System
+# medicare Health Record Management System
 
 ## 🏥 Overview
 
-MediCare is a comprehensive Hospital Management System designed to streamline healthcare operations across multiple user roles. The system provides secure, role-based access to patient data, medical records, appointments, prescriptions, lab tests, and more.
+medicare is a comprehensive Health Record Management System designed to streamline healthcare operations across multiple user roles. The system provides secure, role-based access to patient data, medical records, appointments, prescriptions, lab tests, and more.
 
 ## ✨ Features
 
@@ -79,7 +79,7 @@ MediCare is a comprehensive Hospital Management System designed to streamline he
 ## 📁 Project Structure
 
 ```
-PulseCare/
+medicare/
 ├── app.py                 # Main Flask application
 ├── config.json           # Configuration settings
 ├── package/               # Backend modules
@@ -207,4 +207,4 @@ For support and questions, please refer to the documentation in the `docs/` dire
 
 ---
 
-**PulseCare Hospital Management System** - Streamlining Healthcare Operations
+**medicare Health Record Management System** - Streamlining Healthcare Operations

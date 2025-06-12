@@ -1,4 +1,4 @@
-# PulseCare Hospital Management System - Deployment Guide
+# medicare Health Record Management System - Deployment Guide
 
 ## 🚀 Quick Start with Docker
 
@@ -27,12 +27,12 @@
 
 1. **Build the Docker image**:
    ```bash
-   docker build -t pulsecare:latest .
+   docker build -t medicare:latest .
    ```
 
 2. **Run the container**:
    ```bash
-   docker run -d -p 5001:5001 --name pulsecare-app pulsecare:latest
+   docker run -d -p 5001:5001 --name medicare-app medicare:latest
    ```
 
 3. **Access the application**:
@@ -199,7 +199,7 @@ sqlite3 database/database.db ".restore backup_file.db"
 3. **Docker container not starting**:
    ```bash
    # Check container logs
-   docker logs pulsecare-app
+   docker logs medicare-app
    ```
 
 ## 📞 Support
@@ -222,7 +222,7 @@ docker-compose down
 docker-compose logs -f
 
 # Access container shell
-docker exec -it pulsecare-app /bin/bash
+docker exec -it medicare-app /bin/bash
 
 # Check application status
 curl -f http://localhost:5001/login.html

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is an enhanced Hospital Management System with comprehensive Health Record Management capabilities and role-based access control. The system supports six user roles, each with specific permissions and access rights tailored to their responsibilities in a healthcare environment.
+This is an enhanced Health Record Management System with comprehensive Health Record Management capabilities and role-based access control. The system supports six user roles, each with specific permissions and access rights tailored to their responsibilities in a healthcare environment.
 
 ## User Roles and Access Rights
 

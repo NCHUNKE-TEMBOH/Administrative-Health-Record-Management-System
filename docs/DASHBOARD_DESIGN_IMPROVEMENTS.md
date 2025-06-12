@@ -2,7 +2,7 @@
 
 ## 🚀 **TRANSFORMATION COMPLETE**
 
-The Hospital Management System dashboards have been completely redesigned with modern, vibrant, and role-specific designs that eliminate the previous "dull" appearance and create an engaging, professional user experience.
+The Health Record Management System dashboards have been completely redesigned with modern, vibrant, and role-specific designs that eliminate the previous "dull" appearance and create an engaging, professional user experience.
 
 ---
 
@@ -226,6 +226,6 @@ The Hospital Management System dashboards have been completely redesigned with m
 
 ## 🏆 **CONCLUSION**
 
-The Hospital Management System dashboards have been transformed from "dull" to **spectacular**. Each role now enjoys a personalized, vibrant, and highly functional dashboard that not only looks professional but also enhances productivity and user satisfaction.
+The Health Record Management System dashboards have been transformed from "dull" to **spectacular**. Each role now enjoys a personalized, vibrant, and highly functional dashboard that not only looks professional but also enhances productivity and user satisfaction.
 
 **The HMS now features world-class dashboard design that rivals the best healthcare management systems in the industry!** 🌟

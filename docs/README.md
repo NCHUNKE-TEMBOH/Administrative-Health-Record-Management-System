@@ -1,4 +1,4 @@
-Administrative Hospital Management System 
+Administrative Health Record Management System 
 Works more like a record Tracker in a Hospital where the Super Admin is in charge of Managing everthing "we could talk of workflow in this case" 
 
 # what gets mainly used
@@ -11,7 +11,7 @@ Works more like a record Tracker in a Hospital where the Super Admin is in charg
 What is Microservice Architecture?
 Microservice architecture is an architectural style that structures an application as a collection of small, loosely coupled services, each of which implements a specific business functionality. These services can be developed, deployed, and scaled independently.
 
-#Benefits of Using Microservices for a Hospital Management System
+#Benefits of Using Microservices for a Health Record Management System
 
 Scalability: Each microservice can be scaled independently based on it's load. 
 For example, the appointment scheduling service can be scaled-up during peak hours without affecting other services.
@@ -25,7 +25,7 @@ Resilience and Fault Isolation: If one service fails, it doesn’t necessarily b
 
 Ease of Maintenance and Development: Smaller codebases for individual services are easier to manage and understand, making development and maintenance more efficient.
 
-# Example Microservices for a Hospital Management System
+# Example Microservices for a Health Record Management System
 
 - Patient Management Service: Handles patient records, including personal details, medical history, and demographics.
 - Appointment Scheduling Service: Manages scheduling, rescheduling, and cancellations of patient appointments.
@@ -62,5 +62,5 @@ the Appointment Scheduling Service checks the doctor's availability using the Do
 Once the appointment is scheduled, a confirmation is sent to the Notification Service, which sends an email/SMS to the patient.
 The appointment details are logged for reporting purposes using the Report Generation Service.
 Conclusion
-Microservice architecture can significantly enhance the functionality, maintainability, and scalability of a hospital management system. 
+Microservice architecture can significantly enhance the functionality, maintainability, and scalability of a Health Record Management System. 
 By breaking down the system into smaller, manageable services, development teams can work more efficiently and effectively, ensuring a robust, high-performing, and user-friendly application.

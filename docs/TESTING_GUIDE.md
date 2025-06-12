@@ -1,4 +1,4 @@
-# Hospital Management System - Testing Guide
+# Health Record Management System - Testing Guide
 
 ## 🧪 **COMPREHENSIVE TESTING CHECKLIST**
 

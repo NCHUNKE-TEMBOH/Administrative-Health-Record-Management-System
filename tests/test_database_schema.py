@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Database Schema Test for PulseCare Hospital Management System
+Database Schema Test for medicare Health Record Management System
 Verifies all required tables exist and have proper structure
 """
 
@@ -13,7 +13,7 @@ with open('config.json') as data_file:
 
 def test_database_schema():
     """Test database schema and table structure"""
-    print("🗄️ PulseCare Database Schema Test")
+    print("🗄️ medicare Database Schema Test")
     print("="*50)
     
     # Connect to database

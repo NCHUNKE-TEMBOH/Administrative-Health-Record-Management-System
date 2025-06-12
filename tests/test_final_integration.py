@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Final Integration Test for PulseCare Hospital Management System
+Final Integration Test for medicare Health Record Management System
 Tests complete end-to-end scenarios across all portals
 """
 
@@ -93,7 +93,7 @@ class FinalIntegrationTest:
         appointment_data = {
             "pat_id": patient_id,
             "doc_id": 1,
-            "appointment_date": "2024-12-15",
+            "appointment_date": "2025-12-15",
             "appointment_time": "14:00:00",
             "reason": "Integration test consultation"
         }
@@ -239,7 +239,7 @@ class FinalIntegrationTest:
     
     def run_final_integration_test(self):
         """Run complete integration test"""
-        print("🎯 PulseCare Final Integration Test")
+        print("🎯 medicare Final Integration Test")
         print("=" * 60)
         
         if not self.login_all_users():
@@ -254,7 +254,7 @@ class FinalIntegrationTest:
         print("=" * 60)
         if success:
             print("✅ ALL INTEGRATION TESTS PASSED")
-            print("🎉 PulseCare system is fully functional and ready for production!")
+            print("🎉 medicare system is fully functional and ready for production!")
         else:
             print("❌ Some integration tests failed")
             print("⚠️ Please review the issues before production deployment")

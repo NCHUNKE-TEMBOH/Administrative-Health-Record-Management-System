@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Simple test server for PulseCare to verify page accessibility
+Simple test server for medicare to verify page accessibility
 """
 
 from flask import Flask, send_from_directory
@@ -175,6 +175,6 @@ def department_api():
     ]
 
 if __name__ == '__main__':
-    print("🏥 Starting PulseCare Test Server...")
+    print("🏥 Starting medicare Test Server...")
     print(f"Server will run on http://{config['host']}:{config['port']}")
     app.run(debug=True, host=config['host'], port=config['port'])

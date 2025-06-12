@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Find all pages with "coming soon" messages in PulseCare
+Find all pages with "coming soon" messages in medicare
 """
 
 import os

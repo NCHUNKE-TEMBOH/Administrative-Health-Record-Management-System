@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-PulseCare Hospital Management System - Comprehensive Page Testing Script
+medicare Health Record Management System - Comprehensive Page Testing Script
 Tests all pages for accessibility, functionality, and proper loading.
 """
 
@@ -10,7 +10,7 @@ import json
 from datetime import datetime
 import sys
 
-class PulseCarePageTester:
+class medicarePageTester:
     def __init__(self, base_url="http://localhost:5000"):
         self.base_url = base_url
         self.session = requests.Session()
@@ -275,7 +275,7 @@ class PulseCarePageTester:
 
     def run_all_tests(self):
         """Run all tests"""
-        print("🏥 PulseCare Hospital Management System - Page Testing")
+        print("🏥 medicare Health Record Management System - Page Testing")
         print("=" * 60)
         print(f"Testing server at: {self.base_url}")
         print(f"Test started at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
@@ -347,7 +347,7 @@ if __name__ == "__main__":
     # Allow custom base URL
     base_url = sys.argv[1] if len(sys.argv) > 1 else "http://localhost:5000"
     
-    tester = PulseCarePageTester(base_url)
+    tester = medicarePageTester(base_url)
     success = tester.run_all_tests()
     
     # Exit with appropriate code

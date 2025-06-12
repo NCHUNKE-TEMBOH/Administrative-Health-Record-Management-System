@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Simple test to check PulseCare static files and pages
+Simple test to check medicare static files and pages
 """
 
 import os
@@ -48,9 +48,9 @@ def check_html_content(filepath):
     except Exception as e:
         return [f"Error reading file: {str(e)}"]
 
-def test_pulsecare_pages():
-    """Test all PulseCare pages"""
-    print("🏥 PulseCare Hospital Management System - Static File Testing")
+def test_medicare_pages():
+    """Test all medicare pages"""
+    print("🏥 medicare Health Record Management System - Static File Testing")
     print("=" * 60)
     print(f"Test started at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     
@@ -155,26 +155,26 @@ def test_pulsecare_pages():
     else:
         print("✅ No 'coming soon' messages found!")
     
-    # Check for PulseCare branding
+    # Check for medicare branding
     print(f"\n🏷️  BRANDING CHECK")
     print("-" * 30)
     
     branding_files = ['static/login.html', 'static/signup.html', 'static/index.html']
-    pulsecare_count = 0
+    medicare_count = 0
     
     for file in branding_files:
         if os.path.exists(file):
             with open(file, 'r', encoding='utf-8') as f:
                 content = f.read()
-            if 'PulseCare' in content:
-                pulsecare_count += 1
-                print(f"✅ {os.path.basename(file)}: Contains PulseCare branding")
+            if 'medicare' in content:
+                medicare_count += 1
+                print(f"✅ {os.path.basename(file)}: Contains medicare branding")
             else:
-                print(f"❌ {os.path.basename(file)}: Missing PulseCare branding")
+                print(f"❌ {os.path.basename(file)}: Missing medicare branding")
     
-    print(f"\nBranding Status: {pulsecare_count}/{len(branding_files)} files have PulseCare branding")
+    print(f"\nBranding Status: {medicare_count}/{len(branding_files)} files have medicare branding")
     
     print(f"\nTest completed at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 
 if __name__ == "__main__":
-    test_pulsecare_pages()
+    test_medicare_pages()

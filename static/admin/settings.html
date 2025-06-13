@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Settings - HRMS Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 0.75rem 1rem;
+            margin: 0.25rem 0;
+            border-radius: 0.5rem;
+        }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            color: white;
+            background-color: rgba(255,255,255,0.1);
+        }
+        .main-content {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+        .card {
+            border: none;
+            box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
+            margin-bottom: 1.5rem;
+        }
+        .settings-section {
+            border-left: 4px solid #667eea;
+            padding-left: 1rem;
+            margin-bottom: 2rem;
+        }
+        .setting-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid #e9ecef;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar p-3">
+                <div class="d-flex align-items-center mb-4">
+                    <i class="fas fa-hospital text-white me-2"></i>
+                    <h5 class="text-white mb-0">HRMS Admin</h5>
+                </div>
+                
+                <nav class="nav flex-column">
+                    <a class="nav-link" href="/dashboard.html">
+                        <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                    </a>
+                    <a class="nav-link" href="/admin/users.html">
+                        <i class="fas fa-users me-2"></i> User Management
+                    </a>
+                    <a class="nav-link" href="/admin/analytics.html">
+                        <i class="fas fa-chart-bar me-2"></i> System Analytics
+                    </a>
+                    <a class="nav-link" href="/admin/patients.html">
+                        <i class="fas fa-user-injured me-2"></i> Patients
+                    </a>
+                    <a class="nav-link" href="/admin/audit-logs.html">
+                        <i class="fas fa-clipboard-list me-2"></i> Audit Logs
+                    </a>
+                    <a class="nav-link active" href="/admin/settings.html">
+                        <i class="fas fa-cogs me-2"></i> System Settings
+                    </a>
+                    <hr class="text-white-50">
+                    <a class="nav-link" href="#" onclick="logout()">
+                        <i class="fas fa-sign-out-alt me-2"></i> Logout
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 main-content p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2><i class="fas fa-cogs me-2"></i>System Settings</h2>
+                    <button class="btn btn-primary" onclick="saveAllSettings()">
+                        <i class="fas fa-save me-2"></i>Save All Changes
+                    </button>
+                </div>
+
+                <!-- General Settings -->
+                <div class="settings-section">
+                    <h4><i class="fas fa-sliders-h me-2"></i>General Settings</h4>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="setting-item">
+                                        <label class="form-label fw-bold">System Name</label>
+                                        <input type="text" class="form-control" id="systemName" value="medicare Health Record Management System">
+                                        <small class="text-muted">The name displayed throughout the system</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="setting-item">
+                                        <label class="form-label fw-bold">Organization Name</label>
+                                        <input type="text" class="form-control" id="organizationName" value="General Hospital">
+                                        <small class="text-muted">Your healthcare organization name</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="setting-item">
+                                        <label class="form-label fw-bold">Time Zone</label>
+                                        <select class="form-select" id="timeZone">
+                                            <option value="UTC">UTC</option>
+                                            <option value="America/New_York">Eastern Time</option>
+                                            <option value="America/Chicago">Central Time</option>
+                                            <option value="America/Denver">Mountain Time</option>
+                                            <option value="America/Los_Angeles">Pacific Time</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="setting-item">
+                                        <label class="form-label fw-bold">Date Format</label>
+                                        <select class="form-select" id="dateFormat">
+                                            <option value="MM/DD/YYYY">MM/DD/YYYY</option>
+                                            <option value="DD/MM/YYYY">DD/MM/YYYY</option>
+                                            <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Settings -->
+                <div class="settings-section">
+                    <h4><i class="fas fa-shield-alt me-2"></i>Security Settings</h4>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="setting-item">
+                                        <label class="form-label fw-bold">Session Timeout (minutes)</label>
+                                        <input type="number" class="form-control" id="sessionTimeout" value="30" min="5" max="480">
+                                        <small class="text-muted">Automatic logout after inactivity</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="setting-item">
+                                        <label class="form-label fw-bold">Password Minimum Length</label>
+                                        <input type="number" class="form-control" id="passwordMinLength" value="8" min="6" max="20">
+                                        <small class="text-muted">Minimum characters required for passwords</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="setting-item">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="requirePasswordComplexity" checked>
+                                            <label class="form-check-label fw-bold" for="requirePasswordComplexity">
+                                                Require Password Complexity
+                                            </label>
+                                        </div>
+                                        <small class="text-muted">Require uppercase, lowercase, numbers, and symbols</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="setting-item">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="enableTwoFactor">
+                                            <label class="form-check-label fw-bold" for="enableTwoFactor">
+                                                Enable Two-Factor Authentication
+                                            </label>
+                                        </div>
+                                        <small class="text-muted">Require additional verification for login</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notification Settings -->
+                <div class="settings-section">
+                    <h4><i class="fas fa-bell me-2"></i>Notification Settings</h4>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="setting-item">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="emailNotifications" checked>
+                                            <label class="form-check-label fw-bold" for="emailNotifications">
+                                                Email Notifications
+                                            </label>
+                                        </div>
+                                        <small class="text-muted">Send system notifications via email</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="setting-item">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="smsNotifications">
+                                            <label class="form-check-label fw-bold" for="smsNotifications">
+                                                SMS Notifications
+                                            </label>
+                                        </div>
+                                        <small class="text-muted">Send critical alerts via SMS</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="setting-item">
+                                <label class="form-label fw-bold">SMTP Server Configuration</label>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <input type="text" class="form-control" id="smtpServer" placeholder="smtp.gmail.com">
+                                        <small class="text-muted">SMTP Server</small>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <input type="number" class="form-control" id="smtpPort" placeholder="587">
+                                        <small class="text-muted">Port</small>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="email" class="form-control" id="smtpUsername" placeholder="admin@hospital.com">
+                                        <small class="text-muted">Username</small>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="password" class="form-control" id="smtpPassword" placeholder="Password">
+                                        <small class="text-muted">Password</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Backup Settings -->
+                <div class="settings-section">
+                    <h4><i class="fas fa-database me-2"></i>Backup & Maintenance</h4>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="setting-item">
+                                        <label class="form-label fw-bold">Automatic Backup</label>
+                                        <select class="form-select" id="backupFrequency">
+                                            <option value="disabled">Disabled</option>
+                                            <option value="daily" selected>Daily</option>
+                                            <option value="weekly">Weekly</option>
+                                            <option value="monthly">Monthly</option>
+                                        </select>
+                                        <small class="text-muted">Frequency of automatic database backups</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="setting-item">
+                                        <label class="form-label fw-bold">Backup Retention (days)</label>
+                                        <input type="number" class="form-control" id="backupRetention" value="30" min="1" max="365">
+                                        <small class="text-muted">How long to keep backup files</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="setting-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>Manual Backup</strong>
+                                        <br><small class="text-muted">Create an immediate backup of the database</small>
+                                    </div>
+                                    <button class="btn btn-outline-primary" onclick="createBackup()">
+                                        <i class="fas fa-download me-2"></i>Create Backup
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Information -->
+                <div class="settings-section">
+                    <h4><i class="fas fa-info-circle me-2"></i>System Information</h4>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="setting-item">
+                                        <strong>System Version:</strong> v2.1.0<br>
+                                        <strong>Database Version:</strong> SQLite 3.36.0<br>
+                                        <strong>Last Updated:</strong> <span id="lastUpdated">Loading...</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="setting-item">
+                                        <strong>Server Status:</strong> <span class="text-success">Online</span><br>
+                                        <strong>Uptime:</strong> <span id="uptime">Loading...</span><br>
+                                        <strong>Active Users:</strong> <span id="activeUsers">Loading...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Authentication check
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+        if (!token || user.role !== 'admin') {
+            window.location.href = '/login.html';
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSystemInfo();
+            loadSettings();
+        });
+
+        function loadSystemInfo() {
+            document.getElementById('lastUpdated').textContent = new Date().toLocaleDateString();
+            document.getElementById('uptime').textContent = '5 days, 12 hours';
+            document.getElementById('activeUsers').textContent = '23';
+        }
+
+        function loadSettings() {
+            // Load settings from localStorage or API
+            const settings = JSON.parse(localStorage.getItem('systemSettings') || '{}');
+            
+            // Apply saved settings to form fields
+            Object.keys(settings).forEach(key => {
+                const element = document.getElementById(key);
+                if (element) {
+                    if (element.type === 'checkbox') {
+                        element.checked = settings[key];
+                    } else {
+                        element.value = settings[key];
+                    }
+                }
+            });
+        }
+
+        function saveAllSettings() {
+            const settings = {};
+            const formElements = document.querySelectorAll('input, select');
+            
+            formElements.forEach(element => {
+                if (element.id) {
+                    if (element.type === 'checkbox') {
+                        settings[element.id] = element.checked;
+                    } else {
+                        settings[element.id] = element.value;
+                    }
+                }
+            });
+
+            // Save to localStorage (in real app, save to API)
+            localStorage.setItem('systemSettings', JSON.stringify(settings));
+            
+            showAlert('Settings saved successfully!', 'success');
+        }
+
+        function createBackup() {
+            showAlert('Creating backup... This may take a few moments.', 'info');
+            
+            // Simulate backup creation
+            setTimeout(() => {
+                showAlert('Backup created successfully!', 'success');
+            }, 2000);
+        }
+
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.parentNode.removeChild(alertDiv);
+                }
+            }, 5000);
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/login.html';
+        }
+    </script>
+</body>
+</html>

@@ -1310,20 +1310,8 @@
             }
         }
 
-        function loadAnalytics() {
-            showAlert('Analytics module coming soon!', 'info');
-        }
-
-        function loadAuditLogs() {
-            if (user.role === 'admin') {
-                showAlert('Audit logs module coming soon!', 'info');
-            } else {
-                showAlert('Access denied', 'danger');
-            }
-        }
-
         function loadMyPatients() {
-            if (user.role === 'doctor') {
+            if (user.role === 'doctor' || user.role === 'admin') {
                 window.location.href = '/doctor/patients.html';
             } else {
                 showAlert('Access denied', 'danger');
@@ -1332,7 +1320,7 @@
 
         // Doctor functions
         function loadAppointments() {
-            if (user.role === 'doctor') {
+            if (user.role === 'doctor' || user.role === 'admin') {
                 window.location.href = '/doctor/appointments.html';
             } else {
                 showAlert('Access denied', 'danger');
@@ -1340,7 +1328,7 @@
         }
 
         function loadPrescriptions() {
-            if (user.role === 'doctor') {
+            if (user.role === 'doctor' || user.role === 'admin') {
                 window.location.href = '/doctor/prescriptions.html';
             } else {
                 showAlert('Access denied', 'danger');
@@ -1348,7 +1336,7 @@
         }
 
         function createPrescription() {
-            if (user.role === 'doctor') {
+            if (user.role === 'doctor' || user.role === 'admin') {
                 window.location.href = '/doctor/prescriptions.html';
             } else {
                 showAlert('Access denied', 'danger');
@@ -1356,7 +1344,7 @@
         }
 
         function loadLabTests() {
-            if (user.role === 'doctor') {
+            if (user.role === 'doctor' || user.role === 'admin') {
                 window.location.href = '/doctor/lab-tests.html';
             } else if (user.role === 'lab_technician') {
                 window.location.href = '/lab/tests.html';
@@ -1366,7 +1354,7 @@
         }
 
         function requestLabTest() {
-            if (user.role === 'doctor') {
+            if (user.role === 'doctor' || user.role === 'admin') {
                 window.location.href = '/doctor/lab-tests.html';
             } else {
                 showAlert('Access denied', 'danger');
@@ -1374,7 +1362,7 @@
         }
 
         function loadMedicalNotes() {
-            if (user.role === 'doctor') {
+            if (user.role === 'doctor' || user.role === 'admin') {
                 window.location.href = '/doctor/medical-notes.html';
             } else {
                 showAlert('Access denied', 'danger');
@@ -1382,7 +1370,7 @@
         }
 
         function createMedicalNote() {
-            if (user.role === 'doctor') {
+            if (user.role === 'doctor' || user.role === 'admin') {
                 window.location.href = '/doctor/medical-notes.html';
             } else {
                 showAlert('Access denied', 'danger');
@@ -1391,7 +1379,7 @@
 
         // Nurse functions
         function loadAssignedPatients() {
-            if (user.role === 'nurse') {
+            if (user.role === 'nurse' || user.role === 'admin') {
                 window.location.href = '/nurse/patients.html';
             } else {
                 showAlert('Access denied', 'danger');
@@ -1399,7 +1387,7 @@
         }
 
         function loadPatientAssignments() {
-            if (user.role === 'nurse') {
+            if (user.role === 'nurse' || user.role === 'admin') {
                 window.location.href = '/nurse/assignments.html';
             } else {
                 showAlert('Access denied', 'danger');
@@ -1407,7 +1395,7 @@
         }
 
         function loadVitalSigns() {
-            if (user.role === 'nurse') {
+            if (user.role === 'nurse' || user.role === 'admin') {
                 window.location.href = '/nurse/vital-signs.html';
             } else {
                 showAlert('Access denied', 'danger');
@@ -1415,7 +1403,7 @@
         }
 
         function recordVitalSigns() {
-            if (user.role === 'nurse') {
+            if (user.role === 'nurse' || user.role === 'admin') {
                 window.location.href = '/nurse/vital-signs.html';
             } else {
                 showAlert('Access denied', 'danger');
@@ -1423,7 +1411,7 @@
         }
 
         function loadNursingNotes() {
-            if (user.role === 'nurse') {
+            if (user.role === 'nurse' || user.role === 'admin') {
                 window.location.href = '/nurse/nursing-notes.html';
             } else {
                 showAlert('Access denied', 'danger');
@@ -1431,7 +1419,7 @@
         }
 
         function createNursingNote() {
-            if (user.role === 'nurse') {
+            if (user.role === 'nurse' || user.role === 'admin') {
                 window.location.href = '/nurse/nursing-notes.html';
             } else {
                 showAlert('Access denied', 'danger');
@@ -1440,7 +1428,7 @@
 
         // Lab Technician functions
         function loadPendingTests() {
-            if (user.role === 'lab_technician') {
+            if (user.role === 'lab_technician' || user.role === 'admin') {
                 window.location.href = '/lab/pending-tests.html';
             } else {
                 showAlert('Access denied', 'danger');
@@ -1448,7 +1436,7 @@
         }
 
         function loadInProgressTests() {
-            if (user.role === 'lab_technician') {
+            if (user.role === 'lab_technician' || user.role === 'admin') {
                 window.location.href = '/lab/in-progress-tests.html';
             } else {
                 showAlert('Access denied', 'danger');
@@ -1456,7 +1444,7 @@
         }
 
         function loadTestResults() {
-            if (user.role === 'lab_technician') {
+            if (user.role === 'lab_technician' || user.role === 'admin') {
                 window.location.href = '/lab/test-results.html';
             } else {
                 showAlert('Access denied', 'danger');
@@ -1464,7 +1452,7 @@
         }
 
         function enterTestResult() {
-            if (user.role === 'lab_technician') {
+            if (user.role === 'lab_technician' || user.role === 'admin') {
                 window.location.href = '/lab/enter-results.html';
             } else {
                 showAlert('Access denied', 'danger');
@@ -1473,7 +1461,7 @@
 
         // Pharmacist functions
         function loadActivePrescriptions() {
-            if (user.role === 'pharmacist') {
+            if (user.role === 'pharmacist' || user.role === 'admin') {
                 window.location.href = '/pharmacy/prescriptions.html';
             } else {
                 showAlert('Access denied', 'danger');
@@ -1481,7 +1469,7 @@
         }
 
         function dispenseMedication() {
-            if (user.role === 'pharmacist') {
+            if (user.role === 'pharmacist' || user.role === 'admin') {
                 window.location.href = '/pharmacy/dispense.html';
             } else {
                 showAlert('Access denied', 'danger');
@@ -1489,7 +1477,7 @@
         }
 
         function loadInventory() {
-            if (user.role === 'pharmacist') {
+            if (user.role === 'pharmacist' || user.role === 'admin') {
                 window.location.href = '/pharmacy/inventory.html';
             } else {
                 showAlert('Access denied', 'danger');
@@ -1497,7 +1485,7 @@
         }
 
         function loadDispensingHistory() {
-            if (user.role === 'pharmacist') {
+            if (user.role === 'pharmacist' || user.role === 'admin') {
                 window.location.href = '/pharmacy/history.html';
             } else {
                 showAlert('Access denied', 'danger');
@@ -1506,7 +1494,7 @@
 
         // Patient functions
         function loadMyHealthRecords() {
-            if (user.role === 'patient') {
+            if (user.role === 'patient' || user.role === 'admin') {
                 window.location.href = '/patient/health-records.html';
             } else {
                 showAlert('Access denied', 'danger');
@@ -1514,7 +1502,7 @@
         }
 
         function loadMyVitalSigns() {
-            if (user.role === 'patient') {
+            if (user.role === 'patient' || user.role === 'admin') {
                 window.location.href = '/patient/vital-signs.html';
             } else {
                 showAlert('Access denied', 'danger');
@@ -1522,7 +1510,7 @@
         }
 
         function loadMyPrescriptions() {
-            if (user.role === 'patient') {
+            if (user.role === 'patient' || user.role === 'admin') {
                 window.location.href = '/patient/prescriptions.html';
             } else {
                 showAlert('Access denied', 'danger');
@@ -1530,7 +1518,7 @@
         }
 
         function loadMyAppointments() {
-            if (user.role === 'patient') {
+            if (user.role === 'patient' || user.role === 'admin') {
                 window.location.href = '/patient/appointments.html';
             } else {
                 showAlert('Access denied', 'danger');
@@ -1538,7 +1526,7 @@
         }
 
         function loadMyLabResults() {
-            if (user.role === 'patient') {
+            if (user.role === 'patient' || user.role === 'admin') {
                 window.location.href = '/patient/lab-results.html';
             } else {
                 showAlert('Access denied', 'danger');
@@ -1563,9 +1551,30 @@
             }, 5000);
         }
 
-        // Add missing function stubs for new dashboard features
-        function loadSystemSettings() { showAlert('System settings module coming soon!', 'info'); }
-        function loadBackupRestore() { showAlert('Backup & restore module coming soon!', 'info'); }
+        // Admin dashboard functions
+        function loadAllUsers() {
+            window.location.href = '/admin/users.html';
+        }
+
+        function loadAnalytics() {
+            window.location.href = '/admin/analytics.html';
+        }
+
+        function loadSystemSettings() {
+            window.location.href = '/admin/settings.html';
+        }
+
+        function loadAuditLogs() {
+            window.location.href = '/admin/audit-logs.html';
+        }
+
+        function loadDataManagement() {
+            window.location.href = '/admin/data-management.html';
+        }
+
+        function loadBackupRestore() {
+            window.location.href = '/admin/settings.html#backup';
+        }
         function loadCareTasks() { showAlert('Care tasks module coming soon!', 'info'); }
         function createCareTask() { showAlert('Create care task module coming soon!', 'info'); }
         function loadQualityControl() { showAlert('Quality control module coming soon!', 'info'); }

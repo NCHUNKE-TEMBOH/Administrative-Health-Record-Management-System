@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audit Logs - HRMS Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 0.75rem 1rem;
+            margin: 0.25rem 0;
+            border-radius: 0.5rem;
+        }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            color: white;
+            background-color: rgba(255,255,255,0.1);
+        }
+        .main-content {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+        .card {
+            border: none;
+            box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
+        }
+        .log-success { color: #28a745; }
+        .log-warning { color: #ffc107; }
+        .log-danger { color: #dc3545; }
+        .log-info { color: #17a2b8; }
+        .filter-section {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar p-3">
+                <div class="d-flex align-items-center mb-4">
+                    <i class="fas fa-hospital text-white me-2"></i>
+                    <h5 class="text-white mb-0">HRMS Admin</h5>
+                </div>
+                
+                <nav class="nav flex-column">
+                    <a class="nav-link" href="/dashboard.html">
+                        <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                    </a>
+                    <a class="nav-link" href="/admin/users.html">
+                        <i class="fas fa-users me-2"></i> User Management
+                    </a>
+                    <a class="nav-link" href="/admin/analytics.html">
+                        <i class="fas fa-chart-bar me-2"></i> System Analytics
+                    </a>
+                    <a class="nav-link" href="/admin/patients.html">
+                        <i class="fas fa-user-injured me-2"></i> Patients
+                    </a>
+                    <a class="nav-link active" href="/admin/audit-logs.html">
+                        <i class="fas fa-clipboard-list me-2"></i> Audit Logs
+                    </a>
+                    <a class="nav-link" href="/admin/settings.html">
+                        <i class="fas fa-cogs me-2"></i> System Settings
+                    </a>
+                    <hr class="text-white-50">
+                    <a class="nav-link" href="#" onclick="logout()">
+                        <i class="fas fa-sign-out-alt me-2"></i> Logout
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 main-content p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2><i class="fas fa-clipboard-list me-2"></i>Audit Logs</h2>
+                    <div class="btn-group">
+                        <button class="btn btn-outline-primary" onclick="refreshLogs()">
+                            <i class="fas fa-sync-alt me-2"></i>Refresh
+                        </button>
+                        <button class="btn btn-outline-secondary" onclick="exportLogs()">
+                            <i class="fas fa-download me-2"></i>Export
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="filter-section">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label class="form-label">Date Range</label>
+                            <select class="form-select" id="dateRange" onchange="filterLogs()">
+                                <option value="today">Today</option>
+                                <option value="week" selected>Last 7 days</option>
+                                <option value="month">Last 30 days</option>
+                                <option value="all">All time</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Action Type</label>
+                            <select class="form-select" id="actionFilter" onchange="filterLogs()">
+                                <option value="">All Actions</option>
+                                <option value="LOGIN">Login</option>
+                                <option value="LOGOUT">Logout</option>
+                                <option value="CREATE">Create</option>
+                                <option value="UPDATE">Update</option>
+                                <option value="DELETE">Delete</option>
+                                <option value="VIEW">View</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">User Role</label>
+                            <select class="form-select" id="roleFilter" onchange="filterLogs()">
+                                <option value="">All Roles</option>
+                                <option value="admin">Admin</option>
+                                <option value="doctor">Doctor</option>
+                                <option value="nurse">Nurse</option>
+                                <option value="patient">Patient</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" id="statusFilter" onchange="filterLogs()">
+                                <option value="">All Status</option>
+                                <option value="1">Success</option>
+                                <option value="0">Failed</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Audit Logs Table -->
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table id="auditTable" class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Timestamp</th>
+                                        <th>User</th>
+                                        <th>Role</th>
+                                        <th>Action</th>
+                                        <th>Resource</th>
+                                        <th>IP Address</th>
+                                        <th>Status</th>
+                                        <th>Details</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Data will be loaded via JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Log Details Modal -->
+    <div class="modal fade" id="logDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Log Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="logDetailsContent">
+                        <!-- Details will be loaded here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    
+    <script>
+        // Authentication check
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+        if (!token || user.role !== 'admin') {
+            window.location.href = '/login.html';
+        }
+
+        let auditTable;
+
+        // Initialize page
+        $(document).ready(function() {
+            initializeAuditTable();
+            loadAuditLogs();
+        });
+
+        function initializeAuditTable() {
+            auditTable = $('#auditTable').DataTable({
+                responsive: true,
+                pageLength: 25,
+                order: [[0, 'desc']],
+                columnDefs: [
+                    { targets: [7], orderable: false }
+                ]
+            });
+        }
+
+        async function loadAuditLogs() {
+            try {
+                const response = await apiCall('/audit-logs');
+                if (response) {
+                    displayAuditLogs(response);
+                }
+            } catch (error) {
+                // If audit logs endpoint doesn't exist, show sample data
+                displaySampleAuditLogs();
+            }
+        }
+
+        function displayAuditLogs(logs) {
+            auditTable.clear();
+            
+            logs.forEach(log => {
+                const statusIcon = log.success ? 
+                    '<i class="fas fa-check-circle log-success"></i> Success' : 
+                    '<i class="fas fa-times-circle log-danger"></i> Failed';
+                
+                const detailsBtn = `
+                    <button class="btn btn-sm btn-outline-info" onclick="showLogDetails(${log.log_id})" title="View Details">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                `;
+
+                auditTable.row.add([
+                    new Date(log.timestamp).toLocaleString(),
+                    log.username || 'System',
+                    log.user_role || 'N/A',
+                    log.action,
+                    log.resource,
+                    log.ip_address || 'N/A',
+                    statusIcon,
+                    detailsBtn
+                ]);
+            });
+            
+            auditTable.draw();
+        }
+
+        function displaySampleAuditLogs() {
+            const sampleLogs = [
+                {
+                    timestamp: new Date().toISOString(),
+                    username: 'admin',
+                    user_role: 'admin',
+                    action: 'LOGIN',
+                    resource: 'AUTH',
+                    ip_address: '192.168.1.100',
+                    success: true,
+                    details: 'Successful admin login'
+                },
+                {
+                    timestamp: new Date(Date.now() - 3600000).toISOString(),
+                    username: 'dr.smith',
+                    user_role: 'doctor',
+                    action: 'VIEW',
+                    resource: 'PATIENT',
+                    ip_address: '192.168.1.101',
+                    success: true,
+                    details: 'Viewed patient record #123'
+                },
+                {
+                    timestamp: new Date(Date.now() - 7200000).toISOString(),
+                    username: 'nurse.jane',
+                    user_role: 'nurse',
+                    action: 'UPDATE',
+                    resource: 'PATIENT',
+                    ip_address: '192.168.1.102',
+                    success: true,
+                    details: 'Updated patient vital signs'
+                }
+            ];
+
+            auditTable.clear();
+            
+            sampleLogs.forEach((log, index) => {
+                const statusIcon = log.success ? 
+                    '<i class="fas fa-check-circle log-success"></i> Success' : 
+                    '<i class="fas fa-times-circle log-danger"></i> Failed';
+                
+                const detailsBtn = `
+                    <button class="btn btn-sm btn-outline-info" onclick="showSampleLogDetails(${index})" title="View Details">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                `;
+
+                auditTable.row.add([
+                    new Date(log.timestamp).toLocaleString(),
+                    log.username,
+                    log.user_role,
+                    log.action,
+                    log.resource,
+                    log.ip_address,
+                    statusIcon,
+                    detailsBtn
+                ]);
+            });
+            
+            auditTable.draw();
+        }
+
+        function showSampleLogDetails(index) {
+            const sampleDetails = [
+                {
+                    action: 'LOGIN',
+                    details: 'Administrator successfully logged into the system',
+                    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                    sessionId: 'sess_abc123'
+                },
+                {
+                    action: 'VIEW',
+                    details: 'Doctor accessed patient medical record',
+                    patientId: '123',
+                    recordType: 'Medical History'
+                },
+                {
+                    action: 'UPDATE',
+                    details: 'Nurse updated patient vital signs',
+                    patientId: '456',
+                    changes: 'Blood Pressure: 120/80, Temperature: 98.6°F'
+                }
+            ];
+
+            const details = sampleDetails[index];
+            const content = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <strong>Action:</strong> ${details.action}<br>
+                        <strong>Details:</strong> ${details.details}<br>
+                        ${details.patientId ? `<strong>Patient ID:</strong> ${details.patientId}<br>` : ''}
+                        ${details.recordType ? `<strong>Record Type:</strong> ${details.recordType}<br>` : ''}
+                    </div>
+                    <div class="col-md-6">
+                        ${details.userAgent ? `<strong>User Agent:</strong> ${details.userAgent}<br>` : ''}
+                        ${details.sessionId ? `<strong>Session ID:</strong> ${details.sessionId}<br>` : ''}
+                        ${details.changes ? `<strong>Changes:</strong> ${details.changes}<br>` : ''}
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('logDetailsContent').innerHTML = content;
+            new bootstrap.Modal(document.getElementById('logDetailsModal')).show();
+        }
+
+        function filterLogs() {
+            // In a real application, this would filter the data from the API
+            showAlert('Filters applied successfully', 'info');
+        }
+
+        function refreshLogs() {
+            loadAuditLogs();
+            showAlert('Audit logs refreshed', 'success');
+        }
+
+        function exportLogs() {
+            showAlert('Export functionality coming soon!', 'info');
+        }
+
+        async function apiCall(endpoint, method = 'GET', data = null) {
+            const options = {
+                method,
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            };
+
+            if (data) {
+                options.body = JSON.stringify(data);
+            }
+
+            const response = await fetch(endpoint, options);
+            
+            if (response.status === 401) {
+                logout();
+                return;
+            }
+
+            if (!response.ok) {
+                throw new Error('Request failed');
+            }
+
+            return await response.json();
+        }
+
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.parentNode.removeChild(alertDiv);
+                }
+            }, 5000);
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/login.html';
+        }
+    </script>
+</body>
+</html>

@@ -34,28 +34,11 @@ function setupEventListeners() {
     });
 }
 
-async function loadPatientInfo() {
+function loadPatientInfo() {
     try {
-        // Try to load patient info from API
-        let patientInfo;
-        try {
-            const response = await fetch(`/patient/${user.user_id}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            if (response.ok) {
-                patientInfo = await response.json();
-            } else {
-                throw new Error('API not available');
-            }
-        } catch (error) {
-            console.log('Using sample patient data');
-            patientInfo = getSamplePatientInfo();
-        }
-
+        // Always use comprehensive sample patient data for Jane Doe
+        console.log('Loading comprehensive patient data for Jane Doe');
+        const patientInfo = getSamplePatientInfo();
         displayPatientInfo(patientInfo);
     } catch (error) {
         console.error('Error loading patient info:', error);
@@ -71,31 +54,31 @@ function getSamplePatientInfo() {
         pat_dob: '1988-07-22',
         pat_age: 35,
         pat_gender: 'Female',
-        blood_type: 'A+',
-        primary_doctor: 'Dr. Sarah Johnson',
+        blood_type: 'A+ (Rh Positive)',
+        primary_doctor: 'Dr. Sarah Johnson, MD - Internal Medicine',
         last_visit: '2024-01-20',
-        pat_insurance_no: 'INS001234',
+        pat_insurance_no: 'BCBS-001234567',
         pat_ph_no: '(555) 123-4567',
         pat_email: user.email || 'jane.doe@email.com',
-        pat_address: '123 Main Street, Anytown, ST 12345',
+        pat_address: '123 Main Street, Apt 4B, Anytown, ST 12345',
         emergency_contact_name: 'John Doe (Spouse)',
         emergency_contact_phone: '(555) 987-6543',
-        allergies: 'Penicillin, Shellfish',
-        medical_conditions: 'Hypertension (controlled)',
-        current_medications: 'Lisinopril 10mg daily',
-        insurance_provider: 'Blue Cross Blue Shield',
-        insurance_group: 'Group #12345',
+        allergies: 'Penicillin (severe reaction - hives), Shellfish (mild - digestive upset)',
+        medical_conditions: 'Stage 1 Hypertension (well-controlled with medication), History of Type 2 Diabetes (resolved through lifestyle changes)',
+        current_medications: 'Lisinopril 10mg once daily (for blood pressure), Multivitamin daily, Vitamin D3 2000 IU daily',
+        insurance_provider: 'Blue Cross Blue Shield of State',
+        insurance_group: 'Group #ABC12345',
         marital_status: 'Married',
-        occupation: 'Marketing Manager',
-        height: '5\'6"',
-        weight: '140 lbs',
-        bmi: '22.6',
+        occupation: 'Senior Marketing Manager at TechCorp Solutions',
+        height: '5 feet 6 inches (168 cm)',
+        weight: '140 lbs (63.5 kg)',
+        bmi: '22.6 (Normal weight)',
         smoking_status: 'Never smoker',
-        alcohol_use: 'Occasional social drinking',
-        exercise_frequency: '4-5 times per week',
-        family_history: 'Mother: Breast cancer, Father: Hypertension',
-        preferred_pharmacy: 'Central Pharmacy - 456 Oak Street, Anytown, ST 12345',
-        preferred_language: 'English',
+        alcohol_use: 'Occasional social drinking (1-2 glasses wine per week)',
+        exercise_frequency: '4-5 times per week (cardio and strength training)',
+        family_history: 'Maternal: Breast cancer (age 58), Hypertension; Paternal: Hypertension, Type 2 Diabetes; Siblings: One brother (healthy)',
+        preferred_pharmacy: 'Central Pharmacy - 456 Oak Street, Anytown, ST 12345 | Phone: (555) 234-5678',
+        preferred_language: 'English (fluent), Spanish (conversational)',
         admission_date: '2023-06-15',
         registration_date: '2023-06-15'
     };
@@ -107,44 +90,44 @@ function displayPatientInfo(patient) {
     document.getElementById('patientName').textContent = `${patient.pat_first_name} ${patient.pat_last_name}`;
     document.getElementById('patientDob').textContent = new Date(patient.pat_dob).toLocaleDateString();
     document.getElementById('patientAge').textContent = patient.pat_age || calculateAge(patient.pat_dob);
-    document.getElementById('patientGender').textContent = patient.pat_gender || 'Not specified';
-    document.getElementById('maritalStatus').textContent = patient.marital_status || 'Not specified';
+    document.getElementById('patientGender').textContent = patient.pat_gender;
+    document.getElementById('maritalStatus').textContent = patient.marital_status;
 
     // Contact Information
-    document.getElementById('patientPhone').textContent = patient.pat_ph_no || 'Not provided';
-    document.getElementById('patientEmail').textContent = patient.pat_email || 'Not provided';
-    document.getElementById('patientAddress').textContent = patient.pat_address || 'Not provided';
-    document.getElementById('emergencyContact').textContent = patient.emergency_contact_name || 'Not provided';
-    document.getElementById('emergencyPhone').textContent = patient.emergency_contact_phone || 'Not provided';
-    document.getElementById('preferredLanguage').textContent = patient.preferred_language || 'English';
+    document.getElementById('patientPhone').textContent = patient.pat_ph_no;
+    document.getElementById('patientEmail').textContent = patient.pat_email;
+    document.getElementById('patientAddress').textContent = patient.pat_address;
+    document.getElementById('emergencyContact').textContent = patient.emergency_contact_name;
+    document.getElementById('emergencyPhone').textContent = patient.emergency_contact_phone;
+    document.getElementById('preferredLanguage').textContent = patient.preferred_language;
 
     // Medical Information
-    document.getElementById('bloodType').textContent = patient.blood_type || 'Unknown';
-    document.getElementById('patientHeight').textContent = patient.height || 'Not recorded';
-    document.getElementById('patientWeight').textContent = patient.weight || 'Not recorded';
-    document.getElementById('patientBMI').textContent = patient.bmi || 'Not calculated';
-    document.getElementById('primaryDoctor').textContent = patient.primary_doctor || 'Not assigned';
+    document.getElementById('bloodType').textContent = patient.blood_type;
+    document.getElementById('patientHeight').textContent = patient.height;
+    document.getElementById('patientWeight').textContent = patient.weight;
+    document.getElementById('patientBMI').textContent = patient.bmi;
+    document.getElementById('primaryDoctor').textContent = patient.primary_doctor;
     document.getElementById('lastVisit').textContent = patient.last_visit ? new Date(patient.last_visit).toLocaleDateString() : 'No recent visits';
 
     // Allergies & Conditions
-    document.getElementById('allergies').textContent = patient.allergies || 'No known allergies';
-    document.getElementById('medicalConditions').textContent = patient.medical_conditions || 'None reported';
-    document.getElementById('currentMedications').textContent = patient.current_medications || 'None';
+    document.getElementById('allergies').textContent = patient.allergies;
+    document.getElementById('medicalConditions').textContent = patient.medical_conditions;
+    document.getElementById('currentMedications').textContent = patient.current_medications;
 
     // Lifestyle Information
-    document.getElementById('smokingStatus').textContent = patient.smoking_status || 'Not specified';
-    document.getElementById('alcoholUse').textContent = patient.alcohol_use || 'Not specified';
-    document.getElementById('exerciseFrequency').textContent = patient.exercise_frequency || 'Not specified';
-    document.getElementById('occupation').textContent = patient.occupation || 'Not specified';
+    document.getElementById('smokingStatus').textContent = patient.smoking_status;
+    document.getElementById('alcoholUse').textContent = patient.alcohol_use;
+    document.getElementById('exerciseFrequency').textContent = patient.exercise_frequency;
+    document.getElementById('occupation').textContent = patient.occupation;
 
     // Insurance & Pharmacy
-    document.getElementById('insuranceProvider').textContent = patient.insurance_provider || 'Not provided';
-    document.getElementById('insuranceNumber').textContent = patient.pat_insurance_no || 'Not provided';
-    document.getElementById('insuranceGroup').textContent = patient.insurance_group || 'Not provided';
-    document.getElementById('preferredPharmacy').textContent = patient.preferred_pharmacy || 'Not specified';
+    document.getElementById('insuranceProvider').textContent = patient.insurance_provider;
+    document.getElementById('insuranceNumber').textContent = patient.pat_insurance_no;
+    document.getElementById('insuranceGroup').textContent = patient.insurance_group;
+    document.getElementById('preferredPharmacy').textContent = patient.preferred_pharmacy;
 
     // Family History
-    document.getElementById('familyHistory').textContent = patient.family_history || 'No significant family history reported';
+    document.getElementById('familyHistory').textContent = patient.family_history;
 }
 
 function calculateAge(birthDate) {

@@ -1536,32 +1536,40 @@
 
         // Lab Technician functions
         function loadPendingTests() {
-            if (user.role === 'lab_technician' || user.role === 'admin') {
+            if (user.role === 'lab_technician') {
                 window.location.href = '/lab/pending-tests.html';
+            } else if (user.role === 'admin') {
+                window.location.href = '/admin/lab-overview.html#pending';
             } else {
                 showAlert('Access denied', 'danger');
             }
         }
 
         function loadInProgressTests() {
-            if (user.role === 'lab_technician' || user.role === 'admin') {
+            if (user.role === 'lab_technician') {
                 window.location.href = '/lab/in-progress-tests.html';
+            } else if (user.role === 'admin') {
+                window.location.href = '/admin/lab-overview.html#in-progress';
             } else {
                 showAlert('Access denied', 'danger');
             }
         }
 
         function loadTestResults() {
-            if (user.role === 'lab_technician' || user.role === 'admin') {
+            if (user.role === 'lab_technician') {
                 window.location.href = '/lab/test-results.html';
+            } else if (user.role === 'admin') {
+                window.location.href = '/admin/lab-overview.html#results';
             } else {
                 showAlert('Access denied', 'danger');
             }
         }
 
         function enterTestResult() {
-            if (user.role === 'lab_technician' || user.role === 'admin') {
+            if (user.role === 'lab_technician') {
                 window.location.href = '/lab/enter-results.html';
+            } else if (user.role === 'admin') {
+                window.location.href = '/admin/lab-overview.html#enter-results';
             } else {
                 showAlert('Access denied', 'danger');
             }
@@ -1685,8 +1693,21 @@
         }
         function loadCareTasks() { showAlert('Care tasks module coming soon!', 'info'); }
         function createCareTask() { showAlert('Create care task module coming soon!', 'info'); }
-        function loadQualityControl() { showAlert('Quality control module coming soon!', 'info'); }
-        function loadEquipmentStatus() { showAlert('Equipment status module coming soon!', 'info'); }
+        function loadQualityControl() {
+            if (user.role === 'lab_technician' || user.role === 'admin') {
+                window.location.href = '/lab/quality-control.html';
+            } else {
+                showAlert('Access denied', 'danger');
+            }
+        }
+
+        function loadEquipmentStatus() {
+            if (user.role === 'lab_technician' || user.role === 'admin') {
+                window.location.href = '/lab/equipment.html';
+            } else {
+                showAlert('Access denied', 'danger');
+            }
+        }
         function loadDrugInteractions() { showAlert('Drug interactions module coming soon!', 'info'); }
         function loadSafetyAlerts() { showAlert('Safety alerts module coming soon!', 'info'); }
         function loadMedicationReminders() { showAlert('Medication reminders coming soon!', 'info'); }

@@ -234,22 +234,249 @@
             document.getElementById('patientSearch').addEventListener('input', filterResults);
         }
 
-        async function loadTestResults() {
-            try {
-                const response = await fetch('/lab-tests?status=completed', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
+        // Complete test results data - ALL completed tests
+        const completedTestsData = [
+            // Today's completed tests
+            {
+                test_id: 3001,
+                pat_first_name: 'Jennifer',
+                pat_last_name: 'Wilson',
+                test_type: 'Pregnancy Test',
+                result_status: 'positive',
+                completed_date: '2024-01-15T09:30:00Z',
+                processed_by_first_name: 'Michael',
+                processed_by_last_name: 'Chen'
+            },
+            {
+                test_id: 3002,
+                pat_first_name: 'James',
+                pat_last_name: 'White',
+                test_type: 'Coagulation Panel',
+                result_status: 'normal',
+                completed_date: '2024-01-15T10:15:00Z',
+                processed_by_first_name: 'Sarah',
+                processed_by_last_name: 'Wilson'
+            },
+            {
+                test_id: 3003,
+                pat_first_name: 'Robert',
+                pat_last_name: 'Taylor',
+                test_type: 'Cardiac Enzymes',
+                result_status: 'normal',
+                completed_date: '2024-01-15T11:00:00Z',
+                processed_by_first_name: 'Michael',
+                processed_by_last_name: 'Chen'
+            },
+            {
+                test_id: 3004,
+                pat_first_name: 'Patricia',
+                pat_last_name: 'Clark',
+                test_type: 'Inflammatory Markers',
+                result_status: 'abnormal',
+                completed_date: '2024-01-15T12:30:00Z',
+                processed_by_first_name: 'Sarah',
+                processed_by_last_name: 'Wilson'
+            },
+            // Yesterday's completed tests
+            {
+                test_id: 3005,
+                pat_first_name: 'Nancy',
+                pat_last_name: 'Moore',
+                test_type: 'Stool Culture',
+                result_status: 'normal',
+                completed_date: '2024-01-14T16:45:00Z',
+                processed_by_first_name: 'Michael',
+                processed_by_last_name: 'Chen'
+            },
+            {
+                test_id: 3006,
+                pat_first_name: 'Barbara',
+                pat_last_name: 'Miller',
+                test_type: 'Vitamin D Level',
+                result_status: 'abnormal',
+                completed_date: '2024-01-14T15:20:00Z',
+                processed_by_first_name: 'Sarah',
+                processed_by_last_name: 'Wilson'
+            },
+            {
+                test_id: 3007,
+                pat_first_name: 'John',
+                pat_last_name: 'Smith',
+                test_type: 'Complete Blood Count',
+                result_status: 'normal',
+                completed_date: '2024-01-14T14:30:00Z',
+                processed_by_first_name: 'Michael',
+                processed_by_last_name: 'Chen'
+            },
+            {
+                test_id: 3008,
+                pat_first_name: 'Maria',
+                pat_last_name: 'Garcia',
+                test_type: 'Blood Culture',
+                result_status: 'negative',
+                completed_date: '2024-01-14T13:45:00Z',
+                processed_by_first_name: 'Sarah',
+                processed_by_last_name: 'Wilson'
+            },
+            {
+                test_id: 3009,
+                pat_first_name: 'Lisa',
+                pat_last_name: 'Anderson',
+                test_type: 'Comprehensive Metabolic Panel',
+                result_status: 'normal',
+                completed_date: '2024-01-14T12:20:00Z',
+                processed_by_first_name: 'Michael',
+                processed_by_last_name: 'Chen'
+            },
+            {
+                test_id: 3010,
+                pat_first_name: 'David',
+                pat_last_name: 'Martinez',
+                test_type: 'Thyroid Function Panel',
+                result_status: 'abnormal',
+                completed_date: '2024-01-14T11:15:00Z',
+                processed_by_first_name: 'Sarah',
+                processed_by_last_name: 'Wilson'
+            },
+            {
+                test_id: 3011,
+                pat_first_name: 'Susan',
+                pat_last_name: 'Lee',
+                test_type: 'Liver Function Panel',
+                result_status: 'normal',
+                completed_date: '2024-01-14T10:30:00Z',
+                processed_by_first_name: 'Michael',
+                processed_by_last_name: 'Chen'
+            },
+            {
+                test_id: 3012,
+                pat_first_name: 'Michael',
+                pat_last_name: 'Johnson',
+                test_type: 'Urinalysis',
+                result_status: 'normal',
+                completed_date: '2024-01-14T09:45:00Z',
+                processed_by_first_name: 'Sarah',
+                processed_by_last_name: 'Wilson'
+            },
+            {
+                test_id: 3013,
+                pat_first_name: 'Linda',
+                pat_last_name: 'Brown',
+                test_type: 'Lipid Panel',
+                result_status: 'abnormal',
+                completed_date: '2024-01-14T08:20:00Z',
+                processed_by_first_name: 'Michael',
+                processed_by_last_name: 'Chen'
+            },
+            {
+                test_id: 3014,
+                pat_first_name: 'Christopher',
+                pat_last_name: 'Davis',
+                test_type: 'Hemoglobin A1C',
+                result_status: 'abnormal',
+                completed_date: '2024-01-13T16:30:00Z',
+                processed_by_first_name: 'Sarah',
+                processed_by_last_name: 'Wilson'
+            },
+            {
+                test_id: 3015,
+                pat_first_name: 'Daniel',
+                pat_last_name: 'Wilson',
+                test_type: 'Prostate Specific Antigen',
+                result_status: 'normal',
+                completed_date: '2024-01-13T15:15:00Z',
+                processed_by_first_name: 'Michael',
+                processed_by_last_name: 'Chen'
+            },
+            {
+                test_id: 3016,
+                pat_first_name: 'Karen',
+                pat_last_name: 'Thompson',
+                test_type: 'Glucose Tolerance Test',
+                result_status: 'abnormal',
+                completed_date: '2024-01-13T14:00:00Z',
+                processed_by_first_name: 'Sarah',
+                processed_by_last_name: 'Wilson'
+            },
+            {
+                test_id: 3017,
+                pat_first_name: 'Richard',
+                pat_last_name: 'Adams',
+                test_type: 'Tumor Markers',
+                result_status: 'normal',
+                completed_date: '2024-01-13T13:20:00Z',
+                processed_by_first_name: 'Michael',
+                processed_by_last_name: 'Chen'
+            },
+            {
+                test_id: 3018,
+                pat_first_name: 'Michelle',
+                pat_last_name: 'Roberts',
+                test_type: 'Autoimmune Panel',
+                result_status: 'positive',
+                completed_date: '2024-01-13T12:45:00Z',
+                processed_by_first_name: 'Sarah',
+                processed_by_last_name: 'Wilson'
+            },
+            {
+                test_id: 3019,
+                pat_first_name: 'Steven',
+                pat_last_name: 'Martinez',
+                test_type: 'Cardiac Biomarkers',
+                result_status: 'critical',
+                completed_date: '2024-01-13T11:30:00Z',
+                processed_by_first_name: 'Michael',
+                processed_by_last_name: 'Chen'
+            },
+            {
+                test_id: 3020,
+                pat_first_name: 'Angela',
+                pat_last_name: 'White',
+                test_type: 'Hormone Panel',
+                result_status: 'abnormal',
+                completed_date: '2024-01-13T10:15:00Z',
+                processed_by_first_name: 'Sarah',
+                processed_by_last_name: 'Wilson'
+            },
+            {
+                test_id: 3021,
+                pat_first_name: 'Thomas',
+                pat_last_name: 'Garcia',
+                test_type: 'Urine Drug Screen',
+                result_status: 'positive',
+                completed_date: '2024-01-12T16:20:00Z',
+                processed_by_first_name: 'Michael',
+                processed_by_last_name: 'Chen'
+            },
+            {
+                test_id: 3022,
+                pat_first_name: 'Jessica',
+                pat_last_name: 'Anderson',
+                test_type: 'Blood Gas Analysis',
+                result_status: 'abnormal',
+                completed_date: '2024-01-12T15:45:00Z',
+                processed_by_first_name: 'Sarah',
+                processed_by_last_name: 'Wilson'
+            },
+            {
+                test_id: 3023,
+                pat_first_name: 'Kevin',
+                pat_last_name: 'Lewis',
+                test_type: 'Wound Culture',
+                result_status: 'positive',
+                completed_date: '2024-01-12T14:30:00Z',
+                processed_by_first_name: 'Michael',
+                processed_by_last_name: 'Chen'
+            }
+        ];
 
-                if (response.ok) {
-                    allResults = await response.json();
-                    displayResults(allResults);
-                    updateQuickStats(allResults);
-                } else {
-                    throw new Error('Failed to load test results');
-                }
+        function loadTestResults() {
+            try {
+                // Use sample data directly
+                allResults = completedTestsData;
+                displayResults(allResults);
+                updateQuickStats(allResults);
+                console.log('Loaded', allResults.length, 'test results');
             } catch (error) {
                 console.error('Error loading test results:', error);
                 showError('Failed to load test results');

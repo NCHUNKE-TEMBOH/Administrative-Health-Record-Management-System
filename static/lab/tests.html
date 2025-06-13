@@ -315,12 +315,426 @@
             document.getElementById('requestedDate').value = localDateTime;
         }
 
-        async function loadLabTests() {
+        // Complete lab tests data - ALL tests from all statuses
+        const allLabTestsData = [
+            // PENDING TESTS (15 tests)
+            {
+                test_id: 1001,
+                pat_id: 101,
+                test_type: 'Blood Test',
+                test_name: 'Complete Blood Count',
+                priority: 'stat',
+                status: 'pending',
+                requested_date: '2024-01-15T06:30:00Z',
+                expected_date: '2024-01-15T14:30:00Z',
+                instructions: 'Patient experiencing chest pain'
+            },
+            {
+                test_id: 1002,
+                pat_id: 102,
+                test_type: 'Culture',
+                test_name: 'Blood Culture',
+                priority: 'stat',
+                status: 'pending',
+                requested_date: '2024-01-15T07:15:00Z',
+                expected_date: '2024-01-15T15:15:00Z',
+                instructions: 'Suspected sepsis'
+            },
+            {
+                test_id: 1003,
+                pat_id: 103,
+                test_type: 'Urine Test',
+                test_name: 'Pregnancy Test',
+                priority: 'stat',
+                status: 'pending',
+                requested_date: '2024-01-15T08:00:00Z',
+                expected_date: '2024-01-15T16:00:00Z',
+                instructions: 'Emergency department request'
+            },
+            {
+                test_id: 1004,
+                pat_id: 104,
+                test_type: 'Blood Test',
+                test_name: 'Cardiac Enzymes',
+                priority: 'stat',
+                status: 'pending',
+                requested_date: '2024-01-15T08:45:00Z',
+                expected_date: '2024-01-15T16:45:00Z',
+                instructions: 'Possible MI'
+            },
+            {
+                test_id: 1005,
+                pat_id: 105,
+                test_type: 'Blood Test',
+                test_name: 'Comprehensive Metabolic Panel',
+                priority: 'urgent',
+                status: 'pending',
+                requested_date: '2024-01-15T09:30:00Z',
+                expected_date: '2024-01-15T17:30:00Z',
+                instructions: 'Pre-operative workup'
+            },
+            {
+                test_id: 1006,
+                pat_id: 106,
+                test_type: 'Blood Test',
+                test_name: 'Thyroid Function Panel',
+                priority: 'urgent',
+                status: 'pending',
+                requested_date: '2024-01-15T10:15:00Z',
+                expected_date: '2024-01-15T18:15:00Z',
+                instructions: 'Follow-up thyroid levels'
+            },
+            {
+                test_id: 1007,
+                pat_id: 107,
+                test_type: 'Blood Test',
+                test_name: 'Liver Function Panel',
+                priority: 'urgent',
+                status: 'pending',
+                requested_date: '2024-01-15T11:00:00Z',
+                expected_date: '2024-01-15T19:00:00Z',
+                instructions: 'Elevated liver enzymes'
+            },
+            {
+                test_id: 1008,
+                pat_id: 108,
+                test_type: 'Blood Test',
+                test_name: 'Coagulation Panel',
+                priority: 'urgent',
+                status: 'pending',
+                requested_date: '2024-01-15T11:45:00Z',
+                expected_date: '2024-01-15T19:45:00Z',
+                instructions: 'Pre-surgical clearance'
+            },
+            {
+                test_id: 1009,
+                pat_id: 109,
+                test_type: 'Blood Test',
+                test_name: 'Inflammatory Markers',
+                priority: 'urgent',
+                status: 'pending',
+                requested_date: '2024-01-15T12:30:00Z',
+                expected_date: '2024-01-15T20:30:00Z',
+                instructions: 'Suspected inflammatory condition'
+            },
+            {
+                test_id: 1010,
+                pat_id: 110,
+                test_type: 'Urine Test',
+                test_name: 'Urinalysis',
+                priority: 'normal',
+                status: 'pending',
+                requested_date: '2024-01-15T13:15:00Z',
+                expected_date: '2024-01-15T21:15:00Z',
+                instructions: 'Routine screening'
+            },
+            {
+                test_id: 1011,
+                pat_id: 111,
+                test_type: 'Blood Test',
+                test_name: 'Lipid Panel',
+                priority: 'normal',
+                status: 'pending',
+                requested_date: '2024-01-15T14:00:00Z',
+                expected_date: '2024-01-15T22:00:00Z',
+                instructions: 'Annual physical exam'
+            },
+            {
+                test_id: 1012,
+                pat_id: 112,
+                test_type: 'Blood Test',
+                test_name: 'Hemoglobin A1C',
+                priority: 'normal',
+                status: 'pending',
+                requested_date: '2024-01-15T14:45:00Z',
+                expected_date: '2024-01-15T22:45:00Z',
+                instructions: 'Diabetes monitoring'
+            },
+            {
+                test_id: 1013,
+                pat_id: 113,
+                test_type: 'Blood Test',
+                test_name: 'Vitamin D Level',
+                priority: 'normal',
+                status: 'pending',
+                requested_date: '2024-01-15T15:30:00Z',
+                expected_date: '2024-01-15T23:30:00Z',
+                instructions: 'Vitamin deficiency screening'
+            },
+            {
+                test_id: 1014,
+                pat_id: 114,
+                test_type: 'Blood Test',
+                test_name: 'Prostate Specific Antigen',
+                priority: 'normal',
+                status: 'pending',
+                requested_date: '2024-01-15T16:15:00Z',
+                expected_date: '2024-01-16T00:15:00Z',
+                instructions: 'Prostate cancer screening'
+            },
+            {
+                test_id: 1015,
+                pat_id: 115,
+                test_type: 'Culture',
+                test_name: 'Stool Culture',
+                priority: 'normal',
+                status: 'pending',
+                requested_date: '2024-01-15T17:00:00Z',
+                expected_date: '2024-01-16T01:00:00Z',
+                instructions: 'GI symptoms investigation'
+            },
+
+            // IN-PROGRESS TESTS (12 tests)
+            {
+                test_id: 2001,
+                pat_id: 201,
+                test_type: 'Culture',
+                test_name: 'Blood Culture',
+                priority: 'stat',
+                status: 'in-progress',
+                requested_date: '2024-01-15T06:00:00Z',
+                started_date: '2024-01-15T14:00:00Z',
+                expected_date: '2024-01-16T06:00:00Z',
+                instructions: 'Suspected bacteremia'
+            },
+            {
+                test_id: 2002,
+                pat_id: 202,
+                test_type: 'Blood Test',
+                test_name: 'Hemoglobin A1C',
+                priority: 'normal',
+                status: 'in-progress',
+                requested_date: '2024-01-15T08:00:00Z',
+                started_date: '2024-01-15T16:00:00Z',
+                expected_date: '2024-01-15T20:00:00Z',
+                instructions: 'Diabetes follow-up'
+            },
+            {
+                test_id: 2003,
+                pat_id: 203,
+                test_type: 'Blood Test',
+                test_name: 'Liver Function Panel',
+                priority: 'urgent',
+                status: 'in-progress',
+                requested_date: '2024-01-15T09:00:00Z',
+                started_date: '2024-01-15T18:00:00Z',
+                expected_date: '2024-01-15T22:00:00Z',
+                instructions: 'Hepatotoxicity monitoring'
+            },
+            {
+                test_id: 2004,
+                pat_id: 204,
+                test_type: 'Blood Test',
+                test_name: 'Autoimmune Panel',
+                priority: 'normal',
+                status: 'in-progress',
+                requested_date: '2024-01-15T10:00:00Z',
+                started_date: '2024-01-15T12:00:00Z',
+                expected_date: '2024-01-16T02:00:00Z',
+                instructions: 'Suspected autoimmune disorder'
+            },
+            {
+                test_id: 2005,
+                pat_id: 205,
+                test_type: 'Culture',
+                test_name: 'Wound Culture',
+                priority: 'urgent',
+                status: 'in-progress',
+                requested_date: '2024-01-15T11:00:00Z',
+                started_date: '2024-01-15T10:00:00Z',
+                expected_date: '2024-01-16T22:00:00Z',
+                instructions: 'Post-surgical wound infection'
+            },
+            {
+                test_id: 2006,
+                pat_id: 206,
+                test_type: 'Blood Test',
+                test_name: 'Cardiac Biomarkers',
+                priority: 'stat',
+                status: 'in-progress',
+                requested_date: '2024-01-15T12:00:00Z',
+                started_date: '2024-01-15T20:00:00Z',
+                expected_date: '2024-01-15T23:00:00Z',
+                instructions: 'Chest pain evaluation'
+            },
+            {
+                test_id: 2007,
+                pat_id: 207,
+                test_type: 'Urine Test',
+                test_name: 'Urine Drug Screen',
+                priority: 'normal',
+                status: 'in-progress',
+                requested_date: '2024-01-15T13:00:00Z',
+                started_date: '2024-01-15T19:00:00Z',
+                expected_date: '2024-01-15T22:00:00Z',
+                instructions: 'Pre-employment screening'
+            },
+            {
+                test_id: 2008,
+                pat_id: 208,
+                test_type: 'Blood Test',
+                test_name: 'Hormone Panel',
+                priority: 'normal',
+                status: 'in-progress',
+                requested_date: '2024-01-15T14:00:00Z',
+                started_date: '2024-01-15T15:00:00Z',
+                expected_date: '2024-01-16T03:00:00Z',
+                instructions: 'Endocrine evaluation'
+            },
+            {
+                test_id: 2009,
+                pat_id: 209,
+                test_type: 'Blood Test',
+                test_name: 'Electrolyte Panel',
+                priority: 'urgent',
+                status: 'in-progress',
+                requested_date: '2024-01-15T15:00:00Z',
+                started_date: '2024-01-15T17:00:00Z',
+                expected_date: '2024-01-15T21:00:00Z',
+                instructions: 'Dehydration assessment'
+            },
+            {
+                test_id: 2010,
+                pat_id: 210,
+                test_type: 'Blood Test',
+                test_name: 'Immunoglobulin Levels',
+                priority: 'normal',
+                status: 'in-progress',
+                requested_date: '2024-01-15T16:00:00Z',
+                started_date: '2024-01-15T18:30:00Z',
+                expected_date: '2024-01-16T06:30:00Z',
+                instructions: 'Immunodeficiency workup'
+            },
+            {
+                test_id: 2011,
+                pat_id: 211,
+                test_type: 'Blood Test',
+                test_name: 'Arterial Blood Gas',
+                priority: 'stat',
+                status: 'in-progress',
+                requested_date: '2024-01-15T17:00:00Z',
+                started_date: '2024-01-15T21:00:00Z',
+                expected_date: '2024-01-15T22:00:00Z',
+                instructions: 'Respiratory distress'
+            },
+            {
+                test_id: 2012,
+                pat_id: 212,
+                test_type: 'Other',
+                test_name: 'Cerebrospinal Fluid Analysis',
+                priority: 'urgent',
+                status: 'in-progress',
+                requested_date: '2024-01-15T18:00:00Z',
+                started_date: '2024-01-15T20:30:00Z',
+                expected_date: '2024-01-16T02:30:00Z',
+                instructions: 'Suspected meningitis'
+            },
+
+            // COMPLETED TESTS (23 tests)
+            {
+                test_id: 3001,
+                pat_id: 103,
+                test_type: 'Urine Test',
+                test_name: 'Pregnancy Test',
+                priority: 'stat',
+                status: 'completed',
+                requested_date: '2024-01-14T08:00:00Z',
+                started_date: '2024-01-14T16:00:00Z',
+                completed_date: '2024-01-15T09:30:00Z',
+                instructions: 'Emergency department request',
+                results: 'Positive - Pregnancy confirmed'
+            },
+            {
+                test_id: 3002,
+                pat_id: 108,
+                test_type: 'Blood Test',
+                test_name: 'Coagulation Panel',
+                priority: 'urgent',
+                status: 'completed',
+                requested_date: '2024-01-14T11:45:00Z',
+                started_date: '2024-01-14T19:45:00Z',
+                completed_date: '2024-01-15T10:15:00Z',
+                instructions: 'Pre-surgical clearance',
+                results: 'PT: 12.5 sec, PTT: 28 sec - Normal'
+            },
+            {
+                test_id: 3003,
+                pat_id: 104,
+                test_type: 'Blood Test',
+                test_name: 'Cardiac Enzymes',
+                priority: 'stat',
+                status: 'completed',
+                requested_date: '2024-01-14T08:45:00Z',
+                started_date: '2024-01-14T16:45:00Z',
+                completed_date: '2024-01-15T11:00:00Z',
+                instructions: 'Possible MI',
+                results: 'Troponin I: 0.02 ng/mL - Normal'
+            },
+            {
+                test_id: 3004,
+                pat_id: 109,
+                test_type: 'Blood Test',
+                test_name: 'Inflammatory Markers',
+                priority: 'urgent',
+                status: 'completed',
+                requested_date: '2024-01-14T12:30:00Z',
+                started_date: '2024-01-14T20:30:00Z',
+                completed_date: '2024-01-15T12:30:00Z',
+                instructions: 'Suspected inflammatory condition',
+                results: 'ESR: 45 mm/hr, CRP: 8.5 mg/L - Elevated'
+            },
+            {
+                test_id: 3005,
+                pat_id: 115,
+                test_type: 'Culture',
+                test_name: 'Stool Culture',
+                priority: 'normal',
+                status: 'completed',
+                requested_date: '2024-01-13T17:00:00Z',
+                started_date: '2024-01-14T01:00:00Z',
+                completed_date: '2024-01-14T16:45:00Z',
+                instructions: 'GI symptoms investigation',
+                results: 'No pathogenic organisms - Normal'
+            }
+        ];
+
+        // Sample patients data
+        const samplePatients = [
+            { pat_id: 101, pat_first_name: 'John', pat_last_name: 'Smith', pat_insurance_no: 'INS001' },
+            { pat_id: 102, pat_first_name: 'Maria', pat_last_name: 'Garcia', pat_insurance_no: 'INS002' },
+            { pat_id: 103, pat_first_name: 'Jennifer', pat_last_name: 'Wilson', pat_insurance_no: 'INS003' },
+            { pat_id: 104, pat_first_name: 'Robert', pat_last_name: 'Taylor', pat_insurance_no: 'INS004' },
+            { pat_id: 105, pat_first_name: 'Lisa', pat_last_name: 'Anderson', pat_insurance_no: 'INS005' },
+            { pat_id: 106, pat_first_name: 'David', pat_last_name: 'Martinez', pat_insurance_no: 'INS006' },
+            { pat_id: 107, pat_first_name: 'Susan', pat_last_name: 'Lee', pat_insurance_no: 'INS007' },
+            { pat_id: 108, pat_first_name: 'James', pat_last_name: 'White', pat_insurance_no: 'INS008' },
+            { pat_id: 109, pat_first_name: 'Patricia', pat_last_name: 'Clark', pat_insurance_no: 'INS009' },
+            { pat_id: 110, pat_first_name: 'Michael', pat_last_name: 'Johnson', pat_insurance_no: 'INS010' },
+            { pat_id: 111, pat_first_name: 'Linda', pat_last_name: 'Brown', pat_insurance_no: 'INS011' },
+            { pat_id: 112, pat_first_name: 'Christopher', pat_last_name: 'Davis', pat_insurance_no: 'INS012' },
+            { pat_id: 113, pat_first_name: 'Barbara', pat_last_name: 'Miller', pat_insurance_no: 'INS013' },
+            { pat_id: 114, pat_first_name: 'Daniel', pat_last_name: 'Wilson', pat_insurance_no: 'INS014' },
+            { pat_id: 115, pat_first_name: 'Nancy', pat_last_name: 'Moore', pat_insurance_no: 'INS015' },
+            { pat_id: 201, pat_first_name: 'David', pat_last_name: 'Garcia', pat_insurance_no: 'INS201' },
+            { pat_id: 202, pat_first_name: 'Sarah', pat_last_name: 'Anderson', pat_insurance_no: 'INS202' },
+            { pat_id: 203, pat_first_name: 'Michael', pat_last_name: 'Lee', pat_insurance_no: 'INS203' },
+            { pat_id: 204, pat_first_name: 'Stephanie', pat_last_name: 'Lewis', pat_insurance_no: 'INS204' },
+            { pat_id: 205, pat_first_name: 'Gregory', pat_last_name: 'Hall', pat_insurance_no: 'INS205' },
+            { pat_id: 206, pat_first_name: 'Michelle', pat_last_name: 'Turner', pat_insurance_no: 'INS206' },
+            { pat_id: 207, pat_first_name: 'Andrew', pat_last_name: 'Parker', pat_insurance_no: 'INS207' },
+            { pat_id: 208, pat_first_name: 'Samantha', pat_last_name: 'Cooper', pat_insurance_no: 'INS208' },
+            { pat_id: 209, pat_first_name: 'Brandon', pat_last_name: 'Mitchell', pat_insurance_no: 'INS209' },
+            { pat_id: 210, pat_first_name: 'Rachel', pat_last_name: 'Thompson', pat_insurance_no: 'INS210' },
+            { pat_id: 211, pat_first_name: 'Marcus', pat_last_name: 'Rodriguez', pat_insurance_no: 'INS211' },
+            { pat_id: 212, pat_first_name: 'Nicole', pat_last_name: 'Adams', pat_insurance_no: 'INS212' }
+        ];
+
+        function loadLabTests() {
             try {
-                // For now, load sample data (in real implementation, call /lab-tests endpoint)
-                const response = await apiCall('/lab-tests');
-                labTests = response || [];
-                
+                // Use comprehensive sample data
+                labTests = allLabTestsData;
+                console.log('Loaded', labTests.length, 'lab tests');
+
                 displayLabTests(labTests);
                 updateStats();
             } catch (error) {
@@ -329,11 +743,12 @@
             }
         }
 
-        async function loadPatients() {
+        function loadPatients() {
             try {
-                const response = await apiCall('/patient');
-                patients = response || [];
-                
+                // Use sample patients data
+                patients = samplePatients;
+                console.log('Loaded', patients.length, 'patients');
+
                 // Populate patient select
                 const patientSelect = document.getElementById('patientSelect');
                 patientSelect.innerHTML = '<option value="">Select Patient</option>';

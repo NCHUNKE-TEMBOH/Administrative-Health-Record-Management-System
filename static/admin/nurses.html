@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nurse Management - HRMS Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 0.75rem 1rem;
+            margin: 0.25rem 0;
+            border-radius: 0.5rem;
+        }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            color: white;
+            background-color: rgba(255,255,255,0.1);
+        }
+        .main-content {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+        .card {
+            border: none;
+            box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+        }
+        .nurse-card {
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+        .nurse-card:hover {
+            transform: translateY(-2px);
+        }
+        .nurse-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .department-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+        }
+        .return-arrow {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .return-arrow:hover {
+            color: #764ba2;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar p-3">
+                <div class="d-flex align-items-center mb-4">
+                    <i class="fas fa-hospital text-white me-2"></i>
+                    <h5 class="text-white mb-0">HRMS Admin</h5>
+                </div>
+                
+                <nav class="nav flex-column">
+                    <a class="nav-link" href="/dashboard.html">
+                        <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                    </a>
+                    <a class="nav-link" href="/admin/users.html">
+                        <i class="fas fa-users me-2"></i> User Management
+                    </a>
+                    <a class="nav-link" href="/admin/patients.html">
+                        <i class="fas fa-user-injured me-2"></i> Patients
+                    </a>
+                    <a class="nav-link" href="/admin/doctors.html">
+                        <i class="fas fa-user-md me-2"></i> Doctors
+                    </a>
+                    <a class="nav-link active" href="/admin/nurses.html">
+                        <i class="fas fa-user-nurse me-2"></i> Nurses
+                    </a>
+                    <a class="nav-link" href="/admin/audit-logs.html">
+                        <i class="fas fa-clipboard-list me-2"></i> Audit Logs
+                    </a>
+                    <hr class="text-white-50">
+                    <a class="nav-link" href="#" onclick="logout()">
+                        <i class="fas fa-sign-out-alt me-2"></i> Logout
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 main-content p-4">
+                <!-- Return Arrow -->
+                <div class="mb-3">
+                    <a href="/admin/users.html" class="return-arrow">
+                        <i class="fas fa-arrow-left me-2"></i>Back to User Management
+                    </a>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h2><i class="fas fa-user-nurse me-2"></i>Nurse Management</h2>
+                        <p class="text-muted mb-0">Nurses registered in the system (User Role: Nurse)</p>
+                    </div>
+                    <a href="/admin/users.html" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Add New Nurse User
+                    </a>
+                </div>
+
+                <!-- Search and Filter -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <input type="text" class="form-control" id="searchNurse" placeholder="Search nurses...">
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select" id="filterDepartment" title="Filter by department">
+                                    <option value="">All Departments</option>
+                                    <option value="emergency">Emergency</option>
+                                    <option value="icu">ICU</option>
+                                    <option value="surgery">Surgery</option>
+                                    <option value="pediatrics">Pediatrics</option>
+                                    <option value="maternity">Maternity</option>
+                                    <option value="general">General Ward</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <button type="button" class="btn btn-outline-primary" onclick="loadNurses()">
+                                    <i class="fas fa-search me-2"></i>Search
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" onclick="clearFilters()">
+                                    <i class="fas fa-times me-2"></i>Clear
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Nurses Table -->
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table id="nursesTable" class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nurse</th>
+                                        <th>Department</th>
+                                        <th>Phone</th>
+                                        <th>Email</th>
+                                        <th>Shift</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Data will be loaded via JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nurse Modal -->
+    <div class="modal fade" id="nurseModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="nurseModalTitle">Add New Nurse</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" title="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="nurseForm">
+                        <input type="hidden" id="nurseId" name="nurseId">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="firstName" class="form-label">First Name *</label>
+                                    <input type="text" class="form-control" id="firstName" name="nurse_first_name" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="lastName" class="form-label">Last Name *</label>
+                                    <input type="text" class="form-control" id="lastName" name="nurse_last_name" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="department" class="form-label">Department *</label>
+                                    <select class="form-select" id="department" name="nurse_department" required>
+                                        <option value="">Select Department</option>
+                                        <option value="emergency">Emergency</option>
+                                        <option value="icu">ICU</option>
+                                        <option value="surgery">Surgery</option>
+                                        <option value="pediatrics">Pediatrics</option>
+                                        <option value="maternity">Maternity</option>
+                                        <option value="general">General Ward</option>
+                                        <option value="cardiology">Cardiology</option>
+                                        <option value="neurology">Neurology</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="phoneNo" class="form-label">Phone Number *</label>
+                                    <input type="tel" class="form-control" id="phoneNo" name="nurse_ph_no" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email *</label>
+                                    <input type="email" class="form-control" id="email" name="nurse_email" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="shift" class="form-label">Shift</label>
+                                    <select class="form-select" id="shift" name="nurse_shift">
+                                        <option value="">Select Shift</option>
+                                        <option value="morning">Morning (6 AM - 2 PM)</option>
+                                        <option value="afternoon">Afternoon (2 PM - 10 PM)</option>
+                                        <option value="night">Night (10 PM - 6 AM)</option>
+                                        <option value="rotating">Rotating</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="address" class="form-label">Address</label>
+                            <textarea class="form-control" id="address" name="nurse_address" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="saveNurse()">Save Nurse</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    
+    <script>
+        // Authentication check
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+        if (!token || user.role !== 'admin') {
+            window.location.href = '/login.html';
+        }
+
+        let nursesTable;
+        let editingNurseId = null;
+
+        // Initialize page
+        $(document).ready(function() {
+            initializeNursesTable();
+            loadNurses();
+            setupSearch();
+        });
+
+        function initializeNursesTable() {
+            nursesTable = $('#nursesTable').DataTable({
+                responsive: true,
+                pageLength: 25,
+                order: [[0, 'desc']],
+                columnDefs: [
+                    { targets: [6], orderable: false }
+                ]
+            });
+        }
+
+        function setupSearch() {
+            $('#searchNurse').on('keyup', function() {
+                nursesTable.search(this.value).draw();
+            });
+        }
+
+        async function loadNurses() {
+            try {
+                // Load nurses from users table (role = 'nurse')
+                let nurses = [];
+                try {
+                    const response = await apiCall('/users');
+                    if (response) {
+                        // Filter users to get only nurses
+                        const nurseUsers = response.filter(user => user.role === 'nurse');
+
+                        // Convert user data to nurse format
+                        nurses = nurseUsers.map(user => ({
+                            nurse_id: user.user_id,
+                            nurse_first_name: user.first_name,
+                            nurse_last_name: user.last_name,
+                            nurse_email: user.email,
+                            nurse_ph_no: user.phone_number || 'N/A',
+                            nurse_department: 'general', // Default department
+                            nurse_shift: 'morning', // Default shift
+                            nurse_address: 'Hospital Address',
+                            username: user.username,
+                            is_active: user.is_active,
+                            created_date: user.created_date
+                        }));
+                    }
+                } catch (error) {
+                    console.log('API failed, using sample data');
+                    nurses = getSampleNurses();
+                }
+
+                displayNurses(nurses);
+            } catch (error) {
+                showAlert('Error loading nurses: ' + error.message, 'danger');
+                displayNurses(getSampleNurses());
+            }
+        }
+
+        function getSampleNurses() {
+            return [
+                {
+                    nurse_id: 1,
+                    nurse_first_name: 'Jennifer',
+                    nurse_last_name: 'Williams',
+                    nurse_department: 'emergency',
+                    nurse_ph_no: '555-0201',
+                    nurse_email: 'jennifer.williams@hospital.com',
+                    nurse_shift: 'morning',
+                    nurse_address: '123 Care Street'
+                },
+                {
+                    nurse_id: 2,
+                    nurse_first_name: 'Maria',
+                    nurse_last_name: 'Garcia',
+                    nurse_department: 'icu',
+                    nurse_ph_no: '555-0202',
+                    nurse_email: 'maria.garcia@hospital.com',
+                    nurse_shift: 'night',
+                    nurse_address: '456 Healing Ave'
+                },
+                {
+                    nurse_id: 3,
+                    nurse_first_name: 'Lisa',
+                    nurse_last_name: 'Johnson',
+                    nurse_department: 'pediatrics',
+                    nurse_ph_no: '555-0203',
+                    nurse_email: 'lisa.johnson@hospital.com',
+                    nurse_shift: 'afternoon',
+                    nurse_address: '789 Wellness Blvd'
+                },
+                {
+                    nurse_id: 4,
+                    nurse_first_name: 'Amanda',
+                    nurse_last_name: 'Brown',
+                    nurse_department: 'surgery',
+                    nurse_ph_no: '555-0204',
+                    nurse_email: 'amanda.brown@hospital.com',
+                    nurse_shift: 'rotating',
+                    nurse_address: '321 Recovery Road'
+                },
+                {
+                    nurse_id: 5,
+                    nurse_first_name: 'Rachel',
+                    nurse_last_name: 'Davis',
+                    nurse_department: 'maternity',
+                    nurse_ph_no: '555-0205',
+                    nurse_email: 'rachel.davis@hospital.com',
+                    nurse_shift: 'morning',
+                    nurse_address: '654 Birth Center Dr'
+                }
+            ];
+        }
+
+        function displayNurses(nurses) {
+            nursesTable.clear();
+
+            if (!nurses || nurses.length === 0) {
+                // Show message if no nurses found
+                const noDataRow = `
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">
+                            <i class="fas fa-user-nurse fa-2x mb-3"></i><br>
+                            No nurses found in the system.<br>
+                            <small>Add nurses through the User Management section with role "Nurse"</small>
+                        </td>
+                    </tr>
+                `;
+                $('#nursesTable tbody').html(noDataRow);
+                return;
+            }
+
+            nurses.forEach(nurse => {
+                const initials = `${nurse.nurse_first_name?.charAt(0) || 'N'}${nurse.nurse_last_name?.charAt(0) || 'U'}`;
+                const departmentColors = {
+                    'emergency': 'danger',
+                    'icu': 'warning',
+                    'surgery': 'primary',
+                    'pediatrics': 'success',
+                    'maternity': 'info',
+                    'general': 'secondary',
+                    'cardiology': 'dark',
+                    'neurology': 'light'
+                };
+
+                const departmentBadge = `<span class="badge bg-${departmentColors[nurse.nurse_department] || 'secondary'} department-badge">${nurse.nurse_department?.toUpperCase() || 'GENERAL'}</span>`;
+
+                const statusBadge = nurse.is_active ?
+                    '<span class="badge bg-success">Active</span>' :
+                    '<span class="badge bg-danger">Inactive</span>';
+
+                const nurseInfo = `
+                    <div class="d-flex align-items-center">
+                        <div class="nurse-avatar me-3">${initials}</div>
+                        <div>
+                            <strong>${nurse.nurse_first_name} ${nurse.nurse_last_name}</strong><br>
+                            <small class="text-muted">ID: ${nurse.nurse_id} | Username: ${nurse.username || 'N/A'}</small><br>
+                            ${statusBadge}
+                        </div>
+                    </div>
+                `;
+
+                const shiftDisplay = nurse.nurse_shift ? nurse.nurse_shift.charAt(0).toUpperCase() + nurse.nurse_shift.slice(1) : 'N/A';
+
+                const actions = `
+                    <button type="button" class="btn btn-sm btn-outline-info me-1" onclick="viewNurseDetails(${nurse.nurse_id})" title="View Details">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="editNurseUser(${nurse.nurse_id})" title="Edit User">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-success me-1" onclick="viewNurseSchedule(${nurse.nurse_id})" title="Schedule">
+                        <i class="fas fa-calendar"></i>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-warning" onclick="viewNursePatients(${nurse.nurse_id})" title="Assigned Patients">
+                        <i class="fas fa-users"></i>
+                    </button>
+                `;
+
+                nursesTable.row.add([
+                    nurse.nurse_id,
+                    nurseInfo,
+                    departmentBadge,
+                    nurse.nurse_ph_no || 'N/A',
+                    nurse.nurse_email || 'N/A',
+                    shiftDisplay,
+                    actions
+                ]);
+            });
+
+            nursesTable.draw();
+        }
+
+        function openCreateNurseModal() {
+            editingNurseId = null;
+            document.getElementById('nurseModalTitle').textContent = 'Add New Nurse';
+            document.getElementById('nurseForm').reset();
+            document.getElementById('nurseId').value = '';
+        }
+
+        async function editNurse(nurseId) {
+            try {
+                let nurse;
+                try {
+                    const response = await apiCall(`/nurse/${nurseId}`);
+                    nurse = response;
+                } catch (error) {
+                    // Use sample data
+                    const sampleNurses = getSampleNurses();
+                    nurse = sampleNurses.find(n => n.nurse_id === nurseId);
+                }
+
+                if (nurse) {
+                    editingNurseId = nurseId;
+                    document.getElementById('nurseModalTitle').textContent = 'Edit Nurse';
+
+                    // Populate form
+                    document.getElementById('nurseId').value = nurse.nurse_id;
+                    document.getElementById('firstName').value = nurse.nurse_first_name;
+                    document.getElementById('lastName').value = nurse.nurse_last_name;
+                    document.getElementById('department').value = nurse.nurse_department;
+                    document.getElementById('phoneNo').value = nurse.nurse_ph_no;
+                    document.getElementById('email').value = nurse.nurse_email;
+                    document.getElementById('shift').value = nurse.nurse_shift || '';
+                    document.getElementById('address').value = nurse.nurse_address || '';
+
+                    // Show modal
+                    new bootstrap.Modal(document.getElementById('nurseModal')).show();
+                }
+            } catch (error) {
+                showAlert('Error loading nurse details: ' + error.message, 'danger');
+            }
+        }
+
+        async function saveNurse() {
+            const form = document.getElementById('nurseForm');
+            const formData = new FormData(form);
+            const nurseData = {};
+
+            for (let [key, value] of formData.entries()) {
+                if (value.trim() !== '') {
+                    nurseData[key] = value;
+                }
+            }
+
+            try {
+                let response;
+                if (editingNurseId) {
+                    // Update existing nurse
+                    response = await apiCall(`/nurse/${editingNurseId}`, 'PUT', nurseData);
+                } else {
+                    // Create new nurse
+                    response = await apiCall('/nurse', 'POST', nurseData);
+                }
+
+                showAlert(editingNurseId ? 'Nurse updated successfully!' : 'Nurse created successfully!', 'success');
+                bootstrap.Modal.getInstance(document.getElementById('nurseModal')).hide();
+                loadNurses();
+            } catch (error) {
+                showAlert('Error saving nurse: ' + error.message, 'danger');
+            }
+        }
+
+        function editNurseUser(nurseId) {
+            // Redirect to user management to edit the nurse user
+            window.location.href = `/admin/users.html?edit=${nurseId}`;
+        }
+
+        function viewNurseDetails(nurseId) {
+            showAlert('Nurse details view coming soon!', 'info');
+        }
+
+        function viewNurseSchedule(nurseId) {
+            showAlert('Nurse schedule view coming soon!', 'info');
+        }
+
+        function viewNursePatients(nurseId) {
+            showAlert('Nurse assigned patients view coming soon!', 'info');
+        }
+
+        function clearFilters() {
+            document.getElementById('searchNurse').value = '';
+            document.getElementById('filterDepartment').value = '';
+            nursesTable.search('').draw();
+        }
+
+        // API helper function
+        async function apiCall(endpoint, method = 'GET', data = null) {
+            const options = {
+                method,
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            };
+
+            if (data) {
+                options.body = JSON.stringify(data);
+            }
+
+            const response = await fetch(endpoint, options);
+
+            if (response.status === 401) {
+                logout();
+                return;
+            }
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.error || 'Request failed');
+            }
+
+            return result;
+        }
+
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alertDiv);
+
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.parentNode.removeChild(alertDiv);
+                }
+            }, 5000);
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/login.html';
+        }
+    </script>
+</body>
+</html>

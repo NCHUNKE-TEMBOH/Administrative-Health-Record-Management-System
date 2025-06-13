@@ -236,6 +236,15 @@
         $(document).ready(function() {
             initializeUsersTable();
             loadUsers();
+
+            // Check if we need to edit a specific user (from doctors/nurses page)
+            const urlParams = new URLSearchParams(window.location.search);
+            const editUserId = urlParams.get('edit');
+            if (editUserId) {
+                setTimeout(() => {
+                    editUser(parseInt(editUserId));
+                }, 1000); // Wait for table to load
+            }
         });
 
         function initializeUsersTable() {

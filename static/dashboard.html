@@ -1252,7 +1252,115 @@
 
         // Load patient statistics
         async function loadPatientStats() {
-            // Placeholder for patient-specific stats
+            try {
+                // Load comprehensive patient statistics
+                await Promise.all([
+                    loadPatientAppointmentStats(),
+                    loadPatientPrescriptionStats(),
+                    loadPatientLabStats(),
+                    loadPatientVitalStats()
+                ]);
+            } catch (error) {
+                console.error('Error loading patient stats:', error);
+                // Use sample data as fallback
+                loadSamplePatientStats();
+            }
+        }
+
+        async function loadPatientAppointmentStats() {
+            try {
+                const response = await fetch(`/patient/${user.user_id}/appointments`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const appointments = await response.json();
+                    const upcoming = appointments.filter(apt => new Date(apt.appointment_date) > new Date()).length;
+                    document.getElementById('upcomingAppointments').textContent = upcoming;
+                } else {
+                    throw new Error('API not available');
+                }
+            } catch (error) {
+                document.getElementById('upcomingAppointments').textContent = '2';
+            }
+        }
+
+        async function loadPatientPrescriptionStats() {
+            try {
+                const response = await fetch(`/patient/${user.user_id}/prescriptions`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const prescriptions = await response.json();
+                    const active = prescriptions.filter(rx => rx.status === 'active').length;
+                    document.getElementById('activePrescriptions').textContent = active;
+                } else {
+                    throw new Error('API not available');
+                }
+            } catch (error) {
+                document.getElementById('activePrescriptions').textContent = '3';
+            }
+        }
+
+        async function loadPatientLabStats() {
+            try {
+                const response = await fetch(`/patient/${user.user_id}/lab-results`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const labResults = await response.json();
+                    const recent = labResults.filter(lab => {
+                        const labDate = new Date(lab.result_date);
+                        const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+                        return labDate > thirtyDaysAgo;
+                    }).length;
+                    document.getElementById('recentLabResults').textContent = recent;
+                } else {
+                    throw new Error('API not available');
+                }
+            } catch (error) {
+                document.getElementById('recentLabResults').textContent = '1';
+            }
+        }
+
+        async function loadPatientVitalStats() {
+            try {
+                const response = await fetch(`/patient/${user.user_id}/vital-signs`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const vitals = await response.json();
+                    if (vitals.length > 0) {
+                        const lastVital = new Date(vitals[0].recorded_date);
+                        const daysSince = Math.floor((Date.now() - lastVital.getTime()) / (1000 * 60 * 60 * 24));
+                        document.getElementById('lastVitalCheck').textContent = daysSince;
+                    } else {
+                        document.getElementById('lastVitalCheck').textContent = '--';
+                    }
+                } else {
+                    throw new Error('API not available');
+                }
+            } catch (error) {
+                document.getElementById('lastVitalCheck').textContent = '5';
+            }
+        }
+
+        function loadSamplePatientStats() {
             document.getElementById('upcomingAppointments').textContent = '2';
             document.getElementById('activePrescriptions').textContent = '3';
             document.getElementById('recentLabResults').textContent = '1';

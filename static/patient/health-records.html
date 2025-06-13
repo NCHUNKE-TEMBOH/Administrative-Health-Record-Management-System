@@ -177,8 +177,11 @@
         <!-- Patient Information -->
         <div class="patient-info">
             <h5 class="mb-3"><i class="fas fa-user me-2"></i>Patient Information</h5>
-            <div class="row">
-                <div class="col-md-6">
+
+            <!-- Basic Information -->
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <h6 class="text-muted mb-3">Basic Information</h6>
                     <div class="info-item">
                         <span class="info-label">Patient ID:</span>
                         <span class="info-value" id="patientId">Loading...</span>
@@ -191,11 +194,65 @@
                         <span class="info-label">Date of Birth:</span>
                         <span class="info-value" id="patientDob">Loading...</span>
                     </div>
+                    <div class="info-item">
+                        <span class="info-label">Age:</span>
+                        <span class="info-value" id="patientAge">Loading...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Gender:</span>
+                        <span class="info-value" id="patientGender">Loading...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Marital Status:</span>
+                        <span class="info-value" id="maritalStatus">Loading...</span>
+                    </div>
                 </div>
-                <div class="col-md-6">
+
+                <div class="col-md-4">
+                    <h6 class="text-muted mb-3">Contact Information</h6>
+                    <div class="info-item">
+                        <span class="info-label">Phone:</span>
+                        <span class="info-value" id="patientPhone">Loading...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Email:</span>
+                        <span class="info-value" id="patientEmail">Loading...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Address:</span>
+                        <span class="info-value" id="patientAddress">Loading...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Emergency Contact:</span>
+                        <span class="info-value" id="emergencyContact">Loading...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Emergency Phone:</span>
+                        <span class="info-value" id="emergencyPhone">Loading...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Preferred Language:</span>
+                        <span class="info-value" id="preferredLanguage">Loading...</span>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <h6 class="text-muted mb-3">Medical Information</h6>
                     <div class="info-item">
                         <span class="info-label">Blood Type:</span>
                         <span class="info-value" id="bloodType">Loading...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Height:</span>
+                        <span class="info-value" id="patientHeight">Loading...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Weight:</span>
+                        <span class="info-value" id="patientWeight">Loading...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">BMI:</span>
+                        <span class="info-value" id="patientBMI">Loading...</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Primary Doctor:</span>
@@ -204,6 +261,76 @@
                     <div class="info-item">
                         <span class="info-label">Last Visit:</span>
                         <span class="info-value" id="lastVisit">Loading...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Medical Details -->
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <h6 class="text-muted mb-3">Allergies & Conditions</h6>
+                    <div class="info-item">
+                        <span class="info-label">Known Allergies:</span>
+                        <span class="info-value" id="allergies">Loading...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Medical Conditions:</span>
+                        <span class="info-value" id="medicalConditions">Loading...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Current Medications:</span>
+                        <span class="info-value" id="currentMedications">Loading...</span>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <h6 class="text-muted mb-3">Lifestyle Information</h6>
+                    <div class="info-item">
+                        <span class="info-label">Smoking Status:</span>
+                        <span class="info-value" id="smokingStatus">Loading...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Alcohol Use:</span>
+                        <span class="info-value" id="alcoholUse">Loading...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Exercise Frequency:</span>
+                        <span class="info-value" id="exerciseFrequency">Loading...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Occupation:</span>
+                        <span class="info-value" id="occupation">Loading...</span>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <h6 class="text-muted mb-3">Insurance & Pharmacy</h6>
+                    <div class="info-item">
+                        <span class="info-label">Insurance Provider:</span>
+                        <span class="info-value" id="insuranceProvider">Loading...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Insurance Number:</span>
+                        <span class="info-value" id="insuranceNumber">Loading...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Group Number:</span>
+                        <span class="info-value" id="insuranceGroup">Loading...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Preferred Pharmacy:</span>
+                        <span class="info-value" id="preferredPharmacy">Loading...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Family History -->
+            <div class="row">
+                <div class="col-12">
+                    <h6 class="text-muted mb-3">Family Medical History</h6>
+                    <div class="info-item">
+                        <span class="info-label">Family History:</span>
+                        <span class="info-value" id="familyHistory">Loading...</span>
                     </div>
                 </div>
             </div>
@@ -243,12 +370,57 @@
 
         <!-- Recent Vital Signs Chart -->
         <div class="vital-signs-chart">
-            <h5 class="mb-3"><i class="fas fa-chart-line me-2"></i>Recent Vital Signs</h5>
-            <div id="vitalsChart" style="height: 300px;">
-                <div class="text-center text-muted py-5">
-                    <i class="fas fa-chart-line fa-3x mb-3"></i>
-                    <p>Vital signs chart will be displayed here</p>
-                    <small>Blood pressure, heart rate, and temperature trends</small>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Recent Vital Signs Trends</h5>
+                <div class="d-flex gap-2">
+                    <select class="form-select form-select-sm" id="vitalTypeSelect" onchange="updateVitalsChart()" style="width: auto;">
+                        <option value="blood_pressure">Blood Pressure</option>
+                        <option value="heart_rate">Heart Rate</option>
+                        <option value="temperature">Temperature</option>
+                        <option value="weight">Weight</option>
+                    </select>
+                    <select class="form-select form-select-sm" id="timeRangeSelect" onchange="updateVitalsChart()" style="width: auto;">
+                        <option value="7">Last 7 days</option>
+                        <option value="30">Last 30 days</option>
+                        <option value="90">Last 3 months</option>
+                    </select>
+                </div>
+            </div>
+            <div class="chart-container" style="position: relative; height: 400px;">
+                <canvas id="vitalsChart"></canvas>
+            </div>
+            <div class="row mt-3">
+                <div class="col-md-3 text-center">
+                    <div class="card border-0 bg-light">
+                        <div class="card-body py-2">
+                            <small class="text-muted">Latest BP</small>
+                            <div class="fw-bold text-info" id="latestBP">--/--</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 text-center">
+                    <div class="card border-0 bg-light">
+                        <div class="card-body py-2">
+                            <small class="text-muted">Latest HR</small>
+                            <div class="fw-bold text-danger" id="latestHR">-- bpm</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 text-center">
+                    <div class="card border-0 bg-light">
+                        <div class="card-body py-2">
+                            <small class="text-muted">Latest Temp</small>
+                            <div class="fw-bold text-warning" id="latestTemp">--°F</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 text-center">
+                    <div class="card border-0 bg-light">
+                        <div class="card-body py-2">
+                            <small class="text-muted">Latest Weight</small>
+                            <div class="fw-bold text-success" id="latestWeight">-- lbs</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -331,6 +503,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../js/common.js"></script>
     <script src="health-records.js"></script>
 </body>

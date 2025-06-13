@@ -34,7 +34,7 @@ def generate_token(user_id, username, role):
 def verify_token(token):
     """Verify and decode JWT token"""
     try:
-        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        payload = jwt.decode(token, JWT_SECRET, algoritHRMS=[JWT_ALGORITHM])
         return payload
     except jwt.ExpiredSignatureError:
         raise AuthenticationError("Token has expired")

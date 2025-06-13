@@ -1,4 +1,4 @@
-# 🎨 Dashboard Design Improvements - HMS
+# 🎨 Dashboard Design Improvements - HRMS
 
 ## 🚀 **TRANSFORMATION COMPLETE**
 
@@ -228,4 +228,4 @@ The Health Record Management System dashboards have been completely redesigned w
 
 The Health Record Management System dashboards have been transformed from "dull" to **spectacular**. Each role now enjoys a personalized, vibrant, and highly functional dashboard that not only looks professional but also enhances productivity and user satisfaction.
 
-**The HMS now features world-class dashboard design that rivals the best healthcare management systems in the industry!** 🌟
+**The HRMS now features world-class dashboard design that rivals the best healthcare management systems in the industry!** 🌟

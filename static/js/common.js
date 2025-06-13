@@ -1,5 +1,5 @@
 /**
- * Common JavaScript utilities for HMS
+ * Common JavaScript utilities for HRMS
  */
 
 // Authentication utilities
@@ -260,7 +260,7 @@ function safeNavigate(role, module, fallbackMessage = 'Module coming soon!') {
 }
 
 // Export for use in other modules
-window.HMS = {
+window.HRMS = {
     checkAuth,
     apiCall,
     showAlert,

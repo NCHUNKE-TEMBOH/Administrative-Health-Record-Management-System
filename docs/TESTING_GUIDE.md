@@ -19,7 +19,7 @@ This guide will help you verify that all functionality is working correctly acro
 - [ ] Check all 6 user roles are displayed with descriptions
 - [ ] Verify feature cards show system capabilities
 - [ ] Confirm statistics section displays correctly
-- [ ] Test "Start Using HMS Today" button functionality
+- [ ] Test "Start Using HRMS Today" button functionality
 
 ---
 

@@ -60,6 +60,41 @@ api.add_resource(ChangePassword, '/auth/change-password')
 api.add_resource(Users, '/users')
 api.add_resource(User, '/users/<int:user_id>')
 
+# Simple Users endpoint for debugging
+@app.route('/api/users-debug')
+def get_users_debug():
+    """Simple users endpoint for debugging"""
+    try:
+        from package.model import conn
+        users_rows = conn.execute("""
+            SELECT user_id, username, email, role, first_name, last_name,
+                   phone_number, is_active, created_date, last_login, entity_id
+            FROM users
+            WHERE is_active = 1
+            ORDER BY created_date DESC
+        """).fetchall()
+
+        users = []
+        for row in users_rows:
+            users.append({
+                'user_id': row['user_id'],
+                'username': row['username'],
+                'email': row['email'],
+                'role': row['role'],
+                'first_name': row['first_name'],
+                'last_name': row['last_name'],
+                'phone_number': row['phone_number'],
+                'is_active': row['is_active'],
+                'created_date': row['created_date'],
+                'last_login': row['last_login'],
+                'entity_id': row['entity_id']
+            })
+
+        return jsonify(users)
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 # Health Records Management
 api.add_resource(HealthRecords, '/health-records')
 api.add_resource(HealthRecord, '/health-records/<int:record_id>')

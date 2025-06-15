@@ -4,6 +4,14 @@ from package.model import conn
 from package.auth import login_required, role_required, patient_access_required, get_current_user, log_access
 from datetime import datetime, timedelta
 
+# Global blockchain instance - will be set by app.py
+blockchain = None
+
+def set_blockchain_instance(blockchain_instance):
+    """Set the blockchain instance for this module"""
+    global blockchain
+    blockchain = blockchain_instance
+
 class Prescriptions(Resource):
     """Handle prescription operations"""
     
@@ -166,9 +174,24 @@ class Prescriptions(Resource):
             )).lastrowid
             
             conn.commit()
-            
+
+            # Add to blockchain if available
+            if blockchain:
+                try:
+                    blockchain_data = {
+                        'prescription_id': prescription_id,
+                        'pat_id': data['pat_id'],
+                        'doc_id': current_user['user_id'],
+                        'med_code': data['med_code'],
+                        'dosage': data['dosage'],
+                        'frequency': data['frequency']
+                    }
+                    blockchain.add_prescription(blockchain_data)
+                except Exception as e:
+                    print(f"Warning: Failed to add prescription to blockchain: {e}")
+
             log_access(current_user['user_id'], 'CREATE_PRESCRIPTION', 'PRESCRIPTION', prescription_id, data['pat_id'])
-            
+
             return {
                 'message': 'Prescription created successfully',
                 'prescription_id': prescription_id

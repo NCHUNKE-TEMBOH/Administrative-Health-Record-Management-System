@@ -4,6 +4,14 @@ from package.model import conn
 from package.auth import login_required, role_required, patient_access_required, get_current_user, log_access
 from datetime import datetime
 
+# Global blockchain instance - will be set by app.py
+blockchain = None
+
+def set_blockchain_instance(blockchain_instance):
+    """Set the blockchain instance for this module"""
+    global blockchain
+    blockchain = blockchain_instance
+
 class LabTests(Resource):
     """Handle lab test operations"""
     
@@ -269,9 +277,24 @@ class LabTest(Resource):
             
             conn.execute(f"UPDATE lab_tests SET {set_clause} WHERE test_id = ?", values)
             conn.commit()
-            
+
+            # Add to blockchain if test is completed
+            if blockchain and 'status' in update_data and update_data['status'] == 'completed':
+                try:
+                    blockchain_data = {
+                        'test_id': test_id,
+                        'pat_id': test['pat_id'],
+                        'test_type': test['test_type'],
+                        'result_value': update_data.get('results', ''),
+                        'status': 'completed',
+                        'technician_id': current_user['user_id']
+                    }
+                    blockchain.add_lab_result(blockchain_data)
+                except Exception as e:
+                    print(f"Warning: Failed to add lab result to blockchain: {e}")
+
             log_access(current_user['user_id'], 'UPDATE_LAB_TEST', 'LAB_TEST', test_id, test['pat_id'])
-            
+
             return {'message': 'Lab test updated successfully'}, 200
             
         except Exception as e:

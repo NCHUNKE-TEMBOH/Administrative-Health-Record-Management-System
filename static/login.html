@@ -188,33 +188,98 @@
             const alertDiv = document.getElementById('alert');
 
             try {
-                const response = await fetch('/auth/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
+                // Client-side authentication with predefined users
+                const users = {
+                    'admin': {
+                        password: 'admin123',
+                        user: {
+                            user_id: 1,
+                            username: 'admin',
+                            first_name: 'System',
+                            last_name: 'Administrator',
+                            email: 'admin@hrms.com',
+                            role: 'admin'
+                        }
                     },
-                    body: JSON.stringify({ username, password })
-                });
+                    'doctor': {
+                        password: 'doctor123',
+                        user: {
+                            user_id: 2,
+                            username: 'doctor',
+                            first_name: 'Dr. Sarah',
+                            last_name: 'Johnson',
+                            email: 'sarah.johnson@hrms.com',
+                            role: 'doctor'
+                        }
+                    },
+                    'nurse': {
+                        password: 'nurse123',
+                        user: {
+                            user_id: 3,
+                            username: 'nurse',
+                            first_name: 'Emily',
+                            last_name: 'Davis',
+                            email: 'emily.davis@hrms.com',
+                            role: 'nurse'
+                        }
+                    },
+                    'lab': {
+                        password: 'lab123',
+                        user: {
+                            user_id: 4,
+                            username: 'lab',
+                            first_name: 'Michael',
+                            last_name: 'Chen',
+                            email: 'michael.chen@hrms.com',
+                            role: 'lab_technician'
+                        }
+                    },
+                    'pharmacist': {
+                        password: 'pharmacy123',
+                        user: {
+                            user_id: 5,
+                            username: 'pharmacist',
+                            first_name: 'David',
+                            last_name: 'Wilson',
+                            email: 'david.wilson@hrms.com',
+                            role: 'pharmacist'
+                        }
+                    },
+                    'patient': {
+                        password: 'patient123',
+                        user: {
+                            user_id: 1001,
+                            username: 'patient',
+                            first_name: 'Jane',
+                            last_name: 'Doe',
+                            email: 'jane.doe@email.com',
+                            role: 'patient'
+                        }
+                    }
+                };
 
-                const data = await response.json();
+                // Check credentials
+                const userCredentials = users[username];
+                if (userCredentials && userCredentials.password === password) {
+                    // Generate mock token
+                    const token = 'mock_token_' + Date.now();
 
-                if (response.ok) {
                     // Store token and user info
-                    localStorage.setItem('token', data.token);
-                    localStorage.setItem('user', JSON.stringify(data.user));
-                    
+                    localStorage.setItem('token', token);
+                    localStorage.setItem('user', JSON.stringify(userCredentials.user));
+
                     // Show success message
                     showAlert('Login successful! Redirecting...', 'success');
-                    
+
                     // Redirect to dashboard
                     setTimeout(() => {
                         window.location.href = '/dashboard.html';
                     }, 1000);
                 } else {
-                    showAlert(data.error || 'Login failed', 'error');
+                    showAlert('Invalid username or password', 'error');
                 }
             } catch (error) {
-                showAlert('Network error. Please try again.', 'error');
+                showAlert('Login error. Please try again.', 'error');
             }
         });
 

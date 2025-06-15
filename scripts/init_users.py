@@ -5,10 +5,12 @@ Initialize the database with sample users for testing the Health Record Manageme
 
 import sqlite3
 import json
+import os
 from werkzeug.security import generate_password_hash
 
-# Load config
-with open('../config.json') as data_file:
+# Load config - handle both relative and absolute paths
+config_path = '../config.json' if os.path.exists('../config.json') else 'config.json'
+with open(config_path) as data_file:
     config = json.load(data_file)
 
 # Connect to database

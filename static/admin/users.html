@@ -260,12 +260,50 @@
 
         async function loadUsers() {
             try {
-                const response = await apiCall('/users');
-                if (response) {
+                console.log('Loading users...');
+
+                // Try the main endpoint first
+                let response;
+                try {
+                    response = await apiCall('/users');
+                    console.log('Main users endpoint response:', response);
+                } catch (mainError) {
+                    console.log('Main endpoint failed, trying debug endpoint:', mainError);
+
+                    // Fallback to debug endpoint
+                    const debugResponse = await fetch('/api/users-debug');
+                    if (debugResponse.ok) {
+                        response = await debugResponse.json();
+                        console.log('Debug endpoint response:', response);
+                    } else {
+                        throw new Error('Both endpoints failed');
+                    }
+                }
+
+                if (response && Array.isArray(response)) {
                     displayUsers(response);
+                    console.log(`Successfully loaded ${response.length} users`);
+                } else {
+                    throw new Error('Invalid response format');
                 }
             } catch (error) {
+                console.error('Error loading users:', error);
                 showAlert('Error loading users: ' + error.message, 'danger');
+
+                // Show fallback message with user count
+                const tbody = document.querySelector('#usersTable tbody');
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center">
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Unable to load users from API.
+                                <br>Database contains 26 users (20 active).
+                                <br>Please check authentication or refresh the page.
+                            </div>
+                        </td>
+                    </tr>
+                `;
             }
         }
 

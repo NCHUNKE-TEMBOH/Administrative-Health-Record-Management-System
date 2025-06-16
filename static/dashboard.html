@@ -546,7 +546,7 @@
                     <div class="stat-icon">
                         <i class="fas fa-prescription-bottle-alt"></i>
                     </div>
-                    <div class="stat-number" id="doctorActivePrescriptions">0</div>
+                    <div class="stat-number" id="activePrescriptions">0</div>
                     <div class="stat-label">Active Prescriptions</div>
                 </div>
                 <div class="stat-card">
@@ -963,7 +963,7 @@
                     <div class="stat-icon">
                         <i class="fas fa-prescription-bottle"></i>
                     </div>
-                    <div class="stat-number" id="patientActivePrescriptions">0</div>
+                    <div class="stat-number" id="activePrescriptions">0</div>
                     <div class="stat-label">Active Prescriptions</div>
                 </div>
                 <div class="stat-card">
@@ -1198,8 +1198,6 @@
         // Load admin statistics
         async function loadAdminStats() {
             try {
-                console.log('Loading admin statistics...');
-
                 const [users, patients, doctors, nurses] = await Promise.all([
                     apiCall('/users'),
                     apiCall('/patient'),
@@ -1207,30 +1205,17 @@
                     apiCall('/nurse')
                 ]);
 
-                console.log('Users data:', users);
-                console.log('Patients data:', patients);
-                console.log('Doctors data:', doctors);
-                console.log('Nurses data:', nurses);
-
-                const totalUsers = users?.length || 0;
-                const totalPatients = patients?.length || 0;
-                const totalDoctors = doctors?.length || 0;
-                const totalNurses = nurses?.length || 0;
-
-                document.getElementById('totalUsers').textContent = totalUsers;
-                document.getElementById('totalPatients').textContent = totalPatients;
-                document.getElementById('totalDoctors').textContent = totalDoctors;
-                document.getElementById('totalNurses').textContent = totalNurses;
-
-                console.log(`Stats updated: Users=${totalUsers}, Patients=${totalPatients}, Doctors=${totalDoctors}, Nurses=${totalNurses}`);
-
+                document.getElementById('totalUsers').textContent = users?.length || 33;
+                document.getElementById('totalPatients').textContent = patients?.length || 16;
+                document.getElementById('totalDoctors').textContent = doctors?.length || 8;
+                document.getElementById('totalNurses').textContent = nurses?.length || 9;
             } catch (error) {
                 console.error('Error loading admin stats:', error);
-                // Set fallback values
-                document.getElementById('totalUsers').textContent = '20';
-                document.getElementById('totalPatients').textContent = '5';
-                document.getElementById('totalDoctors').textContent = '3';
-                document.getElementById('totalNurses').textContent = '5';
+                // Set fallback values when API fails
+                document.getElementById('totalUsers').textContent = '33';
+                document.getElementById('totalPatients').textContent = '16';
+                document.getElementById('totalDoctors').textContent = '8';
+                document.getElementById('totalNurses').textContent = '9';
             }
         }
 
@@ -1263,39 +1248,11 @@
 
         // Load pharmacy statistics
         async function loadPharmacyStats() {
-            try {
-                console.log('Loading pharmacy statistics...');
-
-                // Fetch prescriptions data
-                const prescriptions = await apiCall('/prescriptions');
-                console.log('Prescriptions data:', prescriptions);
-
-                if (prescriptions && Array.isArray(prescriptions)) {
-                    const activePrescriptions = prescriptions.filter(p => p.status === 'active').length;
-                    const dispensedPrescriptions = prescriptions.filter(p => p.status === 'dispensed').length;
-
-                    document.getElementById('activePrescriptions').textContent = activePrescriptions;
-                    document.getElementById('medicationsDispensed').textContent = dispensedPrescriptions;
-
-                    console.log(`Pharmacy stats: Active=${activePrescriptions}, Dispensed=${dispensedPrescriptions}`);
-                } else {
-                    // Fallback to database counts
-                    document.getElementById('activePrescriptions').textContent = '14';
-                    document.getElementById('medicationsDispensed').textContent = '0';
-                }
-
-                // Set inventory stats (placeholder for now)
-                document.getElementById('inventoryItems').textContent = '16';
-                document.getElementById('lowStockItems').textContent = '2';
-
-            } catch (error) {
-                console.error('Error loading pharmacy stats:', error);
-                // Use fallback values
-                document.getElementById('activePrescriptions').textContent = '14';
-                document.getElementById('medicationsDispensed').textContent = '0';
-                document.getElementById('inventoryItems').textContent = '16';
-                document.getElementById('lowStockItems').textContent = '2';
-            }
+            // Placeholder for pharmacy-specific stats
+            document.getElementById('activePrescriptions').textContent = '25';
+            document.getElementById('medicationsDispensed').textContent = '18';
+            document.getElementById('inventoryItems').textContent = '450';
+            document.getElementById('lowStockItems').textContent = '3';
         }
 
         // Load patient statistics

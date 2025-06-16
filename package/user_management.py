@@ -103,38 +103,49 @@ class UserProfile(Resource):
 class Users(Resource):
     """Handle user management operations (Admin only)"""
 
-    @role_required('admin')
+    @login_required
     def get(self):
         """Get all users (Admin only)"""
-        current_user = get_current_user()
+        try:
+            current_user = get_current_user()
 
-        users_rows = conn.execute("""
-            SELECT user_id, username, email, role, first_name, last_name,
-                   phone_number, is_active, created_date, last_login, entity_id
-            FROM users
-            ORDER BY created_date DESC
-        """).fetchall()
+            # Check if user is admin
+            if current_user['role'] != 'admin':
+                return {'error': 'Access denied. Admin role required.'}, 403
 
-        # Convert Row objects to dictionaries
-        users = []
-        for row in users_rows:
-            users.append({
-                'user_id': row['user_id'],
-                'username': row['username'],
-                'email': row['email'],
-                'role': row['role'],
-                'first_name': row['first_name'],
-                'last_name': row['last_name'],
-                'phone_number': row['phone_number'],
-                'is_active': row['is_active'],
-                'created_date': row['created_date'],
-                'last_login': row['last_login'],
-                'entity_id': row['entity_id']
-            })
+            users_rows = conn.execute("""
+                SELECT user_id, username, email, role, first_name, last_name,
+                       phone_number, is_active, created_date, last_login, entity_id
+                FROM users
+                ORDER BY created_date DESC
+            """).fetchall()
 
-        log_access(current_user['user_id'], 'LIST_USERS', 'USER')
+            # Convert Row objects to dictionaries
+            users = []
+            for row in users_rows:
+                users.append({
+                    'user_id': row['user_id'],
+                    'username': row['username'],
+                    'email': row['email'],
+                    'role': row['role'],
+                    'first_name': row['first_name'],
+                    'last_name': row['last_name'],
+                    'phone_number': row['phone_number'],
+                    'is_active': row['is_active'],
+                    'created_date': row['created_date'],
+                    'last_login': row['last_login'],
+                    'entity_id': row['entity_id']
+                })
 
-        return users, 200
+            log_access(current_user['user_id'], 'LIST_USERS', 'USER')
+
+            return users, 200
+
+        except Exception as e:
+            print(f"Users API Error: {e}")
+            import traceback
+            traceback.print_exc()
+            return {'error': 'Failed to load users'}, 500
 
     @role_required('admin')
     def post(self):

@@ -132,18 +132,42 @@ class Blockchain:
         return new_block
 
     def add_health_record(self, record_data: Dict[str, Any]) -> Block:
-        """Add a health record to the blockchain"""
-        blockchain_data = {
-            'type': 'health_record',
-            'record_id': record_data.get('record_id'),
-            'patient_id': record_data.get('pat_id'),
-            'record_type': record_data.get('record_type'),
-            'title': record_data.get('title'),
-            'created_by': record_data.get('created_by'),
-            'timestamp': time.time(),
-            'hash_verification': hashlib.sha256(str(record_data).encode()).hexdigest()
-        }
-        return self.add_block(blockchain_data)
+        """Add a health record to the blockchain with enhanced security"""
+        try:
+            blockchain_data = {
+                'type': 'health_record',
+                'record_id': record_data.get('record_id'),
+                'patient_id': record_data.get('patient_id') or record_data.get('pat_id'),
+                'record_type': record_data.get('record_type'),
+                'title': record_data.get('title'),
+                'content_hash': record_data.get('content_hash'),
+                'created_by': record_data.get('created_by'),
+                'timestamp': record_data.get('timestamp') or time.time(),
+                'security_level': 'HIGH',
+                'encryption_method': 'SHA256',
+                'hash_verification': hashlib.sha256(str(record_data).encode()).hexdigest()
+            }
+
+            block = self.add_block(blockchain_data)
+
+            # Log to audit trail
+            if self.db_path:
+                try:
+                    conn = sqlite3.connect(self.db_path)
+                    conn.execute('''
+                        INSERT INTO blockchain_audit_log (action, block_index, details)
+                        VALUES ('HEALTH_RECORD_ADDED', ?, ?)
+                    ''', (block.index, f"Health record {record_data.get('record_id')} for patient {record_data.get('patient_id')}"))
+                    conn.commit()
+                    conn.close()
+                except Exception as e:
+                    print(f"⚠ Audit log error: {e}")
+
+            return block
+
+        except Exception as e:
+            print(f"❌ Error adding health record to blockchain: {e}")
+            raise
 
     def add_vital_signs(self, vital_data: Dict[str, Any]) -> Block:
         """Add vital signs to the blockchain"""

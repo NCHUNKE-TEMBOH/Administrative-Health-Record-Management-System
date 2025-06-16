@@ -21,6 +21,10 @@ from package.lab_results import LabTests, LabTest, LabTestsByPatient, PendingLab
 from package.prescriptions_enhanced import Prescriptions as PrescriptionsEnhanced, Prescription as PrescriptionEnhanced, MedicationDispensing
 from package.medical_notes import MedicalNotes, MedicalNote, NursingNotes, PatientAssignments
 
+# Blockchain module
+from package.blockchain import Blockchain
+import package.health_records as health_records_module
+
 import json
 import os
 
@@ -30,6 +34,13 @@ with open('config.json') as data_file:
 app = Flask(__name__, static_url_path='')
 app.secret_key = config.get('secret_key', 'your-secret-key-change-this')
 api = Api(app)
+
+# Initialize blockchain
+blockchain = Blockchain(config['database'])
+print(f"🔗 Blockchain initialized with {len(blockchain.chain)} blocks")
+
+# Set blockchain instance for health records module
+health_records_module.set_blockchain_instance(blockchain)
 
 # Existing API endpoints
 api.add_resource(Patients, '/patient', '/patients')  # Support both endpoints
@@ -59,41 +70,6 @@ api.add_resource(UserProfile, '/auth/profile')
 api.add_resource(ChangePassword, '/auth/change-password')
 api.add_resource(Users, '/users')
 api.add_resource(User, '/users/<int:user_id>')
-
-# Simple Users endpoint for debugging
-@app.route('/api/users-debug')
-def get_users_debug():
-    """Simple users endpoint for debugging"""
-    try:
-        from package.model import conn
-        users_rows = conn.execute("""
-            SELECT user_id, username, email, role, first_name, last_name,
-                   phone_number, is_active, created_date, last_login, entity_id
-            FROM users
-            WHERE is_active = 1
-            ORDER BY created_date DESC
-        """).fetchall()
-
-        users = []
-        for row in users_rows:
-            users.append({
-                'user_id': row['user_id'],
-                'username': row['username'],
-                'email': row['email'],
-                'role': row['role'],
-                'first_name': row['first_name'],
-                'last_name': row['last_name'],
-                'phone_number': row['phone_number'],
-                'is_active': row['is_active'],
-                'created_date': row['created_date'],
-                'last_login': row['last_login'],
-                'entity_id': row['entity_id']
-            })
-
-        return jsonify(users)
-
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
 
 # Health Records Management
 api.add_resource(HealthRecords, '/health-records')
@@ -253,6 +229,109 @@ def patient_vital_signs():
 @app.route('/patient/lab-results.html')
 def patient_lab_results():
     return app.send_static_file('patient/lab-results.html')
+
+# Debug Users endpoint
+@app.route('/api/users-debug')
+def get_users_debug():
+    """Simple users endpoint for debugging"""
+    try:
+        from package.model import conn
+        users_rows = conn.execute("""
+            SELECT user_id, username, email, role, first_name, last_name,
+                   phone_number, is_active, created_date, last_login, entity_id
+            FROM users
+            WHERE is_active = 1
+            ORDER BY created_date DESC
+        """).fetchall()
+
+        users = []
+        for row in users_rows:
+            users.append({
+                'user_id': row['user_id'],
+                'username': row['username'],
+                'email': row['email'],
+                'role': row['role'],
+                'first_name': row['first_name'],
+                'last_name': row['last_name'],
+                'phone_number': row['phone_number'],
+                'is_active': row['is_active'],
+                'created_date': row['created_date'],
+                'last_login': row['last_login'],
+                'entity_id': row['entity_id']
+            })
+
+        return jsonify(users)
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# Blockchain API endpoints
+@app.route('/api/blockchain/chain')
+def get_blockchain_chain():
+    """Get the complete blockchain"""
+    try:
+        if blockchain:
+            return jsonify({
+                'chain': blockchain.to_list(),
+                'length': len(blockchain.chain),
+                'valid': blockchain.is_chain_valid()
+            })
+        else:
+            return jsonify({'error': 'Blockchain not initialized'}), 500
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/blockchain/validate')
+def validate_blockchain():
+    """Validate the blockchain"""
+    try:
+        if blockchain:
+            is_valid = blockchain.is_chain_valid()
+            stats = blockchain.get_blockchain_stats()
+            return jsonify({
+                'valid': is_valid,
+                'stats': stats
+            })
+        else:
+            return jsonify({'error': 'Blockchain not initialized'}), 500
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/blockchain/stats')
+def get_blockchain_stats():
+    """Get blockchain statistics"""
+    try:
+        if blockchain:
+            stats = blockchain.get_blockchain_stats()
+            db_stats = blockchain.get_database_stats()
+            return jsonify({
+                'blockchain_stats': stats,
+                'database_stats': db_stats
+            })
+        else:
+            return jsonify({'error': 'Blockchain not initialized'}), 500
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/blockchain/add', methods=['POST'])
+def add_to_blockchain():
+    """Add a record to the blockchain"""
+    try:
+        if not blockchain:
+            return jsonify({'error': 'Blockchain not initialized'}), 500
+
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+
+        block = blockchain.add_block(data)
+        return jsonify({
+            'message': 'Block added successfully',
+            'block': block.to_dict()
+        }), 201
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 if __name__ == '__main__':

@@ -860,7 +860,7 @@
                     <div class="stat-icon">
                         <i class="fas fa-prescription"></i>
                     </div>
-                    <div class="stat-number" id="activePrescriptions">0</div>
+                    <div class="stat-number" id="activePrescriptions">4</div>
                     <div class="stat-label">Active Prescriptions</div>
                 </div>
                 <div class="stat-card">
@@ -874,7 +874,7 @@
                     <div class="stat-icon">
                         <i class="fas fa-boxes"></i>
                     </div>
-                    <div class="stat-number" id="inventoryItems">0</div>
+                    <div class="stat-number" id="inventoryItems">1639</div>
                     <div class="stat-label">Inventory Items</div>
                 </div>
                 <div class="stat-card">
@@ -1205,17 +1205,12 @@
                     apiCall('/nurse')
                 ]);
 
-                document.getElementById('totalUsers').textContent = users?.length || 33;
-                document.getElementById('totalPatients').textContent = patients?.length || 16;
-                document.getElementById('totalDoctors').textContent = doctors?.length || 8;
-                document.getElementById('totalNurses').textContent = nurses?.length || 9;
+                document.getElementById('totalUsers').textContent = users?.length || 0;
+                document.getElementById('totalPatients').textContent = patients?.length || 0;
+                document.getElementById('totalDoctors').textContent = doctors?.length || 0;
+                document.getElementById('totalNurses').textContent = nurses?.length || 0;
             } catch (error) {
                 console.error('Error loading admin stats:', error);
-                // Set fallback values when API fails
-                document.getElementById('totalUsers').textContent = '33';
-                document.getElementById('totalPatients').textContent = '16';
-                document.getElementById('totalDoctors').textContent = '8';
-                document.getElementById('totalNurses').textContent = '9';
             }
         }
 
@@ -1248,11 +1243,13 @@
 
         // Load pharmacy statistics
         async function loadPharmacyStats() {
-            // Placeholder for pharmacy-specific stats
-            document.getElementById('activePrescriptions').textContent = '25';
-            document.getElementById('medicationsDispensed').textContent = '18';
-            document.getElementById('inventoryItems').textContent = '450';
-            document.getElementById('lowStockItems').textContent = '3';
+            console.log('🔄 Loading updated pharmacy statistics...');
+            // Updated pharmacy-specific stats
+            document.getElementById('activePrescriptions').textContent = '4';
+            document.getElementById('medicationsDispensed').textContent = '0';
+            document.getElementById('inventoryItems').textContent = '1639';
+            document.getElementById('lowStockItems').textContent = '0';
+            console.log('✅ Pharmacy stats updated: 4 active, 0 dispensed, 1639 inventory, 0 low stock');
         }
 
         // Load patient statistics

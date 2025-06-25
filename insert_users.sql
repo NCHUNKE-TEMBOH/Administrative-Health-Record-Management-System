@@ -35,26 +35,6 @@ INSERT OR IGNORE INTO users (username, email, password_hash, role, first_name, l
 ('patient.davis', 'patient.davis@email.com', 'ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f', 'patient', 'James', 'Davis', '+1-555-0015', 1, 2),
 ('patient.miller', 'patient.miller@email.com', 'ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f', 'patient', 'Patricia', 'Miller', '+1-555-0016', 1, 1);
 
--- Create blockchain tables
-CREATE TABLE IF NOT EXISTS blockchain_blocks (
-    block_index INTEGER PRIMARY KEY,
-    timestamp REAL NOT NULL,
-    data TEXT NOT NULL,
-    previous_hash TEXT NOT NULL,
-    hash TEXT NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE IF NOT EXISTS blockchain_metadata (
-    key TEXT PRIMARY KEY,
-    value TEXT NOT NULL,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-
--- Initialize blockchain metadata
-INSERT OR REPLACE INTO blockchain_metadata (key, value) VALUES
-('initialized', 'true'),
-('version', '1.0'),
-('created_at', datetime('now'));
+-- Blockchain functionality removed
 
 -- Note: All passwords are 'admin123' hashed with SHA256

@@ -3,15 +3,8 @@ from flask import jsonify
 from package.model import conn
 from package.auth import login_required, role_required, patient_access_required, get_current_user, log_access, has_permission
 from datetime import datetime
-import hashlib
 
-# Global blockchain instance - will be set by app.py
-blockchain = None
-
-def set_blockchain_instance(blockchain_instance):
-    """Set the blockchain instance for this module"""
-    global blockchain
-    blockchain = blockchain_instance
+# Removed blockchain functionality
 
 class HealthRecords(Resource):
     """Handle health records operations"""
@@ -101,32 +94,11 @@ class HealthRecords(Resource):
             
             conn.commit()
 
-            # Add to blockchain if available
-            blockchain_success = False
-            if blockchain:
-                try:
-                    blockchain_data = {
-                        'record_id': record_id,
-                        'patient_id': data['pat_id'],  # Use consistent naming
-                        'pat_id': data['pat_id'],
-                        'record_type': data['record_type'],
-                        'title': data['title'],
-                        'content_hash': hashlib.sha256(str(data.get('content', '')).encode()).hexdigest()[:16],
-                        'created_by': current_user['user_id'],
-                        'timestamp': datetime.now().isoformat()
-                    }
-                    block = blockchain.add_health_record(blockchain_data)
-                    blockchain_success = True
-                    print(f"✓ Health record {record_id} added to blockchain (Block #{block.index})")
-                except Exception as e:
-                    print(f"⚠ Warning: Failed to add health record to blockchain: {e}")
-
             log_access(current_user['user_id'], 'CREATE_HEALTH_RECORD', 'HEALTH_RECORD', record_id, data['pat_id'])
 
             response_data = {
                 'message': 'Health record created successfully',
-                'record_id': record_id,
-                'blockchain_recorded': blockchain_success
+                'record_id': record_id
             }
 
             return response_data, 201
@@ -349,35 +321,11 @@ class VitalSigns(Resource):
             
             conn.commit()
 
-            # Add to blockchain if available
-            blockchain_success = False
-            if blockchain:
-                try:
-                    blockchain_data = {
-                        'vital_id': vital_id,
-                        'patient_id': data['pat_id'],  # Use consistent naming
-                        'pat_id': data['pat_id'],
-                        'recorded_by': current_user['user_id'],
-                        'temperature': data.get('temperature'),
-                        'blood_pressure_systolic': data.get('blood_pressure_systolic'),
-                        'blood_pressure_diastolic': data.get('blood_pressure_diastolic'),
-                        'heart_rate': data.get('heart_rate'),
-                        'respiratory_rate': data.get('respiratory_rate'),
-                        'oxygen_saturation': data.get('oxygen_saturation'),
-                        'timestamp': datetime.now().isoformat()
-                    }
-                    block = blockchain.add_vital_signs(blockchain_data)
-                    blockchain_success = True
-                    print(f"✓ Vital signs {vital_id} added to blockchain (Block #{block.index})")
-                except Exception as e:
-                    print(f"⚠ Warning: Failed to add vital signs to blockchain: {e}")
-
             log_access(current_user['user_id'], 'CREATE_VITAL_SIGNS', 'VITAL_SIGNS', vital_id, data['pat_id'])
 
             response_data = {
                 'message': 'Vital signs recorded successfully',
-                'vital_id': vital_id,
-                'blockchain_recorded': blockchain_success
+                'vital_id': vital_id
             }
 
             return response_data, 201

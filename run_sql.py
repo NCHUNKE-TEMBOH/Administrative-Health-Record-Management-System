@@ -22,9 +22,9 @@ print(f"Total users: {len(users)}")
 for user in users:
     print(f"  {user[0]}: {user[1]} ({user[2]}) - {user[3]} {user[4]}")
 
-# Check blockchain tables
-tables = conn.execute("SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 'blockchain%'").fetchall()
-print(f"\nBlockchain tables: {[t[0] for t in tables]}")
+# Check system tables
+tables = conn.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()
+print(f"\nSystem tables: {len(tables)} total")
 
 conn.close()
 print("Done!")

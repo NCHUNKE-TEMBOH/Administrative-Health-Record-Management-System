@@ -83,7 +83,7 @@ def start_application():
         print(f"   Doctor: dr.smith / doctor123")
         print(f"   Nurse: nurse.williams / nurse123")
         print(f"   Patient: patient.doe / patient123")
-        print(f"🔗 Blockchain Dashboard: http://{host}:{port}/blockchain/dashboard.html")
+        print(f"🏥 Health Records Dashboard: http://{host}:{port}/dashboard.html")
         print("=" * 60)
         
         app.run(host=host, port=port, debug=True)

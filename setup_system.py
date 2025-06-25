@@ -96,43 +96,7 @@ def setup_users(conn):
     
     return len(users)
 
-def setup_blockchain_database(conn):
-    """Setup blockchain tables"""
-    print("\n🔗 Setting up blockchain database...")
-    
-    # Create blockchain tables
-    conn.execute('''
-        CREATE TABLE IF NOT EXISTS blockchain_blocks (
-            block_index INTEGER PRIMARY KEY,
-            timestamp REAL NOT NULL,
-            data TEXT NOT NULL,
-            previous_hash TEXT NOT NULL,
-            hash TEXT NOT NULL,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
-    
-    conn.execute('''
-        CREATE TABLE IF NOT EXISTS blockchain_metadata (
-            key TEXT PRIMARY KEY,
-            value TEXT NOT NULL,
-            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
-    
-    # Initialize blockchain metadata
-    conn.execute('''
-        INSERT OR REPLACE INTO blockchain_metadata (key, value)
-        VALUES 
-        ('initialized', 'true'),
-        ('version', '1.0'),
-        ('created_at', datetime('now'))
-    ''')
-    
-    conn.commit()
-    print("   ✓ Blockchain database tables created")
-    
-    return True
+# Blockchain functionality removed
 
 def main():
     print("🏥 Administrative Health Record Management System Setup")
@@ -152,15 +116,13 @@ def main():
         # Setup users
         user_count = setup_users(conn)
         
-        # Setup blockchain database
-        blockchain_setup = setup_blockchain_database(conn)
+        # Blockchain functionality removed
         
         conn.close()
         
         print("\n" + "="*70)
         print("🎉 System setup completed successfully!")
         print(f"📊 {user_count} users available in the system")
-        print("🔗 Blockchain database initialized")
         
         print("\n🔐 Login credentials for testing:")
         print("   Admin: admin / admin123")
@@ -173,7 +135,7 @@ def main():
         print("\n🌐 Access the system:")
         print("   Main App: http://127.0.0.1:5001")
         print("   Login: http://127.0.0.1:5001/login.html")
-        print("   Blockchain: http://127.0.0.1:5001/blockchain/dashboard.html")
+        print("   Dashboard: http://127.0.0.1:5001/dashboard.html")
         
         return True
         

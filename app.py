@@ -21,9 +21,8 @@ from package.lab_results import LabTests, LabTest, LabTestsByPatient, PendingLab
 from package.prescriptions_enhanced import Prescriptions as PrescriptionsEnhanced, Prescription as PrescriptionEnhanced, MedicationDispensing
 from package.medical_notes import MedicalNotes, MedicalNote, NursingNotes, PatientAssignments
 
-# Blockchain module
-from package.blockchain import Blockchain
-import package.health_records as health_records_module
+# Blockchain module removed - not available
+# import package.health_records as health_records_module
 
 import json
 import os
@@ -35,12 +34,12 @@ app = Flask(__name__, static_url_path='')
 app.secret_key = config.get('secret_key', 'your-secret-key-change-this')
 api = Api(app)
 
-# Initialize blockchain
-blockchain = Blockchain(config['database'])
-print(f"🔗 Blockchain initialized with {len(blockchain.chain)} blocks")
+# Blockchain initialization removed - not available
+# blockchain = Blockchain(config['database'])
+# print(f"🔗 Blockchain initialized with {len(blockchain.chain)} blocks")
 
 # Set blockchain instance for health records module
-health_records_module.set_blockchain_instance(blockchain)
+# health_records_module.set_blockchain_instance(blockchain)
 
 # Existing API endpoints
 api.add_resource(Patients, '/patient', '/patients')  # Support both endpoints
@@ -265,73 +264,8 @@ def get_users_debug():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# Blockchain API endpoints
-@app.route('/api/blockchain/chain')
-def get_blockchain_chain():
-    """Get the complete blockchain"""
-    try:
-        if blockchain:
-            return jsonify({
-                'chain': blockchain.to_list(),
-                'length': len(blockchain.chain),
-                'valid': blockchain.is_chain_valid()
-            })
-        else:
-            return jsonify({'error': 'Blockchain not initialized'}), 500
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-@app.route('/api/blockchain/validate')
-def validate_blockchain():
-    """Validate the blockchain"""
-    try:
-        if blockchain:
-            is_valid = blockchain.is_chain_valid()
-            stats = blockchain.get_blockchain_stats()
-            return jsonify({
-                'valid': is_valid,
-                'stats': stats
-            })
-        else:
-            return jsonify({'error': 'Blockchain not initialized'}), 500
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-@app.route('/api/blockchain/stats')
-def get_blockchain_stats():
-    """Get blockchain statistics"""
-    try:
-        if blockchain:
-            stats = blockchain.get_blockchain_stats()
-            db_stats = blockchain.get_database_stats()
-            return jsonify({
-                'blockchain_stats': stats,
-                'database_stats': db_stats
-            })
-        else:
-            return jsonify({'error': 'Blockchain not initialized'}), 500
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-@app.route('/api/blockchain/add', methods=['POST'])
-def add_to_blockchain():
-    """Add a record to the blockchain"""
-    try:
-        if not blockchain:
-            return jsonify({'error': 'Blockchain not initialized'}), 500
-
-        data = request.get_json()
-        if not data:
-            return jsonify({'error': 'No data provided'}), 400
-
-        block = blockchain.add_block(data)
-        return jsonify({
-            'message': 'Block added successfully',
-            'block': block.to_dict()
-        }), 201
-
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+# Blockchain API endpoints removed - not available
+# All blockchain functionality has been disabled
 
 
 if __name__ == '__main__':

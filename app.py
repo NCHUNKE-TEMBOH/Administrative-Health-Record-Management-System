@@ -1,7 +1,23 @@
-from flask import Flask, send_from_directory, render_template, session, request, jsonify
-from flask_restful import Resource, Api
+from flask import Flask, send_from_directory, request, jsonify
+from flask_restful import Api
+from prometheus_flask_exporter import PrometheusMetrics
+import json
+import os
 
-# Existing modules
+# Load config once
+with open('config.json') as data_file:
+    config = json.load(data_file)
+
+# Initialize Flask app once
+app = Flask(__name__, static_url_path='')
+
+# Set secret key
+app.secret_key = config.get('secret_key', 'your-secret-key-change-this')
+
+# Initialize Flask RESTful API on this app
+api = Api(app)
+
+# Import modules AFTER app created
 from package.patient import Patients, Patient
 from package.doctor import Doctors, Doctor
 from package.appointment import Appointments, Appointment
@@ -14,39 +30,28 @@ from package.procedure import Procedure, Procedures
 from package.prescribes import Prescribes, Prescribe
 from package.undergoes import Undergoess, Undergoes
 
-# New health record management modules
-from package.user_management import UserLogin, UserProfile, Users, User, ChangePassword, UserRegistration, UserRegistration
+from package.user_management import UserLogin, UserProfile, Users, User, ChangePassword, UserRegistration
 from package.health_records import HealthRecords, HealthRecord, VitalSigns
 from package.lab_results import LabTests, LabTest, LabTestsByPatient, PendingLabTests
 from package.prescriptions_enhanced import Prescriptions as PrescriptionsEnhanced, Prescription as PrescriptionEnhanced, MedicationDispensing
 from package.medical_notes import MedicalNotes, MedicalNote, NursingNotes, PatientAssignments
 
-# Blockchain module removed - not available
-# import package.health_records as health_records_module
+from package.blockchain import Blockchain
+import package.health_records as health_records_module
 
-import json
-import os
-
-with open('config.json') as data_file:
-    config = json.load(data_file)
-
-app = Flask(__name__, static_url_path='')
-app.secret_key = config.get('secret_key', 'your-secret-key-change-this')
-api = Api(app)
-
-# Blockchain initialization removed - not available
-# blockchain = Blockchain(config['database'])
-# print(f"🔗 Blockchain initialized with {len(blockchain.chain)} blocks")
+# Initialize blockchain once
+blockchain = Blockchain(config['database'])
+print(f"🔗 Blockchain initialized with {len(blockchain.chain)} blocks")
 
 # Set blockchain instance for health records module
-# health_records_module.set_blockchain_instance(blockchain)
+health_records_module.set_blockchain_instance(blockchain)
 
-# Existing API endpoints
-api.add_resource(Patients, '/patient', '/patients')  # Support both endpoints
+# Register API resources
+api.add_resource(Patients, '/patient', '/patients')
 api.add_resource(Patient, '/patient/<int:id>', '/patients/<int:id>')
 api.add_resource(Doctors, '/doctor')
 api.add_resource(Doctor, '/doctor/<int:id>')
-api.add_resource(Appointments, '/appointment', '/appointments')  # Support both endpoints
+api.add_resource(Appointments, '/appointment', '/appointments')
 api.add_resource(Appointment, '/appointment/<int:id>', '/appointments/<int:id>')
 api.add_resource(Common, '/common')
 api.add_resource(Medications, '/medication')
@@ -62,7 +67,6 @@ api.add_resource(Procedure, '/procedure/<int:code>')
 api.add_resource(Prescribes, '/prescribes')
 api.add_resource(Undergoess, '/undergoes')
 
-# Authentication and User Management
 api.add_resource(UserLogin, '/auth/login')
 api.add_resource(UserRegistration, '/auth/register')
 api.add_resource(UserProfile, '/auth/profile')
@@ -70,41 +74,32 @@ api.add_resource(ChangePassword, '/auth/change-password')
 api.add_resource(Users, '/users')
 api.add_resource(User, '/users/<int:user_id>')
 
-# Health Records Management
 api.add_resource(HealthRecords, '/health-records')
 api.add_resource(HealthRecord, '/health-records/<int:record_id>')
 api.add_resource(VitalSigns, '/vital-signs')
 
-# Lab Tests Management
 api.add_resource(LabTests, '/lab-tests')
 api.add_resource(LabTest, '/lab-tests/<int:test_id>')
 api.add_resource(LabTestsByPatient, '/lab-tests/patient/<int:patient_id>')
 api.add_resource(PendingLabTests, '/lab-tests/pending')
 
-# Enhanced Prescriptions Management
 api.add_resource(PrescriptionsEnhanced, '/prescriptions')
 api.add_resource(PrescriptionEnhanced, '/prescriptions/<int:prescription_id>')
 api.add_resource(MedicationDispensing, '/medication-dispensing')
 
-# Medical and Nursing Notes
 api.add_resource(MedicalNotes, '/medical-notes')
 api.add_resource(MedicalNote, '/medical-notes/<int:note_id>')
 api.add_resource(NursingNotes, '/nursing-notes')
 api.add_resource(PatientAssignments, '/patient-assignments')
 
-# Routes
-
+# Static file routes
 @app.route('/favicon.ico')
 def favicon():
-    return send_from_directory(os.path.join(app.root_path, 'static'),
-                          'favicon.ico',mimetype='image/vnd.microsoft.icon')
+    return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 @app.route('/')
-def index():
-    return app.send_static_file('index.html')
-
 @app.route('/home.html')
-def home_page():
+def index():
     return app.send_static_file('index.html')
 
 @app.route('/login.html')
@@ -232,7 +227,6 @@ def patient_lab_results():
 # Debug Users endpoint
 @app.route('/api/users-debug')
 def get_users_debug():
-    """Simple users endpoint for debugging"""
     try:
         from package.model import conn
         users_rows = conn.execute("""
@@ -264,19 +258,80 @@ def get_users_debug():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# Blockchain API endpoints removed - not available
-# All blockchain functionality has been disabled
+# Blockchain API endpoints
+@app.route('/api/blockchain/chain')
+def get_blockchain_chain():
+    try:
+        if blockchain:
+            return jsonify({
+                'chain': blockchain.to_list(),
+                'length': len(blockchain.chain),
+                'valid': blockchain.is_chain_valid()
+            })
+        else:
+            return jsonify({'error': 'Blockchain not initialized'}), 500
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
+@app.route('/api/blockchain/validate')
+def validate_blockchain():
+    try:
+        if blockchain:
+            is_valid = blockchain.is_chain_valid()
+            stats = blockchain.get_blockchain_stats()
+            return jsonify({
+                'valid': is_valid,
+                'stats': stats
+            })
+        else:
+            return jsonify({'error': 'Blockchain not initialized'}), 500
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/blockchain/stats')
+def get_blockchain_stats():
+    try:
+        if blockchain:
+            stats = blockchain.get_blockchain_stats()
+            db_stats = blockchain.get_database_stats()
+            return jsonify({
+                'blockchain_stats': stats,
+                'database_stats': db_stats
+            })
+        else:
+            return jsonify({'error': 'Blockchain not initialized'}), 500
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/blockchain/add', methods=['POST'])
+def add_to_blockchain():
+    try:
+        if not blockchain:
+            return jsonify({'error': 'Blockchain not initialized'}), 500
+
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+
+        block = blockchain.add_block(data)
+        return jsonify({
+            'message': 'Block added successfully',
+            'block': block.to_dict()
+        }), 201
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# Prometheus metrics setup
+metrics = PrometheusMetrics(app, path="/metrics")
 
 if __name__ == '__main__':
-    import os
-    # Use environment variables for Docker deployment
-    host = os.getenv('FLASK_HOST', config['host'])
-    port = int(os.getenv('FLASK_PORT', config['port']))
+    host = os.getenv('FLASK_HOST', config.get('host', '0.0.0.0'))
+    port = int(os.getenv('FLASK_PORT', config.get('port', 5001)))
     debug = os.getenv('FLASK_ENV', 'production') != 'production'
 
-    print(f"🏥 Starting medicare Health Record Management System...")
-    print(f"🌐 Server: http://{host}:{port}")
-    print(f"🔧 Environment: {'Development' if debug else 'Production'}")
+    print(f" Starting medicare Health Record Management System...")
+    print(f" Server: http://{host}:{port}")
+    print(f" Environment: {'Development' if debug else 'Production'}")
 
     app.run(host=host, port=port, debug=debug)

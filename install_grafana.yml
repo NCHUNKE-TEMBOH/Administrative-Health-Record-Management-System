@@ -1,0 +1,29 @@
+- name: Install and start Grafana
+  hosts: localhost
+  become: yes
+  tasks:
+    - name: Install required dependencies
+      apt:
+        name: [apt-transport-https, software-properties-common, wget]
+        state: present
+
+    - name: Add Grafana APT key
+      shell: wget -q -O - https://packages.grafana.com/gpg.key | apt-key add -
+
+    - name: Add Grafana repo
+      apt_repository:
+        repo: 'deb https://packages.grafana.com/oss/deb stable main'
+        state: present
+        filename: 'grafana'
+
+    - name: Install Grafana
+      apt:
+        name: grafana
+        state: present
+        update_cache: yes
+
+    - name: Ensure Grafana is running
+      service:
+        name: grafana-server
+        state: started
+        enabled: yes

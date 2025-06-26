@@ -1,0 +1,87 @@
+{
+  "generated_at": "2025-06-26T06:27:56.341636",
+  "project": "Administrative Health Record Management System",
+  "test_summary": {
+    "total_tests": 0,
+    "passed": 0,
+    "failed": 0,
+    "skipped": 0,
+    "errors": 0,
+    "execution_time": "0s"
+  },
+  "coverage_summary": {
+    "total_coverage": 0,
+    "line_coverage": 0,
+    "branch_coverage": 0,
+    "files_covered": 0,
+    "lines_covered": 0,
+    "lines_total": 0
+  },
+  "test_results": {
+    "unit_tests": {
+      "status": "not_run",
+      "count": 0,
+      "passed": 0,
+      "failed": 0
+    },
+    "integration_tests": {
+      "status": "not_run",
+      "count": 0,
+      "passed": 0,
+      "failed": 0
+    },
+    "e2e_tests": {
+      "status": "not_run",
+      "count": 0,
+      "passed": 0,
+      "failed": 0
+    },
+    "security_tests": {
+      "status": "not_run",
+      "count": 0,
+      "passed": 0,
+      "failed": 0
+    }
+  },
+  "security_analysis": {
+    "bandit_scan": {
+      "status": "not_run",
+      "issues": []
+    },
+    "dependency_check": {
+      "status": "not_run",
+      "vulnerabilities": []
+    },
+    "security_tests": {
+      "status": "not_run",
+      "passed": 0,
+      "failed": 0
+    }
+  },
+  "recommendations": [
+    {
+      "category": "Coverage",
+      "priority": "High",
+      "issue": "Code coverage is 0.0%, below the 80% target",
+      "recommendation": "Add more unit tests to increase code coverage, focusing on untested modules"
+    },
+    {
+      "category": "Test Count",
+      "priority": "Medium",
+      "issue": "Only 0 tests found, may not be sufficient",
+      "recommendation": "Consider adding more comprehensive test cases for all modules"
+    },
+    {
+      "category": "Security",
+      "priority": "Medium",
+      "issue": "Security analysis not performed",
+      "recommendation": "Run security scans using tools like Bandit to identify potential vulnerabilities"
+    },
+    {
+      "category": "Performance",
+      "priority": "Low",
+      "issue": "Performance testing not implemented",
+      "recommendation": "Add performance tests to ensure API response times meet requirements"
+    }
+  ]
+}

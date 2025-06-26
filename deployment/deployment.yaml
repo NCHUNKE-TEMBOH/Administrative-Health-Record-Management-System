@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pulsecare
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: pulsecare
+  template:
+    metadata:
+      labels:
+        app: pulsecare
+    spec:
+      containers:
+        name: pulsecare-container
+        image: alphafrederic94/pulsecare:latest
+        ports:
+        containerPort: 5001
